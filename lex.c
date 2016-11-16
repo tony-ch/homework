@@ -2,21 +2,28 @@
 FILE* fin=NULL;//源文件
 FILE* fout=NULL;//结果文件
 char ch=' ';//最新读入的字符!需要初始化
-char buf[2][BUFSZ]={{EOF},{EOF}};
-int bufsel=1;//sel first buf//!先选前一部分
-int bufidx=0;//buf index
-int lcnt=1;//line num
-int lidx=0;//line index
+//char buf[2][BUFSZ]={{EOF},{EOF}};
+char line[LLEN];
+//int bufsel=1;//sel first buf//!先选前一部分
+//int bufidx=0;//buf index
+int lcnt=0;//line num
+//int lidx=0;//line index
+int lleng=0;
+int ccnt=0;
 int ecnt=0;//err cnt;
 char* key[KEYNO];//保留字
 enum symbol ksym[KEYNO];//保留字
 char punc[SPSN];//分隔符号
 char* emsg[ERRMAX];
 int err[ERRMAX][3];
-char token[STRMAX];
-int num=0;
+//char token[STRMAX];
 
-int dirtyBufFlag[2]={1,1};
+//struct symStru sym;
+struct symStru symBuf[3];
+int symBufIdx=0;
+//int num=0;
+
+//int dirtyBufFlag[2]={1,1};
 
 char* symbolstr[]={"CONSTSY","INTSY","CHARSY","VOIDSY","MAINSY","IFSY","ELSESY","WHILESY","SWITCHSY","CASESY","DEFAULTSY","SCANFSY","PRINTFSY","RETURNSY",
 "PLUS","MINUS","MUL","DIVD","LES","GTR","BECOME","SEMICOLON ","COMMA","LPARENT","RPARENT","LBRACK","RBRACK","LBRACE","RBRACE","COLON",
@@ -24,16 +31,10 @@ char* symbolstr[]={"CONSTSY","INTSY","CHARSY","VOIDSY","MAINSY","IFSY","ELSESY",
 "IDENT","UNSIGNUM","ZERO",
 "CHARCON","STRCON",
 "NUL"};
-
+/*
 void getch(){//读取下一个字符，存放到ch中
     int i=0;
     if(buf[bufsel][bufidx]==EOF){//一行结束
-        //printf("%c\n",ch);
-        /*if(feof(fin)){//!todo
-            fclose(fin);
-            fclose(fout);
-            exit(1);
-        }*/
         dirtyBufFlag[bufsel]=1;
         if(dirtyBufFlag[1-bufsel]){
             //fprintf(fout,"line:%d,col:%d,ch:%c\n",lcnt,lidx,ch);
@@ -59,9 +60,36 @@ void getch(){//读取下一个字符，存放到ch中
     }
     lidx=lidx+1;
 }
-int isFirst=1;
+*/
+
+void getch(){//读取下一个字符，存放到ch中
+    if(ccnt==lleng){//一行结束
+        /*if(feof(fin)){
+            //fputs("program ends",fout);
+            fclose(fin);
+            fclose(fout);
+            exit(0);
+        }*/
+        if(feof(fin)){
+            ch=EOF;
+            return;
+        }
+        lcnt=lcnt+1;
+        ccnt=0;
+        lleng=0;
+        while((ch=fgetc(fin))!=EOF && ch!='\n'){
+            line[lleng]=ch;
+            lleng=lleng+1;
+        }
+        line[lleng]=' ';
+        lleng=lleng+1;
+    }
+    ch=line[ccnt];
+    ccnt=ccnt+1;
+}
+
 void getsym(){
-    if(!isFirst){
+    /*if(!isFirst){
         fprintf(fout,"%-10s:\t\t%s\n",symbolstr[sym],token);
     }
     isFirst=0;
@@ -70,32 +98,35 @@ void getsym(){
         fclose(fout);
         exit(1);
     }
+    */
     while(isspace(ch)){
         getch();
     }
+    symBuf[symBufIdx].lin=lcnt;
+    symBuf[symBufIdx].col=ccnt;
     if(isalpha(ch)||ch=='_'){
         int i=0,j=0;
         do{
             if(i<=ALENMAX-3){
-                token[i]=tolower(ch);//!to_lower
+                symBuf[symBufIdx].token[i]=tolower(ch);//!to_lower
                 i++;
             }
             getch();
         }while(isalpha(ch) || isdigit(ch) || ch=='_' );
-        token[i]=0;
+        symBuf[symBufIdx].token[i]=0;
         for(j=0;j<KEYNO;j++){
-            if(strcmp(token,key[j])==0){
-                sym=ksym[j];
+            if(strcmp(symBuf[symBufIdx].token,key[j])==0){
+                symBuf[symBufIdx].id=ksym[j];
                 break;
             }
         }
         if(j==KEYNO){
-            sym=ident;
+            symBuf[symBufIdx].id=ident;
         }
     }else if(ch=='0'){
-        sym=zero;
-        token[0]='0';token[1]=0;
-        num=0;
+        symBuf[symBufIdx].id=zero;
+        symBuf[symBufIdx].token[0]='0';symBuf[symBufIdx].token[1]=0;
+        //num=0;
         getch();
         if(isdigit(ch)){
             error(1);//todo
@@ -105,19 +136,19 @@ void getsym(){
         }
     }else if(isdigit(ch)){
         int i=0;
-        sym=unsignum;
-        num=0;
+        symBuf[symBufIdx].id=unsignum;
+        //num=0;
         while(isdigit(ch)){
             if(i<NMAX){//!NMAX
-                token[i]=ch;
+                symBuf[symBufIdx].token[i]=ch;
                 i++;
-                num=num*10+(ch-'0');
+                //num=num*10+(ch-'0');
             }else{
                 error(1);//todo
             }
             getch();
         }
-        token[i]=0;
+        symBuf[symBufIdx].token[i]=0;
     }else if(ch=='\''){
         char con=' ';
         getch();
@@ -125,34 +156,34 @@ void getsym(){
             con=ch;
             getch();
             if(ch=='\''){
-                sym=charcon;
-                token[0]='\'';token[1]=con;token[2]='\'';token[3]=0;
+                symBuf[symBufIdx].id=charcon;
+                symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=con;symBuf[symBufIdx].token[2]='\'';symBuf[symBufIdx].token[3]=0;
                 getch();
             }else{
                 error(1);//todo;
                 if(ch=='\"'){//!
-                    sym=charcon;
-                    token[0]='\'';token[1]=con;token[2]='\'';token[3]=0;
+                    symBuf[symBufIdx].id=charcon;
+                    symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=con;symBuf[symBufIdx].token[2]='\'';symBuf[symBufIdx].token[3]=0;
                     getch();
                 }else{
-                    sym=nul;
-                    token[0]='\'';
-                    token[1]=ch;
-                    token[2]=0;
+                    symBuf[symBufIdx].id=nul;
+                    symBuf[symBufIdx].token[0]='\'';
+                    symBuf[symBufIdx].token[1]=ch;
+                    symBuf[symBufIdx].token[2]=0;
                 }
             }
         }else{
             error(1);//todo
-            sym=nul;
-            token[0]='\'';token[1]=0;
+            symBuf[symBufIdx].id=nul;
+            symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=0;
         }
     }else if(ch=='\"'){
         int i=0;
-        sym=strcon;
+        symBuf[symBufIdx].id=strcon;
         do{
             if(ch>=32 && ch<=126 && ch!=33){
                 if(i<=STRMAX-3){
-                    token[i]=ch;
+                    symBuf[symBufIdx].token[i]=ch;
                     i++;
                 }
             }else{
@@ -160,112 +191,147 @@ void getsym(){
             }
             getch();
         }while(ch!='\"');
-        token[i]='\"';
+        symBuf[symBufIdx].token[i]='\"';
         getch();//！需要再读一个字符
         i++;
-        token[i]=0;
+        symBuf[symBufIdx].token[i]=0;
     }else if(ch=='<'){
         getch();
         if(ch=='='){
-            token[0]='<';token[1]='=';token[2]=0;
-            sym=leq;
+            symBuf[symBufIdx].token[0]='<';symBuf[symBufIdx].token[1]='=';symBuf[symBufIdx].token[2]=0;
+            symBuf[symBufIdx].id=leq;
             getch();
         }else{
-            token[0]='<';token[1]=0;
-            sym=les;
+            symBuf[symBufIdx].token[0]='<';symBuf[symBufIdx].token[1]=0;
+            symBuf[symBufIdx].id=les;
         }
     }else if(ch=='>'){
         getch();
         if(ch=='='){
-            token[0]='>';token[1]='=';token[2]=0;
-            sym=geq;
+            symBuf[symBufIdx].token[0]='>';symBuf[symBufIdx].token[1]='=';symBuf[symBufIdx].token[2]=0;
+            symBuf[symBufIdx].id=geq;
             getch();
         }else{
-            token[0]='>';token[1]=0;
-            sym=gtr;
+            symBuf[symBufIdx].token[0]='>';symBuf[symBufIdx].token[1]=0;
+            symBuf[symBufIdx].id=gtr;
         }
     }else if(ch=='!'){
         getch();
         if(ch=='='){
-            sym=neq;
-            token[0]='!';
-            token[1]='=';
-            token[2]=0;
+            symBuf[symBufIdx].id=neq;
+            symBuf[symBufIdx].token[0]='!';
+            symBuf[symBufIdx].token[1]='=';
+            symBuf[symBufIdx].token[2]=0;
             getch();
         }else{
             error(1);//todo
-            sym=nul;
-            token[0]=ch;token[1]=0;
+            symBuf[symBufIdx].id=nul;
+            symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         }
     }else if(ch=='='){
         getch();
         if(ch=='='){
-            sym=eql;
-            token[0]='=';
-            token[1]='=';
-            token[2]=0;
+            symBuf[symBufIdx].id=eql;
+            symBuf[symBufIdx].token[0]='=';
+            symBuf[symBufIdx].token[1]='=';
+            symBuf[symBufIdx].token[2]=0;
             getch();
         }else{
-            sym=become;
-            token[0]='=';
-            token[1]=0;
+            symBuf[symBufIdx].id=become;
+            symBuf[symBufIdx].token[0]='=';
+            symBuf[symBufIdx].token[1]=0;
         }
     }else if(ch=='+'){
-        sym=plus;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=plus;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='-'){
-        sym=minus;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=minus;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='*'){
-        sym=mul;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=mul;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='/'){
-        sym=divd;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=divd;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch==';'){
-        sym=semicolon;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=semicolon;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch==','){
-        sym=comma;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=comma;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='('){
-        sym=lparent;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=lparent;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch==')'){
-        sym=rparent;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=rparent;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='['){
-        sym=lbrack;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=lbrack;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch==']'){
-        sym=rbrack;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=rbrack;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='{'){
-        sym=lbrace;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=lbrace;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch=='}'){
-        sym=rbrace;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=rbrace;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else if(ch==':'){
-        sym=colon;
-        token[0]=ch;token[1]=0;
+        symBuf[symBufIdx].id=colon;
+        symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
         getch();
     }else{
-        error(0);//todo
-        sym=nul;
-        token[0]=ch;token[1]=0;
-        getch();
+        if(ch==EOF){
+            symBuf[symBufIdx].id=eofs;
+        }else{
+            error(0);//todo
+            symBuf[symBufIdx].id=nul;
+            symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
+            getch();
+        }
     }
+}
+
+void initSymBuf(){
+    for(symBufIdx=0;symBufIdx<3;symBufIdx++){
+        do{
+            getsym();
+        }while(symBuf[symBufIdx].id==nul);
+    }
+	symBufIdx=0;
+}
+
+void updateSymBuf(){
+	fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+    do{
+        getsym();
+    }while(symBuf[symBufIdx].id==nul);
+    symBufIdx+=1;
+    if(symBuf[symBufIdx].id==eofs){
+        error(1);//!todo
+        fprintf(fout,"incomplete source file.\n");
+        fclose(fin);
+        fclose(fout);
+        exit(1);
+    }
+    if(symBufIdx==3){
+        symBufIdx=0;
+    }
+}
+
+int reachEof(){
+    return(symBuf[(symBufIdx+1)%1].id==eofs);
 }

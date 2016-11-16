@@ -1,16 +1,18 @@
 # depslib dependency file v1.0
-1479217362 source:d:\c\compile\main.c
+1479306150 source:d:\c\compile\main.c
 	"global.h"
 
-1479220930 d:\c\compile\global.h
+1479306115 d:\c\compile\global.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 
-1479227555 source:d:\c\compile\lex.c
+1479306093 source:d:\c\compile\lex.c
 	"global.h"
 
-1479230066 source:d:\c\compile\syntax.c
+1479304125 source:d:\c\compile\syntax.c
 	"global.h"
+
+1479305336 d:\c\compile\error.h
 

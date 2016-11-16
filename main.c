@@ -24,9 +24,12 @@ int main()
     /*while(1){
         getsym();
     }*/
-    getsym();
+    //getsym();
+    initSymBuf();
     program();
-
+    if(!reachEof()){
+        fprintf(fout,"there should be nothing after main func.\n");
+    }
     fclose(fin);
     fclose(fout);
     return 0;
@@ -86,11 +89,11 @@ void setup(){
 
 void error(int n){
     if(ecnt<ERRMAX){
-        err[ecnt][0]=lcnt;
-        err[ecnt][1]=lidx;
+        err[ecnt][0]=symBuf[symBufIdx].lin;
+        err[ecnt][1]=symBuf[symBufIdx].col;
         err[ecnt][2]=n;
     }
-    fprintf(fout,"line:%d col:%d errno:%d %s\n",lcnt,lidx,n,emsg[n]);
+    fprintf(fout,"line:%d col:%d errno:%d %s\n",symBuf[symBufIdx].lin,symBuf[symBufIdx].col,n,emsg[n]);
     ecnt=ecnt+1;
 }
 
