@@ -31,7 +31,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="global.h" />
+		<Unit filename="lex.c">
+			<Option compilerVar="CC" />
+		</Unit>
 		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="syntax.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Extensions>
