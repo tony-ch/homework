@@ -21,9 +21,11 @@ int main()
     }
 
     setup();
-    while(1){
+    /*while(1){
         getsym();
-    }
+    }*/
+    getsym();
+    program();
 
     fclose(fin);
     fclose(fout);
@@ -78,16 +80,17 @@ void setup(){
     punc[15]=':';
     */
     emsg[0]="invalid character";
-    emsg[1]=" ";
+    emsg[1]="lex error";
+    emsg[2]="syn error";
 }
 
 void error(int n){
     if(ecnt<ERRMAX){
         err[ecnt][0]=lcnt;
-        err[ecnt][1]=ccnt;
+        err[ecnt][1]=lidx;
         err[ecnt][2]=n;
     }
-    fprintf(fout,"line:%d col:%d errno:%d %s\n",lcnt,ccnt,n,emsg[n]);
+    fprintf(fout,"line:%d col:%d errno:%d %s\n",lcnt,lidx,n,emsg[n]);
     ecnt=ecnt+1;
 }
 

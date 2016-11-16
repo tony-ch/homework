@@ -10,6 +10,7 @@
 #define PATHLEN 100//
 #define KEYNO 14//number of key words
 #define LLEN 200//line len limit
+#define BUFSZ 10//inout buf size
 #define SPSN 16//punc num
 #define ERRMAX 30// max err num
 #define ALENMAX 15//id len max
@@ -24,10 +25,11 @@ extern char* symbolstr[SYMNUM];
 extern FILE* fin;//源文件
 extern FILE* fout;//结果文件
 extern char ch;//最新读入的字符!需要初始化
-extern char line[LLEN];
+extern char buf[2][BUFSZ];
+extern int bufsel;//select buf
+extern int bufidx;//buf index
 extern int lcnt;//line num
-extern int lleng;//line index
-extern int ccnt;//ch cnt;
+extern int lidx;//line index
 extern int ecnt;//err cnt;
 
 extern char* key[KEYNO];//保留字
@@ -59,6 +61,9 @@ struct tabrecord tab[TMAX];
 extern int tidx;//tab index
 */
 
+
+void saveState();
+void recState();
 void program();
 void decConst();
 void constDef();
@@ -66,6 +71,7 @@ void decVar();
 void varDef();
 void numDef();
 void retFuncDef();
+void voidFuncDef();
 void paraList();
 void mainDef();
 void valueParaList();

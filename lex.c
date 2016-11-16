@@ -2,10 +2,11 @@
 FILE* fin=NULL;//源文件
 FILE* fout=NULL;//结果文件
 char ch=' ';//最新读入的字符!需要初始化
-char line[LLEN];
-int lcnt=0;//line num
-int lleng=0;//line index
-int ccnt=0;//ch cnt;
+char buf[2][BUFSZ]={{EOF},{EOF}};
+int bufsel=1;//sel first buf//!先选前一部分
+int bufidx=0;//buf index
+int lcnt=1;//line num
+int lidx=0;//line index
 int ecnt=0;//err cnt;
 char* key[KEYNO];//保留字
 enum symbol ksym[KEYNO];//保留字
@@ -15,6 +16,8 @@ int err[ERRMAX][3];
 char token[STRMAX];
 int num=0;
 
+int dirtyBufFlag[2]={1,1};
+
 char* symbolstr[]={"CONSTSY","INTSY","CHARSY","VOIDSY","MAINSY","IFSY","ELSESY","WHILESY","SWITCHSY","CASESY","DEFAULTSY","SCANFSY","PRINTFSY","RETURNSY",
 "PLUS","MINUS","MUL","DIVD","LES","GTR","BECOME","SEMICOLON ","COMMA","LPARENT","RPARENT","LBRACK","RBRACK","LBRACE","RBRACE","COLON",
 "LEQ","GEQ","NEQ","EQL",
@@ -23,28 +26,50 @@ char* symbolstr[]={"CONSTSY","INTSY","CHARSY","VOIDSY","MAINSY","IFSY","ELSESY",
 "NUL"};
 
 void getch(){//读取下一个字符，存放到ch中
-    if(ccnt==lleng){//一行结束
-        if(feof(fin)){
-            //fputs("program ends",fout);
+    int i=0;
+    if(buf[bufsel][bufidx]==EOF){//一行结束
+        //printf("%c\n",ch);
+        /*if(feof(fin)){//!todo
             fclose(fin);
             fclose(fout);
-            exit(0);
+            exit(1);
+        }*/
+        dirtyBufFlag[bufsel]=1;
+        if(dirtyBufFlag[1-bufsel]){
+            //fprintf(fout,"line:%d,col:%d,ch:%c\n",lcnt,lidx,ch);
+            bufsel=1-bufsel;
+            bufidx=0;
+            while( i<BUFSZ-1 && (ch=fgetc(fin))!=EOF){//!先判断下标再读入
+                buf[bufsel][i]=ch;
+                i=i+1;
+            }
+            buf[bufsel][i]=EOF;
+            dirtyBufFlag[bufsel]=0;
+        }else{
+            bufsel=1-bufsel;
+            bufidx=0;
         }
-        lcnt=lcnt+1;
-        ccnt=0;
-        lleng=0;
-        while((ch=fgetc(fin))!=EOF && ch!='\n'){
-            line[lleng]=ch;
-            lleng=lleng+1;
-        }
-        line[lleng]=' ';
-        lleng=lleng+1;
     }
-    ch=line[ccnt];
-    ccnt=ccnt+1;
+    ch=buf[bufsel][bufidx];
+    bufidx=bufidx+1;
+    if(ch=='\n'){//换行
+        lcnt=lcnt+1;
+        lidx=0;
+        ch=' ';
+    }
+    lidx=lidx+1;
 }
-
+int isFirst=1;
 void getsym(){
+    if(!isFirst){
+        fprintf(fout,"%-10s:\t\t%s\n",symbolstr[sym],token);
+    }
+    isFirst=0;
+    if(ch==EOF){//!todo
+        fclose(fin);
+        fclose(fout);
+        exit(1);
+    }
     while(isspace(ch)){
         getch();
     }
@@ -243,5 +268,4 @@ void getsym(){
         token[0]=ch;token[1]=0;
         getch();
     }
-    fprintf(fout,"%-10s:\t\t%s\n",symbolstr[sym],token);
 }

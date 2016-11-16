@@ -1,10 +1,100 @@
 #include "global.h"
-
+int tempBufSel;
+int tempBufIdx;
+int tempLcnt;
+int tempLidx;
+char tempCh;
+enum symbol tempSym;
+int tempNum;
+char tempToken[STRMAX];
 void program(){
-    if(sym==constsy){
+    if(sym==constsy){//!Í··ûºÅÎªconst
         decConst();
     }
 
+    while(sym==intsy || sym==charsy){
+        saveState();//!in while body
+        getsym();
+        if(sym!=ident){
+            error(2);//todoÓ¦ÊÇ±êÊ¶·û
+            return;
+        }
+        getsym();
+        if(sym==lparent){//!ÊÇº¯Êý¶¨Òå
+            recState();
+            break;
+        }else{
+            recState();
+            varDef();
+            if(sym!=semicolon){
+                error(2);//Ó¦ÊÇ·ÖºÅ
+                return;
+            }
+            getsym();//!read one more sym
+        }
+    }
+    while(1){
+        saveState();//!in while body
+        if(sym==voidsy){
+            getsym();
+            if(sym==mainsy){//!ÊÇmainº¯Êý
+                recState();
+                break;
+            }else{
+                recState();
+                voidFuncDef();
+            }
+        }else if(sym==charsy || sym==intsy){//!Í··ûºÅÎª{char int}
+            retFuncDef();
+        }else{
+            error(2);//todo
+            return;
+        }
+    }
+    mainDef();
+    fprintf(fout,"\t\tthis is a program.\n");
+}
+
+void saveState(){
+    fprintf(fout,"\t\tsave stat.\n");
+    /*fprintf(fout,"\t\tbufsel:%d\n",bufsel);
+    fprintf(fout,"\t\tbufidx:%d\n",bufidx);
+    fprintf(fout,"\t\tlcnt:%d\n",lcnt);
+    fprintf(fout,"\t\tlidx:%d\n",lidx);
+    fprintf(fout,"\t\tch:%c\n",ch);
+    fprintf(fout,"\t\tsym:%s\n",symbolstr[sym]);*/
+    tempBufSel=bufsel;
+    tempBufIdx=bufidx;
+    tempLcnt=lcnt;
+    tempLidx=lidx;
+    tempCh=ch;
+    tempSym=sym;
+    tempNum=num;
+    strcpy(tempToken,token);
+}
+void recState(){
+    fprintf(fout,"\t\trec stat.\n");
+    /*fprintf(fout,"\t\tbufsel:%d\n",bufsel);
+    fprintf(fout,"\t\tbufidx:%d\n",bufidx);
+    fprintf(fout,"\t\tlcnt:%d\n",lcnt);
+    fprintf(fout,"\t\tlidx:%d\n",lidx);
+    fprintf(fout,"\t\tch:%c\n",ch);
+    fprintf(fout,"\t\tsym:%s\n",symbolstr[sym]);*/
+    bufsel=tempBufSel;
+    bufidx=tempBufIdx;
+    lcnt=tempLcnt;
+    lidx=tempLidx;
+    ch=tempCh;
+    sym=tempSym;
+    num=tempNum;
+    strcpy(token,tempToken);
+    /*fprintf(fout,"\t\tafter rec.\n");
+    fprintf(fout,"\t\tbufsel:%d\n",bufsel);
+    fprintf(fout,"\t\tbufidx:%d\n",bufidx);
+    fprintf(fout,"\t\tlcnt:%d\n",lcnt);
+    fprintf(fout,"\t\tlidx:%d\n",lidx);
+    fprintf(fout,"\t\tch:%c\n",ch);
+    fprintf(fout,"\t\tsym:%s\n",symbolstr[sym]);*/
 }
 //const ¿ªÍ·
 void decConst(){
@@ -28,7 +118,7 @@ void decConst(){
         }
         getsym();
     }
-    printf("this is dec of const.\n");
+    fprintf(fout,"\t\tthis is dec of const.\n");
 }
 
 void constDef(){
@@ -44,7 +134,7 @@ void constDef(){
             return;
         }
         getsym();
-        if(sym!=minus &&sym!=plus && sym!=unsignum && sym!=zero){
+        if(sym!=minus &&sym!=plus && sym!=unsignum && sym!=zero){//!first¼¯ºÏ
             error(2);//Ó¦ÊÇÊý×Ö
             return;
         }
@@ -106,14 +196,85 @@ void constDef(){
         error(2);//todp Ó¦Îªint»òchar
         return;
     }
-    printf("this is const def.\n");
+    fprintf(fout,"\t\tthis is const def.\n");
 }
+/*
+void decVar(){//£¼±äÁ¿ËµÃ÷£¾::=£¼±äÁ¿¶¨Òå£¾;{£¼±äÁ¿¶¨Òå£¾;}
 
-void decVar(){
+    while(sym==intsy || sym==charsy){
+        getsym();
+        if(sym!=ident){
+            error(2);//todo Ó¦Îª±êÊ¶·û
+            return;
+        }
+        getsym();
+        bufsel=tempBufSel;
+        bufidx=tempBufIdx;
+        lcnt=tempLcnt;
+        lidx=tempLidx;
+        ch=tempCh;
+        if(sym==lparent){
+            sym=tempSym;
+            break;
+        }else{
+            sym=tempSym;
+            varDef();
+            if(sym!=semicolon){
+                error(2);//todo Ó¦ÊÇ·ÖºÅ
+                return;
+            }
+            getsym();
+        }
+    }
 }
-
+*/
 void varDef(){
-
+    //enum symbol typ=sym;
+    if(sym!=intsy && sym!=charsy){
+        error(2);//todo Ó¦Îªint»òchar
+        return;
+    }
+    getsym();
+    if(sym!=ident){
+        error(2);//todo Ó¦Îª±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym==lbrack){//!¿ÉÑ¡Ïî
+        getsym();
+        if(sym!=unsignum){
+            error(2);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
+            return;
+        }
+        getsym();
+        if(sym!=rbrack){
+            error(2);//todo )
+            return;
+        }
+        getsym();
+    }
+    while(sym==comma){
+        getsym();
+        if(sym!=ident){//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
+            error(2);//todo Ó¦Îª±êÊ¶·û
+            return;
+        }
+        getsym();
+        if(sym==lbrack){//!¿ÉÑ¡Ïî
+            getsym();
+            if(sym!=unsignum){
+                error(2);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
+                return;
+            }
+            getsym();
+            if(sym!=rbrack){
+                error(2);//todo )
+                return;
+            }
+            getsym();
+        }
+    }
+    fprintf(fout,"\t\tthis is var def.\n");
 }
 
 void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
@@ -137,20 +298,139 @@ void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
             return;
         }
     }
-    printf("this is a num:%d\n",num);
+    fprintf(fout,"\t\tthis is a num:%d\n",num);
 }
 
-void retFuncDef(){
+void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+    if(sym!=charsy&&sym!=intsy){
+        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=ident){
+        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=lparent){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    paraList();
+    if(sym!=rparent){
+        error(2);//todo Ó¦ÊÇ)
+        return;
+    }
+    getsym();
+    if(sym!=lbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    complexStat();
+    if(sym!=rbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    fprintf(fout,"\t\tthis is a ret func dec.\n");
 }
 
-void voidFuncDef(){
+void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+    if(sym!=voidsy){
+        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=ident){
+        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=lparent){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    paraList();
+    if(sym!=rparent){
+        error(2);//todo Ó¦ÊÇ)
+        return;
+    }
+    getsym();
+    if(sym!=lbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    complexStat();
+    if(sym!=rbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    fprintf(fout,"\t\tthis is a void func dec.\n");
 }
 
-void paraList(){
-
+void paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
+    if(sym==charsy||sym==intsy){//!¿ÉÒÔÎª¿Õ
+        getsym();
+        if(sym!=ident){
+            error(2);//todo
+            return;
+        }
+        getsym();
+        while(sym==comma){
+            getsym();
+            if(sym!=charsy && sym!=intsy){
+                error(2);//todo
+                return;
+            }
+            getsym();
+            if(sym!=ident){
+                error(2);//todo
+                return;
+            }
+            getsym();
+        }
+    }
+    fprintf(fout,"\t\tthis is para list.\n");
 }
 
-void mainDef(){
+void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+    if(sym!=voidsy){
+        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=mainsy){
+        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        return;
+    }
+    getsym();
+    if(sym!=lparent){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    if(sym!=rparent){
+        error(2);//todo Ó¦ÊÇ)
+        return;
+    }
+    getsym();
+    if(sym!=lbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }
+    getsym();
+    complexStat();
+    fprintf(fout,"%-10s:\t\t%s\n",symbolstr[sym],token);
+    if(sym!=rbrace){
+        error(2);//todo Ó¦ÊÇ(
+        return;
+    }//!!todo
+    fprintf(fout,"\t\tthis is main func dec.\n");
 }
 
 /*void call(){
@@ -159,7 +439,7 @@ void mainDef(){
 
 void valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
     if(sym==rparent){//!¿Õ
-        getsym();
+        //getsym();//!
     }else{
         expr();//!ÖÁÉÙÒ»¸ö
         while(sym==comma){
@@ -167,10 +447,22 @@ void valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
             expr();
         }
     }
-    printf("this is value para list.\n");
+    fprintf(fout,"\t\tthis is value para list.\n");
 }
 
-void complexStat(){
+void complexStat(){//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾äÁÐ£¾
+    if(sym==constsy){//!Í··ûºÅÎªconst
+        decConst();
+    }
+    while(sym==charsy || sym==intsy){
+        varDef();
+        if(sym!=semicolon){
+            error(2);//Ó¦ÊÇ;
+        }
+        getsym();
+    }
+    statList();
+    fprintf(fout,"\t\tthis is complex stat.\n");
 }
 
 void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾; | £¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾;£ü£¼¸³ÖµÓï¾ä£¾;£ü£¼¶ÁÓï¾ä£¾;£ü£¼Ð´Óï¾ä£¾;£ü£¼¿Õ£¾;|£¼Çé¿öÓï¾ä£¾£ü£¼·µ»ØÓï¾ä£¾;
@@ -214,7 +506,7 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
         if(sym==become){//±äÁ¿¸³Öµ£¼¸³ÖµÓï¾ä£¾   ::=  £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾
             getsym();
             expr();//!Ö±½Óµ÷ÓÃ
-            printf("this is a assignment.\n");
+            fprintf(fout,"\t\tthis is a assignment.\n");
         }else if(sym==lbrack){//Êý×éÔªËØ¸³Öµ
             getsym();//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             expr();
@@ -229,7 +521,7 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
             }
             getsym();
             expr();
-            printf("this is a assignment.\n");
+            fprintf(fout,"\t\tthis is a assignment.\n");
         }else if(sym==lparent){//º¯Êýµ÷ÓÃ
             getsym();//£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
             valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
@@ -238,7 +530,7 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
                 return;
             }
             getsym();
-            printf("this is a call stat.\n");
+            fprintf(fout,"\t\tthis is a call stat.\n");
         }else{
             error(2);//todo  ·Ç·¨Óï¾ä
             return;
@@ -255,7 +547,7 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
         }
         getsym();
     }//!¿Õ
-    printf("this is a stat.\n");
+    fprintf(fout,"\t\tthis is a stat.\n");
 }
 
 void statList(){
@@ -265,7 +557,7 @@ void statList(){
           sym==switchsy ||  sym==ident      ||  sym==semicolon){//!first¼¯ºÏ
         stat();
     }
-    printf("this is a stat list.\n");
+    fprintf(fout,"\t\tthis is a stat list.\n");
 }
 
 void expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
@@ -277,7 +569,7 @@ void expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
         getsym();
         term();
     }
-    printf("this is an expr.\n");
+    fprintf(fout,"\t\tthis is an expr.\n");
 }
 
 void term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
@@ -286,7 +578,7 @@ void term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
         getsym();
         factor();
     }
-    printf("this is a term.\n");
+    fprintf(fout,"\t\tthis is a term.\n");
 }
 
 void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|£¼×Ö·û£¾£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾|¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
@@ -308,7 +600,7 @@ void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
                 return;
             }
             getsym();
-            printf("this is a call stat.\n");
+            fprintf(fout,"\t\tthis is a call stat.\n");
         }
     }else if(sym==charcon){
         getsym();
@@ -326,7 +618,7 @@ void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
         error(2);//todo ·Ç·¨Òò×Ó
         return;
     }
-    printf("this is a factor.\n");
+    fprintf(fout,"\t\tthis is a factor.\n");
 }
 /*
 void assignment(){
@@ -349,11 +641,13 @@ void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
         error(2);//Ó¦ÊÇ)
         return;
     }
+	getsym();//!read one more sym
     stat();//!Ö±½Óµ÷ÓÃ
     if(sym==elsesy){//!¿ÉÑ¡Ïî
+		getsym();//!one more sym
         stat();
     }
-    printf("this is an if stat.\n");
+    fprintf(fout,"\t\tthis is an if stat.\n");
 }
 
 void condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
@@ -373,8 +667,11 @@ void condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
     }else if(sym==eql){
         getsym();
         expr();
+    }else if(sym==neq){//!Â©Ð´
+        getsym();
+        expr();
     }
-    printf("this is a condition.\n");
+    fprintf(fout,"\t\tthis is a condition.\n");
 }
 //while¿ªÍ·
 void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
@@ -395,7 +692,7 @@ void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
     }
     getsym();
     stat();//!Ö±½Óµ÷ÓÃ
-    printf("this is a while stat.\n");
+    fprintf(fout,"\t\tthis is a while stat.\n");
 }
 //printf¿ªÍ·
 void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡®(¡¯£¼×Ö·û´®£¾ ¡®)¡¯|printf ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
@@ -425,7 +722,8 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
         }
         return;
     }
-    printf("this is a write stat.\n");
+	getsym();//!one more sym
+    fprintf(fout,"\t\tthis is a write stat.\n");
 }
 //scanf¿ªÍ·
 void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
@@ -461,7 +759,7 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
         error(2);//todo Ó¦Îª±êÊ¶·û
         return;
     }
-    printf("this is a read stat.\n");
+    fprintf(fout,"\t\tthis is a read stat.\n");
 }
 //switch¿ªÍ·
 void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í£¾£Û£¼È±Ê¡£¾£Ý¡®}¡¯
@@ -495,7 +793,7 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
         return;
     }
     getsym();
-    printf("this is a switch stat.\n");
+    fprintf(fout,"\t\tthis is a switch stat.\n");
 }
 //case¿ªÍ·
 void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
@@ -506,7 +804,7 @@ void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
     while(sym==casesy){//! first¼¯ºÏÎª{case}
         oneCase();
     }
-    printf("this is a case table.\n");
+    fprintf(fout,"\t\tthis is a case table.\n");
 }
 //case¿ªÍ·
 void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
@@ -526,7 +824,7 @@ void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
     }
     getsym();
     stat();//!Ö±½Óµ÷ÓÃ
-    printf("this is a one case.\n");
+    fprintf(fout,"\t\tthis is a one case.\n");
 }
 //default¿ªÍ·
 void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
@@ -541,7 +839,7 @@ void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     }
     getsym();
     stat();//!Ö±½Óµ÷ÓÃ
-    printf("this is a default case.\n");
+    fprintf(fout,"\t\tthis is a default case.\n");
 }
 //return¿ªÍ·
 void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
@@ -563,5 +861,5 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
             return;
         }
     }
-    printf("this is a return stat.\n");
+    fprintf(fout,"\t\tthis is a return stat.\n");
 }
