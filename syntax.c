@@ -1,12 +1,5 @@
 #include "global.h"
-/*int tempBufSel;
-int tempBufIdx;
-int tempLcnt;
-int tempLidx;
-char tempCh;
-enum symbol tempSym;
-int tempNum;
-char tempToken[STRMAX];*/
+#include "err.h"
 void program(){
     if(symBuf[symBufIdx].id==constsy){//!Í··ûºÅÎªconst
         decConst();
@@ -16,10 +9,10 @@ void program(){
         hasVarDef=1;
         varDef();
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ·ÖºÅ
-            return;
+            error(4);//!Ó¦ÊÇ·ÖºÅ(F)
+        }else{
+            updateSymBuf();//!read one more sym
         }
-        updateSymBuf();//!read one more sym
     }
     if(hasVarDef){
         fprintf(fout,"\t\tthis is dec of var.\n");
@@ -34,51 +27,27 @@ void program(){
     mainDef();
     fprintf(fout,"\t\tthis is a program.\n");
 }
-/*
-void saveState(){
-    fprintf(fout,"\t\tsave stat.\n");
-    tempBufSel=bufsel;
-    tempBufIdx=bufidx;
-    tempLcnt=lcnt;
-    tempLidx=lidx;
-    tempCh=ch;
-    tempSym=sym;
-    tempNum=num;
-    strcpy(tempToken,token);
-}
-void recState(){
-    fprintf(fout,"\t\trec stat.\n");
-    bufsel=tempBufSel;
-    bufidx=tempBufIdx;
-    lcnt=tempLcnt;
-    lidx=tempLidx;
-    ch=tempCh;
-    sym=tempSym;
-    num=tempNum;
-    strcpy(token,tempToken);S
-}
-*/
 //const ¿ªÍ·
 void decConst(){
     if(symBuf[symBufIdx].id!=constsy){//!¿ÉÉÔ¸ÄÐ´ÎÄ·¨
-        error(2);//Ó¦ÊÇconst
+        error(5);//Ó¦ÊÇconst
         return;
     }
     updateSymBuf();
     constDef();
     if(symBuf[symBufIdx].id!=semicolon){
-        error(2);//Ó¦ÊÇ;
-        return;
+        error(4);//!Ó¦ÊÇ;(F)
+    }else{
+        updateSymBuf();
     }
-    updateSymBuf();
     while(symBuf[symBufIdx].id==constsy){//! first¼¯ºÏÎª{const}
         updateSymBuf();
         constDef();
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }
     fprintf(fout,"\t\tthis is dec of const.\n");
 }
@@ -87,34 +56,34 @@ void constDef(){
     if(symBuf[symBufIdx].id==intsy){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo ÖØ¸´´úÂë
-            error(2);//Ó¦ÊÇ±êÊ¶·û
+            error(5);//Ó¦ÊÇ±êÊ¶·û
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
-            error(2);//Ó¦ÊÇ=
+            error(5);//Ó¦ÊÇ=
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=minus &&symBuf[symBufIdx].id!=plus && symBuf[symBufIdx].id!=unsignum && symBuf[symBufIdx].id!=zero){//!first¼¯ºÏ
-            error(2);//Ó¦ÊÇÊý×Ö
+            error(5);//Ó¦ÊÇÊý×Ö
             return;
         }
         numDef();
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(2);//Ó¦ÊÇ±êÊ¶·û
+                error(5);//Ó¦ÊÇ±êÊ¶·û
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
-                error(2);//Ó¦ÊÇ=
+                error(5);//Ó¦ÊÇ=
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=minus &&symBuf[symBufIdx].id!=plus && symBuf[symBufIdx].id!=unsignum && symBuf[symBufIdx].id!=zero){
-                error(2);//Ó¦ÊÇÊý×Ö
+                error(5);//Ó¦ÊÇÊý×Ö
                 return;
             }
             numDef();
@@ -122,95 +91,69 @@ void constDef(){
     }else if(symBuf[symBufIdx].id==charsy){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo ÖØ¸´´úÂë
-            error(2);//Ó¦ÊÇ±êÊ¶·û
+            error(5);//Ó¦ÊÇ±êÊ¶·û
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
-            error(2);//Ó¦ÊÇ=
+            error(5);//Ó¦ÊÇ=
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=charcon){
-            error(2);//Ó¦ÊÇÊý×Ö
+            error(5);//Ó¦ÊÇÊý×Ö
             return;
         }
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(2);//Ó¦ÊÇ±êÊ¶·û
+                error(5);//Ó¦ÊÇ±êÊ¶·û
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
-                error(2);//Ó¦ÊÇ=
+                error(5);//Ó¦ÊÇ=
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charcon){
-                error(2);//Ó¦ÊÇÊý×Ö
+                error(5);//Ó¦ÊÇÊý×Ö
                 return;
             }
             updateSymBuf();
         }
     }else{
-        error(2);//todp Ó¦Îªint»òchar
+        error(5);//todp Ó¦Îªint»òchar
         return;
     }
     fprintf(fout,"\t\tthis is const def.\n");
 }
 /*
 void decVar(){//£¼±äÁ¿ËµÃ÷£¾::=£¼±äÁ¿¶¨Òå£¾;{£¼±äÁ¿¶¨Òå£¾;}
-
-    while(sym==intsy || sym==charsy){
-        getsym();
-        if(sym!=ident){
-            error(2);//todo Ó¦Îª±êÊ¶·û
-            return;
-        }
-        getsym();
-        bufsel=tempBufSel;
-        bufidx=tempBufIdx;
-        lcnt=tempLcnt;
-        lidx=tempLidx;
-        ch=tempCh;
-        if(sym==lparent){
-            sym=tempSym;
-            break;
-        }else{
-            sym=tempSym;
-            varDef();
-            if(sym!=semicolon){
-                error(2);//todo Ó¦ÊÇ·ÖºÅ
-                return;
-            }
-            getsym();
-        }
-    }
 }
 */
 void varDef(){
     //enum symbol typ=sym;
     if(symBuf[symBufIdx].id!=intsy && symBuf[symBufIdx].id!=charsy){
-        error(2);//todo Ó¦Îªint»òchar
+        error(5);//todo Ó¦Îªint»òchar
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(2);//todo Ó¦Îª±êÊ¶·û
+        error(5);//todo Ó¦Îª±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
         updateSymBuf();
         if(symBuf[symBufIdx].id!=unsignum){
-            error(2);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
+            error(5);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=rbrack){
-            error(2);//todo )
+            error(5);//todo )
             return;
         }
         updateSymBuf();
@@ -218,19 +161,19 @@ void varDef(){
     while(symBuf[symBufIdx].id==comma){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
-            error(2);//todo Ó¦Îª±êÊ¶·û
+            error(5);//todo Ó¦Îª±êÊ¶·û
             return;
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=unsignum){
-                error(2);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
+                error(5);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=rbrack){
-                error(2);//todo )
+                error(5);//todo )
                 return;
             }
             updateSymBuf();
@@ -256,7 +199,7 @@ void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
             //}
             updateSymBuf();
         }else{
-            error(2);//todo Ó¦ÊÇunsignnum
+            error(5);//todo Ó¦ÊÇunsignnum
             return;
         }
     }
@@ -269,34 +212,34 @@ void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
 
 void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     if(symBuf[symBufIdx].id!=charsy&&symBuf[symBufIdx].id!=intsy){
-        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     paraList();
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     complexStat();
     if(symBuf[symBufIdx].id!=rbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
@@ -305,34 +248,34 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
 
 void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     if(symBuf[symBufIdx].id!=voidsy){
-        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     paraList();
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     complexStat();
     if(symBuf[symBufIdx].id!=rbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
@@ -343,19 +286,19 @@ void paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
     if(symBuf[symBufIdx].id==charsy||symBuf[symBufIdx].id==intsy){//!¿ÉÒÔÎª¿Õ
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
-            error(2);//todo
+            error(5);//todo
             return;
         }
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charsy && symBuf[symBufIdx].id!=intsy){
-                error(2);//todo
+                error(5);//todo
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(2);//todo
+                error(5);//todo
                 return;
             }
             updateSymBuf();
@@ -366,34 +309,34 @@ void paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
 
 void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     if(symBuf[symBufIdx].id!=voidsy){
-        error(2);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=mainsy){
-        error(2);//todo Ó¦ÊÇ±êÊ¶·û
+        error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     complexStat();
     fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
     if(symBuf[symBufIdx].id!=rbrace){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }//!!todo
     fprintf(fout,"\t\tthis is main func dec.\n");
@@ -425,9 +368,10 @@ void complexStat(){//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾äÁ
         varDef();
         hasVarDef=1;
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }
     if(hasVarDef){
         fprintf(fout,"\t\tthis is dec of var.\n");
@@ -445,31 +389,31 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
         updateSymBuf();
         statList();
         if(symBuf[symBufIdx].id!=rbrace){
-            error(2);//Ó¦ÊÇ}
+            error(5);//Ó¦ÊÇ}
             return;
         }
         updateSymBuf();
     }else if(symBuf[symBufIdx].id==scanfsy){
         readStat();
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }else if(symBuf[symBufIdx].id==printfsy){
         writeStat();
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }else if(symBuf[symBufIdx].id==returnsy){
         retStat();
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }else if(symBuf[symBufIdx].id==switchsy){
         switchStat();
     }else if(symBuf[symBufIdx].id==ident){//!first¼¯ºÏÏà½»
@@ -482,12 +426,12 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
             updateSymBuf();//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             expr();
             if(symBuf[symBufIdx].id!=rbrack){
-                error(2);//todo Ó¦ÊÇ]
+                error(5);//todo Ó¦ÊÇ]
                 return;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
-                error(2);//todo Ó¦ÊÇ=
+                error(5);//todo Ó¦ÊÇ=
                 return;
             }
             updateSymBuf();
@@ -497,26 +441,26 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
             updateSymBuf();//£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
             valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
             if(symBuf[symBufIdx].id!=rparent){
-                error(2);//todo Ó¦ÊÇ)
+                error(5);//todo Ó¦ÊÇ)
                 return;
             }
             updateSymBuf();
             fprintf(fout,"\t\tthis is a call stat.\n");
         }else{
-            error(2);//todo  ·Ç·¨Óï¾ä
+            error(5);//todo  ·Ç·¨Óï¾ä
             return;
         }
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }else{
         if(symBuf[symBufIdx].id!=semicolon){
-            error(2);//Ó¦ÊÇ;
-            return;
+            error(4);//!!Ó¦ÊÇ;(F)
+        }else{
+            updateSymBuf();
         }
-        updateSymBuf();
     }//!¿Õ
     fprintf(fout,"\t\tthis is a stat.\n");
 }
@@ -559,7 +503,7 @@ void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
             updateSymBuf();
             expr();
             if(symBuf[symBufIdx].id!=rbrack){
-                error(2);//todo Ó¦ÊÇ]
+                error(5);//todo Ó¦ÊÇ]
                 return;
             }
             updateSymBuf();
@@ -567,7 +511,7 @@ void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
             updateSymBuf();//!ÐèÒªÅÐ¶ÏÊÇ·ñÎªÓÐ·µ»ØÖµ
             valueParaList();
             if(symBuf[symBufIdx].id!=rparent){
-                error(2);//Ó¦ÊÇ)
+                error(5);//Ó¦ÊÇ)
                 return;
             }
             updateSymBuf();
@@ -581,12 +525,12 @@ void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
         updateSymBuf();
         expr();
         if(symBuf[symBufIdx].id!=rparent){
-            error(2);//todo Ó¦ÊÇ])
+            error(5);//todo Ó¦ÊÇ])
             return;
         }
         updateSymBuf();
     }else{
-        error(2);//todo ·Ç·¨Òò×Ó
+        error(5);//todo ·Ç·¨Òò×Ó
         return;
     }
     fprintf(fout,"\t\tthis is a factor.\n");
@@ -598,18 +542,18 @@ void assignment(){
 //if¿ªÍ·
 void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
     if(symBuf[symBufIdx].id!=ifsy){
-        error(2);//Ó¦ÊÇif
+        error(5);//Ó¦ÊÇif
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//Ó¦ÊÇ(
+        error(5);//Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     condition();//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//Ó¦ÊÇ)
+        error(5);//Ó¦ÊÇ)
         return;
     }
 	updateSymBuf();//!read one more sym
@@ -647,18 +591,18 @@ void condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
 //while¿ªÍ·
 void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
     if(symBuf[symBufIdx].id!=whilesy){
-        error(2);//todo Ó¦ÊÇwhile
+        error(5);//todo Ó¦ÊÇwhile
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     condition();//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
@@ -668,12 +612,12 @@ void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
 //printf¿ªÍ·
 void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡®(¡¯£¼×Ö·û´®£¾ ¡®)¡¯|printf ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
     if(symBuf[symBufIdx].id!=printfsy){
-        error(2);//todo Ó¦ÊÇprintf
+        error(5);//todo Ó¦ÊÇprintf
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
@@ -687,7 +631,7 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
         expr();//!Ö±½Óµ÷ÓÃ todo expr first¼¯ºÏ
     }
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
             updateSymBuf();//todo
         }
@@ -699,12 +643,12 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
 //scanf¿ªÍ·
 void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     if(symBuf[symBufIdx].id!=scanfsy){
-        error(2);//todo Ó¦ÊÇscanf
+        error(5);//todo Ó¦ÊÇscanf
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//Ó¦ÊÇ(
+        error(5);//Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
@@ -713,13 +657,13 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
         while(symBuf[symBufIdx].id==comma){//!Ñ­»·ÒÔ,·Ö¸ô
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(2);//todo Ó¦ÊÇ±êÊ¶·û
+                error(5);//todo Ó¦ÊÇ±êÊ¶·û
                 return;
             }
             updateSymBuf();
         }
         if(symBuf[symBufIdx].id!=rparent){
-            error(2);//todo Ó¦ÊÇ)
+            error(5);//todo Ó¦ÊÇ)
             if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
                 updateSymBuf();//todo
             }
@@ -727,7 +671,7 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
         }
         updateSymBuf();
     }else{
-        error(2);//todo Ó¦Îª±êÊ¶·û
+        error(5);//todo Ó¦Îª±êÊ¶·û
         return;
     }
     fprintf(fout,"\t\tthis is a read stat.\n");
@@ -735,23 +679,23 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
 //switch¿ªÍ·
 void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í£¾£Û£¼È±Ê¡£¾£Ý¡®}¡¯
     if(symBuf[symBufIdx].id!=switchsy){
-        error(2);//todo Ó¦ÊÇswitch
+        error(5);//todo Ó¦ÊÇswitch
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(2);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
     expr();//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id!=rparent){
-        error(2);//todo Ó¦ÊÇ)
+        error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(2);//todo Ó¦ÊÇswitch
+        error(5);//todo Ó¦ÊÇswitch
         return;
     }
     updateSymBuf();
@@ -760,7 +704,7 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
         defaultCase();//!¿ÉÑ¡Ïî
     }
     if(symBuf[symBufIdx].id!=rbrace){
-        error(2);//todo Ó¦ÊÇ}
+        error(5);//todo Ó¦ÊÇ}
         return;
     }
     updateSymBuf();
@@ -769,7 +713,7 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
 //case¿ªÍ·
 void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
     if(symBuf[symBufIdx].id!=casesy){//!ÖÁÉÙÒ»¸öcaseÓï¾ä
-        error(2);//todo Ó¦ÊÇcase
+        error(5);//todo Ó¦ÊÇcase
         return;
     }
     while(symBuf[symBufIdx].id==casesy){//! first¼¯ºÏÎª{case}
@@ -780,7 +724,7 @@ void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
 //case¿ªÍ·
 void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
     if(symBuf[symBufIdx].id!=casesy){
-        error(2);//todo Ó¦ÊÇcase
+        error(5);//todo Ó¦ÊÇcase
         return;
     }
     updateSymBuf();
@@ -790,7 +734,7 @@ void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
         numDef();//!Ö±½Óµ÷ÓÃ
     }
     if(symBuf[symBufIdx].id!=colon){
-        error(2);//todo Ó¦ÊÇ:
+        error(5);//todo Ó¦ÊÇ:
         return;
     }
     updateSymBuf();
@@ -800,12 +744,12 @@ void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
 //default¿ªÍ·
 void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     if(symBuf[symBufIdx].id!=defaultsy){
-        error(2);//todo Ó¦ÊÇdefault
+        error(5);//todo Ó¦ÊÇdefault
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=colon){
-        error(2);//todo Ó¦ÊÇ:
+        error(5);//todo Ó¦ÊÇ:
         return;
     }
     updateSymBuf();
@@ -815,7 +759,7 @@ void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
 //return¿ªÍ·
 void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
     if(symBuf[symBufIdx].id!=returnsy){
-        error(2);//todo Ó¦ÊÇreturn
+        error(5);//todo Ó¦ÊÇreturn
         return;
     }
     updateSymBuf();
@@ -825,7 +769,7 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
         if(symBuf[symBufIdx].id==rparent){
             updateSymBuf();
         }else{
-            error(2);//todo Ó¦ÊÇ)
+            error(5);//todo Ó¦ÊÇ)
             if(symBuf[symBufIdx].id==rbrack || symBuf[symBufIdx].id==rbrace){//todo
                 updateSymBuf();
             }

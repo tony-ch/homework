@@ -3,7 +3,7 @@ INTSY     :		int
 IDENT     :		max
 BECOME    :		=
 UNSIGNUM  :		1000
-		this is a num:1000
+		this is a num.
 		this is const def.
 SEMICOLON :		;
 CONSTSY   :		const
@@ -11,19 +11,15 @@ INTSY     :		int
 IDENT     :		is_prime
 BECOME    :		=
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 COMMA     :		,
 IDENT     :		not_prime
 BECOME    :		=
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is const def.
 SEMICOLON :		;
 		this is dec of const.
-		save stat.
-INTSY     :		int
-IDENT     :		nums
-		rec stat.
 INTSY     :		int
 IDENT     :		nums
 LBRACK    :		[
@@ -31,11 +27,7 @@ UNSIGNUM  :		1000
 RBRACK    :		]
 		this is var def.
 SEMICOLON :		;
-		save stat.
-INTSY     :		int
-IDENT     :		read
-		rec stat.
-		save stat.
+		this is dec of var.
 INTSY     :		int
 IDENT     :		read
 LPARENT   :		(
@@ -46,10 +38,11 @@ INTSY     :		int
 IDENT     :		n
 		this is var def.
 SEMICOLON :		;
+		this is dec of var.
 IDENT     :		n
 BECOME    :		=
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -122,7 +115,7 @@ IDENT     :		n
 		this is an expr.
 LEQ       :		<=
 UNSIGNUM  :		2
-		this is a num:2
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -168,7 +161,6 @@ SEMICOLON :		;
 		this is complex stat.
 RBRACE    :		}
 		this is a ret func dec.
-		save stat.
 INTSY     :		int
 IDENT     :		isprime
 LPARENT   :		(
@@ -187,10 +179,11 @@ INTSY     :		int
 IDENT     :		temp
 		this is var def.
 SEMICOLON :		;
+		this is dec of var.
 IDENT     :		i
 BECOME    :		=
 UNSIGNUM  :		2
-		this is a num:2
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -200,7 +193,7 @@ SEMICOLON :		;
 IDENT     :		temp
 BECOME    :		=
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -216,7 +209,7 @@ IDENT     :		n
 LES       :		<
 PLUS      :		+
 UNSIGNUM  :		2
-		this is a num:2
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -242,7 +235,7 @@ IDENT     :		n
 		this is an expr.
 EQL       :		==
 UNSIGNUM  :		2
-		this is a num:2
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -336,7 +329,7 @@ SEMICOLON :		;
 IDENT     :		i
 BECOME    :		=
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 PLUS      :		+
@@ -362,7 +355,7 @@ IDENT     :		i
 		this is a term.
 PLUS      :		+
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -388,9 +381,6 @@ SEMICOLON :		;
 		this is complex stat.
 RBRACE    :		}
 		this is a ret func dec.
-		save stat.
-VOIDSY    :		void
-		rec stat.
 VOIDSY    :		void
 IDENT     :		cal
 LPARENT   :		(
@@ -401,6 +391,7 @@ INTSY     :		int
 IDENT     :		i
 		this is var def.
 SEMICOLON :		;
+		this is dec of var.
 IDENT     :		i
 BECOME    :		=
 IDENT     :		max
@@ -408,7 +399,7 @@ IDENT     :		max
 		this is a term.
 MINUS     :		-
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -423,7 +414,7 @@ IDENT     :		i
 		this is an expr.
 GEQ       :		>=
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -488,7 +479,7 @@ IDENT     :		i
 BECOME    :		=
 MINUS     :		-
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 PLUS      :		+
@@ -512,9 +503,6 @@ SEMICOLON :		;
 		this is complex stat.
 RBRACE    :		}
 		this is a void func dec.
-		save stat.
-VOIDSY    :		void
-		rec stat.
 VOIDSY    :		void
 IDENT     :		printwithtype
 LPARENT   :		(
@@ -530,10 +518,11 @@ INTSY     :		int
 IDENT     :		i
 		this is var def.
 SEMICOLON :		;
+		this is dec of var.
 IDENT     :		i
 BECOME    :		=
 UNSIGNUM  :		2
-		this is a num:2
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -598,7 +587,7 @@ IDENT     :		i
 		this is a term.
 PLUS      :		+
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -621,9 +610,6 @@ SEMICOLON :		;
 		this is complex stat.
 RBRACE    :		}
 		this is a void func dec.
-		save stat.
-VOIDSY    :		void
-		rec stat.
 VOIDSY    :		void
 IDENT     :		read_cmd
 LPARENT   :		(
@@ -640,6 +626,7 @@ COMMA     :		,
 IDENT     :		flag
 		this is var def.
 SEMICOLON :		;
+		this is dec of var.
 IDENT     :		cmd
 BECOME    :		=
 CHARCON   :		'0'
@@ -652,7 +639,7 @@ SEMICOLON :		;
 IDENT     :		flag
 BECOME    :		=
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -667,7 +654,7 @@ IDENT     :		flag
 		this is an expr.
 GTR       :		>
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -677,7 +664,7 @@ LBRACE    :		{
 IDENT     :		flag
 BECOME    :		=
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -909,7 +896,7 @@ RPARENT   :		)
 LBRACE    :		{
 CASESY    :		case
 ZERO      :		0
-		this is a num:0
+		this is a num.
 COLON     :		:
 PRINTFSY  :		printf
 LPARENT   :		(
@@ -921,7 +908,7 @@ SEMICOLON :		;
 		this is a one case.
 CASESY    :		case
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 COLON     :		:
 PRINTFSY  :		printf
 LPARENT   :		(
@@ -946,7 +933,7 @@ LBRACE    :		{
 IDENT     :		flag
 BECOME    :		=
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -980,7 +967,7 @@ IDENT     :		flag
 		this is an expr.
 EQL       :		==
 ZERO      :		0
-		this is a num:0
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -1030,7 +1017,7 @@ LBRACE    :		{
 IDENT     :		flag
 BECOME    :		=
 UNSIGNUM  :		1
-		this is a num:1
+		this is a num.
 		this is a factor.
 		this is a term.
 		this is an expr.
@@ -1056,9 +1043,6 @@ RBRACE    :		}
 		this is complex stat.
 RBRACE    :		}
 		this is a void func dec.
-		save stat.
-VOIDSY    :		void
-		rec stat.
 VOIDSY    :		void
 MAINSY    :		main
 LPARENT   :		(

@@ -1,24 +1,80 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
 <CodeBlocks_layout_file>
 	<ActiveTarget name="Debug" />
-	<File name="global.h" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="err.c" open="1" top="0" tabpos="1" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1349" topLine="10" />
+			<Cursor1 position="1041" topLine="0" />
+		</Cursor>
+		<Folding>
+			<Collapse line="5" />
+			<Collapse line="15" />
+			<Collapse line="18" />
+			<Collapse line="30" />
+		</Folding>
+	</File>
+	<File name="err.h" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+		<Cursor>
+			<Cursor1 position="109" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="lex.c" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="global.h" open="1" top="0" tabpos="3" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="1949" topLine="55" />
+			<Cursor1 position="1467" topLine="0" />
 		</Cursor>
 	</File>
-	<File name="syntax.c" open="1" top="0" tabpos="4" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
+	<File name="lex.c" open="1" top="0" tabpos="2" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="14918" topLine="565" />
+			<Cursor1 position="2576" topLine="7" />
 		</Cursor>
+		<Folding>
+			<Collapse line="12" />
+			<Collapse line="19" />
+			<Collapse line="25" />
+			<Collapse line="40" />
+			<Collapse line="41" />
+			<Collapse line="42" />
+			<Collapse line="49" />
+			<Collapse line="60" />
+			<Collapse line="61" />
+			<Collapse line="66" />
+			<Collapse line="68" />
+			<Collapse line="69" />
+			<Collapse line="76" />
+			<Collapse line="77" />
+			<Collapse line="82" />
+			<Collapse line="90" />
+			<Collapse line="97" />
+			<Collapse line="98" />
+			<Collapse line="111" />
+			<Collapse line="119" />
+			<Collapse line="125" />
+			<Collapse line="137" />
+			<Collapse line="138" />
+			<Collapse line="139" />
+			<Collapse line="154" />
+			<Collapse line="164" />
+			<Collapse line="174" />
+			<Collapse line="189" />
+			<Collapse line="253" />
+			<Collapse line="264" />
+			<Collapse line="265" />
+			<Collapse line="266" />
+			<Collapse line="273" />
+			<Collapse line="275" />
+			<Collapse line="279" />
+			<Collapse line="282" />
+			<Collapse line="287" />
+		</Folding>
 	</File>
-	<File name="main.c" open="1" top="1" tabpos="1" split="0" active="1" splitpos="0" zoom_1="1" zoom_2="0">
+	<File name="main.c" open="1" top="1" tabpos="5" split="0" active="1" splitpos="0" zoom_1="0" zoom_2="0">
 		<Cursor>
-			<Cursor1 position="98" topLine="5" />
+			<Cursor1 position="1014" topLine="0" />
 		</Cursor>
+		<Folding>
+			<Collapse line="6" />
+			<Collapse line="9" />
+			<Collapse line="16" />
+			<Collapse line="26" />
+		</Folding>
 	</File>
 </CodeBlocks_layout_file>

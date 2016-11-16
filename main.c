@@ -1,6 +1,8 @@
 #include "global.h"
+#include "err.h"
 int getPath(char* path);//读取控制台输入的路径
-void setup();
+FILE* fin=NULL;//源文件
+FILE* fout=NULL;//结果文件
 int main()
 {
     char finPath[PATHLEN];
@@ -20,11 +22,6 @@ int main()
             printf("can't open file\n");
     }
 
-    setup();
-    /*while(1){
-        getsym();
-    }*/
-    //getsym();
     initSymBuf();
     program();
     if(!reachEof()){
@@ -53,47 +50,5 @@ int getPath(char* path){//读取控制台输入的路径
     }
     path[i]='\0';
     return 0;
-}
-
-void setup(){
-    key[0]="const";     key[1]="int";   key[2]="char";      key[3]="void";
-    key[4]="main";      key[5]="if";    key[6]="else";      key[7]="while";
-    key[8]="switch";    key[9]="case";  key[10]="default";  key[11]="scanf";
-    key[12]="printf";   key[13]="return";
-    ksym[0]=constsy;    ksym[1]=intsy;  ksym[2]=charsy;     ksym[3]=voidsy;
-    ksym[4]=mainsy;     ksym[5]=ifsy;   ksym[6]=elsesy;     ksym[7]=whilesy;
-    ksym[8]=switchsy;   ksym[9]=casesy; ksym[10]=defaultsy; ksym[11]=scanfsy;
-    ksym[12]=printfsy;  ksym[13]=returnsy;
-    /*
-    punc[0]='+';
-    punc[1]='-';
-    punc[2]='*';
-    punc[3]='/';
-    punc[4]='<';
-    punc[5]='>';
-    punc[6]='=';
-    punc[7]=';';
-    punc[8]=',';
-    punc[9]='(';
-    punc[10]=')';
-    punc[11]='[';
-    punc[12]=']';
-    punc[13]='{';
-    punc[14]='}';
-    punc[15]=':';
-    */
-    emsg[0]="invalid character";
-    emsg[1]="lex error";
-    emsg[2]="syn error";
-}
-
-void error(int n){
-    if(ecnt<ERRMAX){
-        err[ecnt][0]=symBuf[symBufIdx].lin;
-        err[ecnt][1]=symBuf[symBufIdx].col;
-        err[ecnt][2]=n;
-    }
-    fprintf(fout,"line:%d col:%d errno:%d %s\n",symBuf[symBufIdx].lin,symBuf[symBufIdx].col,n,emsg[n]);
-    ecnt=ecnt+1;
 }
 
