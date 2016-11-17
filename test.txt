@@ -7,6 +7,13 @@ UNSIGNUM  :		1000
 		this is const def.
 SEMICOLON :		;
 CONSTSY   :		const
+CHARSY    :		char
+IDENT     :		charcon
+BECOME    :		=
+CHARCON   :		'0'
+		this is const def.
+SEMICOLON :		;
+CONSTSY   :		const
 INTSY     :		int
 IDENT     :		is_prime
 BECOME    :		=
@@ -27,140 +34,15 @@ UNSIGNUM  :		1000
 RBRACK    :		]
 		this is var def.
 SEMICOLON :		;
-		this is dec of var.
+CHARSY    :		char
+IDENT     :		varchar
+		this is var def.
+SEMICOLON :		;
 INTSY     :		int
-IDENT     :		read
-LPARENT   :		(
-		this is para list.
-RPARENT   :		)
-LBRACE    :		{
-INTSY     :		int
-IDENT     :		n
+IDENT     :		vatint
 		this is var def.
 SEMICOLON :		;
 		this is dec of var.
-IDENT     :		n
-BECOME    :		=
-ZERO      :		0
-		this is a num.
-		this is a factor.
-		this is a term.
-		this is an expr.
-		this is a assignment.
-SEMICOLON :		;
-		this is a stat.
-PRINTFSY  :		printf
-LPARENT   :		(
-STRCON    :		"please input n: "
-RPARENT   :		)
-		this is a write stat.
-SEMICOLON :		;
-		this is a stat.
-SCANFSY   :		scanf
-LPARENT   :		(
-IDENT     :		n
-RPARENT   :		)
-		this is a read stat.
-SEMICOLON :		;
-		this is a stat.
-IFSY      :		if
-LPARENT   :		(
-IDENT     :		n
-		this is a factor.
-		this is a term.
-		this is an expr.
-GEQ       :		>=
-IDENT     :		max
-		this is a factor.
-		this is a term.
-		this is an expr.
-		this is a condition.
-RPARENT   :		)
-LBRACE    :		{
-PRINTFSY  :		printf
-LPARENT   :		(
-STRCON    :		"n is too large, enter a num < "
-COMMA     :		,
-IDENT     :		max
-		this is a factor.
-		this is a term.
-		this is an expr.
-RPARENT   :		)
-		this is a write stat.
-SEMICOLON :		;
-		this is a stat.
-IDENT     :		n
-BECOME    :		=
-IDENT     :		read
-LPARENT   :		(
-		this is value para list.
-RPARENT   :		)
-		this is a call stat.
-		this is a factor.
-		this is a term.
-		this is an expr.
-		this is a assignment.
-SEMICOLON :		;
-		this is a stat.
-		this is a stat list.
-RBRACE    :		}
-		this is a stat.
-		this is an if stat.
-		this is a stat.
-IFSY      :		if
-LPARENT   :		(
-IDENT     :		n
-		this is a factor.
-		this is a term.
-		this is an expr.
-LEQ       :		<=
-UNSIGNUM  :		2
-		this is a num.
-		this is a factor.
-		this is a term.
-		this is an expr.
-		this is a condition.
-RPARENT   :		)
-LBRACE    :		{
-PRINTFSY  :		printf
-LPARENT   :		(
-STRCON    :		"n is too samll, enter a num > 2"
-RPARENT   :		)
-		this is a write stat.
-SEMICOLON :		;
-		this is a stat.
-IDENT     :		n
-BECOME    :		=
-IDENT     :		read
-LPARENT   :		(
-		this is value para list.
-RPARENT   :		)
-		this is a call stat.
-		this is a factor.
-		this is a term.
-		this is an expr.
-		this is a assignment.
-SEMICOLON :		;
-		this is a stat.
-		this is a stat list.
-RBRACE    :		}
-		this is a stat.
-		this is an if stat.
-		this is a stat.
-RETURNSY  :		return
-LPARENT   :		(
-IDENT     :		n
-		this is a factor.
-		this is a term.
-		this is an expr.
-RPARENT   :		)
-		this is a return stat.
-SEMICOLON :		;
-		this is a stat.
-		this is a stat list.
-		this is complex stat.
-RBRACE    :		}
-		this is a ret func dec.
 INTSY     :		int
 IDENT     :		isprime
 LPARENT   :		(
@@ -503,6 +385,139 @@ SEMICOLON :		;
 		this is complex stat.
 RBRACE    :		}
 		this is a void func dec.
+INTSY     :		int
+IDENT     :		read
+LPARENT   :		(
+		this is para list.
+RPARENT   :		)
+LBRACE    :		{
+INTSY     :		int
+IDENT     :		n
+		this is var def.
+SEMICOLON :		;
+		this is dec of var.
+IDENT     :		n
+BECOME    :		=
+ZERO      :		0
+		this is a num.
+		this is a factor.
+		this is a term.
+		this is an expr.
+		this is a assignment.
+SEMICOLON :		;
+		this is a stat.
+PRINTFSY  :		printf
+LPARENT   :		(
+STRCON    :		"please input n: "
+RPARENT   :		)
+		this is a write stat.
+SEMICOLON :		;
+		this is a stat.
+SCANFSY   :		scanf
+LPARENT   :		(
+IDENT     :		n
+RPARENT   :		)
+		this is a read stat.
+SEMICOLON :		;
+		this is a stat.
+IFSY      :		if
+LPARENT   :		(
+IDENT     :		n
+		this is a factor.
+		this is a term.
+		this is an expr.
+GEQ       :		>=
+IDENT     :		max
+		this is a factor.
+		this is a term.
+		this is an expr.
+		this is a condition.
+RPARENT   :		)
+LBRACE    :		{
+PRINTFSY  :		printf
+LPARENT   :		(
+STRCON    :		"n is too large, enter a num < "
+COMMA     :		,
+IDENT     :		max
+		this is a factor.
+		this is a term.
+		this is an expr.
+RPARENT   :		)
+		this is a write stat.
+SEMICOLON :		;
+		this is a stat.
+IDENT     :		n
+BECOME    :		=
+IDENT     :		read
+LPARENT   :		(
+		this is value para list.
+RPARENT   :		)
+		this is a call stat.
+		this is a factor.
+		this is a term.
+		this is an expr.
+		this is a assignment.
+SEMICOLON :		;
+		this is a stat.
+		this is a stat list.
+RBRACE    :		}
+		this is a stat.
+		this is an if stat.
+		this is a stat.
+IFSY      :		if
+LPARENT   :		(
+IDENT     :		n
+		this is a factor.
+		this is a term.
+		this is an expr.
+LEQ       :		<=
+UNSIGNUM  :		2
+		this is a num.
+		this is a factor.
+		this is a term.
+		this is an expr.
+		this is a condition.
+RPARENT   :		)
+LBRACE    :		{
+PRINTFSY  :		printf
+LPARENT   :		(
+STRCON    :		"n is too samll, enter a num > 2"
+RPARENT   :		)
+		this is a write stat.
+SEMICOLON :		;
+		this is a stat.
+IDENT     :		n
+BECOME    :		=
+IDENT     :		read
+LPARENT   :		(
+		this is value para list.
+RPARENT   :		)
+		this is a call stat.
+		this is a factor.
+		this is a term.
+		this is an expr.
+		this is a assignment.
+SEMICOLON :		;
+		this is a stat.
+		this is a stat list.
+RBRACE    :		}
+		this is a stat.
+		this is an if stat.
+		this is a stat.
+RETURNSY  :		return
+LPARENT   :		(
+IDENT     :		n
+		this is a factor.
+		this is a term.
+		this is an expr.
+RPARENT   :		)
+		this is a return stat.
+SEMICOLON :		;
+		this is a stat.
+		this is a stat list.
+		this is complex stat.
+RBRACE    :		}
+		this is a ret func dec.
 VOIDSY    :		void
 IDENT     :		printwithtype
 LPARENT   :		(

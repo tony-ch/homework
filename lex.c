@@ -286,6 +286,6 @@ void updateSymBuf(){
 }
 
 int reachEof(){
-    return(symBuf[(symBufIdx+1)%1].id==eofs);
+    return(symBuf[(symBufIdx+1)%3].id==eofs);
 }
 

@@ -342,9 +342,26 @@ void mainDef(){//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
     fprintf(fout,"\t\tthis is main func dec.\n");
 }
 
-/*void call(){
+void call(){
+    if(symBuf[symBufIdx].id!=ident){
+        error(5);//tofo
+        return;
+    }
+    updateSymBuf();
+    if(symBuf[symBufIdx].id!=lparent){
+        error(5);//tofo
+        return;
+    }
+    updateSymBuf();//＜有返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
+    valueParaList();//＜无返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
+    if(symBuf[symBufIdx].id!=rparent){
+        error(5);//todo 应是)
+        return;
+    }
+    updateSymBuf();
+    fprintf(fout,"\t\tthis is a call stat.\n");
 }
-*/
+
 
 void valueParaList(){//＜值参数表＞   ::= ＜表达式＞{,＜表达式＞}｜＜空＞
     if(symBuf[symBufIdx].id==rparent){//!空
@@ -417,37 +434,13 @@ void stat(){//＜语句＞::= ＜条件语句＞｜＜循环语句＞| ‘{’＜语句列＞‘}’｜＜有
     }else if(symBuf[symBufIdx].id==switchsy){
         switchStat();
     }else if(symBuf[symBufIdx].id==ident){//!first集合相交
-        updateSymBuf();
-        if(symBuf[symBufIdx].id==become){//变量赋值＜赋值语句＞   ::=  ＜标识符＞＝＜表达式＞
-            updateSymBuf();
-            expr();//!直接调用
-            fprintf(fout,"\t\tthis is a assignment.\n");
-        }else if(symBuf[symBufIdx].id==lbrack){//数组元素赋值
-            updateSymBuf();//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
-            expr();
-            if(symBuf[symBufIdx].id!=rbrack){
-                error(5);//todo 应是]
-                return;
-            }
-            updateSymBuf();
-            if(symBuf[symBufIdx].id!=become){
-                error(5);//todo 应是=
-                return;
-            }
-            updateSymBuf();
-            expr();
-            fprintf(fout,"\t\tthis is a assignment.\n");
-        }else if(symBuf[symBufIdx].id==lparent){//函数调用
-            updateSymBuf();//＜有返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
-            valueParaList();//＜无返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
-            if(symBuf[symBufIdx].id!=rparent){
-                error(5);//todo 应是)
-                return;
-            }
-            updateSymBuf();
-            fprintf(fout,"\t\tthis is a call stat.\n");
+        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        if(nextSym==become || nextSym==lbrack){
+            assignment();
+        }else if(nextSym==lparent){
+            call();
         }else{
-            error(5);//todo  非法语句
+            error(5);//非法语句
             return;
         }
         if(symBuf[symBufIdx].id!=semicolon){
@@ -498,24 +491,20 @@ void term(){//＜项＞::=＜因子＞{＜乘法运算符＞＜因子＞}
 
 void factor(){//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞|＜字符＞｜＜有返回值函数调用语句＞|‘(’＜表达式＞‘)’
     if(symBuf[symBufIdx].id==ident){
-        updateSymBuf();
-        if(symBuf[symBufIdx].id==lbrack){//!可选项 ＜标识符＞‘[’＜表达式＞‘]’
+        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        if(nextSym==lparent){
+            call();
+        }else{
             updateSymBuf();
-            expr();
-            if(symBuf[symBufIdx].id!=rbrack){
-                error(5);//todo 应是]
-                return;
+            if(symBuf[symBufIdx].id==lbrack){//!可选项 ＜标识符＞‘[’＜表达式＞‘]’
+                updateSymBuf();
+                expr();
+                if(symBuf[symBufIdx].id!=rbrack){
+                    error(5);//todo 应是]
+                    return;
+                }
+                updateSymBuf();
             }
-            updateSymBuf();
-        }else if(symBuf[symBufIdx].id==lparent){//＜有返回值函数调用语句＞
-            updateSymBuf();//!需要判断是否为有返回值
-            valueParaList();
-            if(symBuf[symBufIdx].id!=rparent){
-                error(5);//应是)
-                return;
-            }
-            updateSymBuf();
-            fprintf(fout,"\t\tthis is a call stat.\n");
         }
     }else if(symBuf[symBufIdx].id==charcon){
         updateSymBuf();
@@ -535,10 +524,36 @@ void factor(){//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞
     }
     fprintf(fout,"\t\tthis is a factor.\n");
 }
-/*
-void assignment(){
+
+void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
+    if(symBuf[symBufIdx].id!=ident){
+        error(5);//todo 应是标识符
+        return;
+    }
+    updateSymBuf();
+    if(symBuf[symBufIdx].id==lbrack){
+        updateSymBuf();//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
+        expr();
+        if(symBuf[symBufIdx].id!=rbrack){
+            error(5);//todo 应是]
+            return;
+        }
+        updateSymBuf();
+        if(symBuf[symBufIdx].id!=become){
+            error(5);//todo 应是=
+            return;
+        }
+        updateSymBuf();
+        expr();
+    }else if(symBuf[symBufIdx].id==become){//变量赋值＜赋值语句＞   ::=  ＜标识符＞＝＜表达式＞
+        updateSymBuf();
+        expr();//!直接调用
+    }else{
+        error(5);//todo 非法语句
+        return;
+    }
+    fprintf(fout,"\t\tthis is a assignment.\n");
 }
-*/
 //if开头
 void ifStat(){//＜条件语句＞::=if ‘(’＜条件＞‘)’＜语句＞［else＜语句＞］
     if(symBuf[symBufIdx].id!=ifsy){

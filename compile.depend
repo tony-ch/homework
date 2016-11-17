@@ -1,17 +1,17 @@
 # depslib dependency file v1.0
-1479317375 source:d:\c\compile\err.c
+1479351103 source:d:\c\compile\err.c
 	"err.h"
 	"global.h"
 
 1479312341 d:\c\compile\err.h
 
-1479317389 d:\c\compile\global.h
+1479349300 d:\c\compile\global.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 
-1479315614 source:d:\c\compile\lex.c
+1479352254 source:d:\c\compile\lex.c
 	"global.h"
 	"err.h"
 
@@ -19,7 +19,7 @@
 	"global.h"
 	"err.h"
 
-1479317305 source:d:\c\compile\syntax.c
+1479349215 source:d:\c\compile\syntax.c
 	"global.h"
 	"err.h"
 

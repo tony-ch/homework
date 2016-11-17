@@ -1,22 +1,10 @@
 const int MAX=1000;
+const char charcon='0';
 const int IS_PRIME=1,NOT_PRIME=0;
 int nums[1000];
+char varchar;
+int vatint;
 
-int read(){
-	int n;
-	n=0;
-	printf("please input n: ");
-	scanf(n);
-	if(n>=MAX){
-		printf("n is too large, enter a num < ",MAX);
-		n=read();
-	}
-	if(n<=2){
-		printf("n is too samll, enter a num > 2");
-		n=read();
-	}
-	return(n);
-}
 int isprime(int n)
 {
 	int i,result;
@@ -52,6 +40,22 @@ void cal(){
 		i=-1+i;
 	}
 	return;
+}
+
+int read(){
+	int n;
+	n=0;
+	printf("please input n: ");
+	scanf(n);
+	if(n>=MAX){
+		printf("n is too large, enter a num < ",MAX);
+		n=read();
+	}
+	if(n<=2){
+		printf("n is too samll, enter a num > 2");
+		n=read();
+	}
+	return(n);
 }
 
 void printWithType(int type,int n){
