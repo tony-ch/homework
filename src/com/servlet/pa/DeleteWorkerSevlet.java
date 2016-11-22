@@ -14,7 +14,7 @@ import com.javabean.entity.*;
 /**
  * Servlet implementation class DeleteWorkerSevlet
  */
-@WebServlet("/DeleteWorkerSevlet")
+@WebServlet("/pa/deleteWorkerSevlet")
 public class DeleteWorkerSevlet extends HttpServlet {				//人事管理 ——>删除员工
 	private static final long serialVersionUID = 1L;
        

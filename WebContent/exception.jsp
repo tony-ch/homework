@@ -9,16 +9,16 @@ isErrorPage="true"%>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
     
-    <link href="./css/bootstrap.min.css" rel="stylesheet" />
-    <link href="./css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap-responsive.min.css" rel="stylesheet" />
     
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet" />
-    <link href="./css/font-awesome.css" rel="stylesheet" />
+    <link href="/bicycle/css/font-awesome.css" rel="stylesheet" />
     
-    <link href="./css/adminia.css" rel="stylesheet" /> 
-    <link href="./css/adminia-responsive.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia-responsive.css" rel="stylesheet" /> 
     
-    <link href="./css/pages/login.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/pages/login.css" rel="stylesheet" /> 
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -51,7 +51,7 @@ isErrorPage="true"%>
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="./index.jsp">Bicycle</a>
+			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
 			
@@ -59,7 +59,7 @@ isErrorPage="true"%>
 					
 					<li class="">
 						
-						<a href="./index.jsp"><i class="icon-chevron-left"></i> 返回首页</a>
+						<a href="/bicycle/index.jsp"><i class="icon-chevron-left"></i> 返回首页</a>
 					</li>
 				</ul>
 				
@@ -75,7 +75,6 @@ isErrorPage="true"%>
 <br>
 <br>
 <h1>error</h1>
-<h2><%=((Exception)request.getAttribute("exception")).getMessage() %></h2>
 
 </div>
 

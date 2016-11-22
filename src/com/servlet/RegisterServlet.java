@@ -14,7 +14,7 @@ import com.javabean.entity.User;
 /**
  * Servlet implementation class RegisterServlet
  */
-/*@WebServlet("/RegisterServlet")*/
+@WebServlet("/regServlet")
 public class RegisterServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

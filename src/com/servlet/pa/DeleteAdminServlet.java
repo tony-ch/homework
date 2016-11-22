@@ -14,7 +14,7 @@ import com.javabean.entity.*;
 /**
  * Servlet implementation class DeleteAdminServlet
  */
-@WebServlet("/DeleteAdminServlet")
+@WebServlet("/pa/deleteAdminServlet")
 public class DeleteAdminServlet extends HttpServlet {				//人事管理 ——>删除管理员
 	private static final long serialVersionUID = 1L;
        
@@ -51,16 +51,12 @@ public class DeleteAdminServlet extends HttpServlet {				//人事管理 ——>�
 		Person person = (Person)session.getAttribute("person");
 		
 		try{
-			if(person==null){
-				session.setAttribute("message", "对不起，只有登陆后才能访问系统");
-				request.getRequestDispatcher("/login.jsp").forward(request, response);
-			}
-			else if(admin==null){
+			if(admin==null){
 				session.setAttribute("message", "该管理员不存在，请重试");
 				request.setAttribute("activeTab", "adtab");
 				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
 			}else{
-				if(person.getLoginName().equals(loginname)){
+				if(person.getLoginname().equals(loginname)){
 					session.setAttribute("message", "对不起，您不能删除自己");
 					request.setAttribute("activeTab", "adtab");
 					request.getRequestDispatcher("/manager.jsp").forward(request, response);	

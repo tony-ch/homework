@@ -14,7 +14,7 @@ import com.javabean.entity.*;
 /**
  * Servlet implementation class AddUserServlet
  */
-@WebServlet("/AddUserServlet")
+@WebServlet("/pa/addUserServlet")
 public class AddUserServlet extends HttpServlet {				//人事管理 ——>添加用户
 	private static final long serialVersionUID = 1L;
        

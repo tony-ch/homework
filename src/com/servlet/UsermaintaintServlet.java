@@ -14,7 +14,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class UsermaintaintServlet
  */
-@WebServlet("/UsermaintaintServlet")
+@WebServlet("/usermaintaintServlet")
 
 public class UsermaintaintServlet extends HttpServlet {				//用户报修
 	private static final long serialVersionUID = 1L;
@@ -56,7 +56,7 @@ public class UsermaintaintServlet extends HttpServlet {				//用户报修
 				UserDao userDao = new UserDao();
 				MaintainDao maintainDao = new MaintainDao();
 				BikeDao bikeDao = new BikeDao();
-				User user = userDao.findUserByLoginName(person.getLoginName());
+				User user = userDao.findUserByLoginName(person.getLoginname());
 				int userId=user.getId();
 				String bike=request.getParameter("bike");
 				String place=request.getParameter("place");

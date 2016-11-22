@@ -14,7 +14,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class UsebikeServlet
  */
-@WebServlet("/UsebikeServlet")
+@WebServlet("/usebikeServlet")
 
 public class UsebikeServlet extends HttpServlet {				//用户用车
 	private static final long serialVersionUID = 1L;
@@ -66,7 +66,7 @@ public class UsebikeServlet extends HttpServlet {				//用户用车
 			}else{
 				UserDao userDao = new UserDao();
 				OrderDao orderDao = new OrderDao();
-				int userId = userDao.findUserByLoginName(person.getLoginName()).getId();
+				int userId = userDao.findUserByLoginName(person.getLoginname()).getId();
 				Order order = new Order(0, userId, bikeId, null, null);
 				orderDao.addOrder(order);
 				String key = bikeDao.findBikeById(bikeId).getKey();				

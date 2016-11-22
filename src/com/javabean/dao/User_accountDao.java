@@ -26,7 +26,7 @@ public class User_accountDao{
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setInt(1, user_account.getUser());
 			pstmt.setDouble(2, user_account.getMoney());
-			pstmt.setDate(3, user_account.getTime());
+			pstmt.setTimestamp(3, user_account.getTime());
 			pstmt.executeUpdate();
 		}catch(Exception e){
 			e.printStackTrace();
@@ -92,7 +92,7 @@ public class User_accountDao{
 				user_account.setId(rs.getInt(1));
 				user_account.setUser(rs.getInt(2));
 				user_account.setMoney(rs.getDouble(3));
-				user_account.setTime(rs.getDate(4));
+				user_account.setTime(rs.getTimestamp(4));
 			}
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -129,7 +129,7 @@ public class User_accountDao{
 					user_account.setId(rs.getInt(1));
 					user_account.setUser(rs.getInt(2));
 					user_account.setMoney(rs.getDouble(3));
-					user_account.setTime(rs.getDate(4));
+					user_account.setTime(rs.getTimestamp(4));
 					list.add(user_account);
 				}else{
 					break;

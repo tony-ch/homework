@@ -9,48 +9,6 @@
     <welcome-file>default.htm</welcome-file>
     <welcome-file>default.jsp</welcome-file>
   </welcome-file-list>
-  <servlet>
-    <servlet-name>loginServlet</servlet-name>
-    <servlet-class>com.servlet.LoginServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>loginServlet</servlet-name>
-    <url-pattern>/loginServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>logoutServlet</servlet-name>
-    <servlet-class>com.servlet.LogoutServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>logoutServlet</servlet-name>
-    <url-pattern>/logoutServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>regServlet</servlet-name>
-    <servlet-class>com.servlet.RegisterServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>regServlet</servlet-name>
-    <url-pattern>/regServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>updateAccount</servlet-name>
-    <servlet-class>com.servlet.UpdateServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>updateAccount</servlet-name>
-    <url-pattern>/updateServlet</url-pattern>
-  </servlet-mapping>
-  <servlet>
-    <servlet-name>listAdm</servlet-name>
-    <servlet-class>com.servlet.ListAllAdminServlet</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>listAdm</servlet-name>
-    <url-pattern>/listAdmServlet</url-pattern>
-  </servlet-mapping>  
-  
-  
   <filter>
     <filter-name>login</filter-name>
     <filter-class>com.filter.LoginFilter</filter-class>
@@ -63,6 +21,8 @@
     <filter-name>login</filter-name>
     <url-pattern>/logoutServlet</url-pattern>
   </filter-mapping>
+  
+  
   <filter>
     <filter-name>logout</filter-name>
     <filter-class>com.filter.LogedFilter</filter-class>
@@ -75,6 +35,8 @@
     <filter-name>logout</filter-name>
     <url-pattern>/register.jsp</url-pattern>
   </filter-mapping>
+  
+  
   <filter>
     <filter-name>admin</filter-name>
     <filter-class>com.filter.AdminFilter</filter-class>
@@ -83,6 +45,13 @@
     <filter-name>admin</filter-name>
     <url-pattern>/manager.jsp</url-pattern>
   </filter-mapping>
+  <filter-mapping>
+    <filter-name>admin</filter-name>
+    <url-pattern>/pa/*</url-pattern>
+  </filter-mapping>
+  
+  
+  
   <filter>
     <filter-name>encode</filter-name>
     <filter-class>com.filter.EncodeFilter</filter-class>

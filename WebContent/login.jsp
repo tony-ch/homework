@@ -10,16 +10,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
     
-    <link href="./css/bootstrap.min.css" rel="stylesheet" />
-    <link href="./css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap-responsive.min.css" rel="stylesheet" />
     
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet" />
-    <link href="./css/font-awesome.css" rel="stylesheet" />
+    <link href="/bicycle/css/font-awesome.css" rel="stylesheet" />
     
-    <link href="./css/adminia.css" rel="stylesheet" /> 
-    <link href="./css/adminia-responsive.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia-responsive.css" rel="stylesheet" /> 
     
-    <link href="./css/pages/login.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/pages/login.css" rel="stylesheet" /> 
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -47,7 +47,7 @@
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="./index.jsp">Bicycle</a>
+			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
 			
@@ -55,7 +55,7 @@
 					
 					<li class="">
 						
-						<a href="./index.jsp"><i class="icon-chevron-left"></i> 返回首页</a>
+						<a href="/bicycle/index.jsp"><i class="icon-chevron-left"></i> 返回首页</a>
 					</li>
 				</ul>
 				
@@ -78,7 +78,7 @@
 	</div> <!-- /login-header -->
 	
 	<div id="login-content" class="clearfix">
-	<form name="loginform" action="./loginServlet"  method="post">
+	<form name="loginform" action="/bicycle/loginServlet"  method="post">
 				<fieldset>
 					<div class="control-group">
 						<label class="control-label" for="loginname">登录名</label>
@@ -116,7 +116,7 @@
 		
 		<div id="login-extra">
 			
-			<p>还没有账号? <a href="./register.jsp;">马上注册.</a></p>
+			<p>还没有账号? <a href="/bicycle/register.jsp;">马上注册.</a></p>
 			
 			<!--<p>忘记密码? <a href="forgot_password.html">发送邮件.</a></p>  -->
 			
@@ -127,10 +127,10 @@
 <!-- Le javascript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="./js/jquery-1.7.2.min.js"></script>
+<script src="/bicycle/js/jquery-1.7.2.min.js"></script>
 
 
-<script src="./js/bootstrap.js"></script>
+<script src="/bicycle/js/bootstrap.js"></script>
 
   </body>
 </html>

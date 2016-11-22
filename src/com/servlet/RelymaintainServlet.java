@@ -14,7 +14,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class RelymaintainServlet
  */
-@WebServlet("/RelymaintainServlet")
+@WebServlet("/relymaintainServlet")
 //维修工批复维修单，不用传参，不用
 //准确说，不叫做批复，叫处理维修单，修改自行车状态
 public class RelymaintainServlet extends HttpServlet {				
@@ -56,7 +56,7 @@ public class RelymaintainServlet extends HttpServlet {
 			else{	//维修工
 				MaintainDao maintainDao = new MaintainDao();
 				WorkerDao workerDao = new WorkerDao();
-				Worker maintainer = workerDao.findWorkerByLoginName(person.getLoginName());
+				Worker maintainer = workerDao.findWorkerByLoginName(person.getLoginname());
 				
 				if(maintainer==null){
 					session.setAttribute("message", "无效maintainer，请重新登录");

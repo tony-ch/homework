@@ -10,16 +10,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
     
-    <link href="./css/bootstrap.min.css" rel="stylesheet" />
-    <link href="./css/bootstrap-responsive.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="/bicycle/css/bootstrap-responsive.min.css" rel="stylesheet" />
     
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet" />
-    <link href="./css/font-awesome.css" rel="stylesheet" />
+    <link href="/bicycle/css/font-awesome.css" rel="stylesheet" />
     
-    <link href="./css/adminia.css" rel="stylesheet" /> 
-    <link href="./css/adminia-responsive.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/adminia-responsive.css" rel="stylesheet" /> 
     
-    <link href="./css/pages/dashboard.css" rel="stylesheet" /> 
+    <link href="/bicycle/css/pages/dashboard.css" rel="stylesheet" /> 
     
 
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
@@ -47,13 +47,13 @@
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="./index.jsp">BlAdmin</a>
+			<a class="brand" href="/bicycle/index.jsp">BlAdmin</a>
 			
 			<div class="nav-collapse">
 			
 				<ul class="nav pull-right">
 					<li>
-						<a href="./index.jsp"><span class="badge badge-warning">7</span></a>
+						<a href="/bicycle/index.jsp"><span class="badge badge-warning">7</span></a>
 					</li>
 					
 					<li class="divider-vertical"></li>
@@ -66,17 +66,17 @@
 						
 						<ul class="dropdown-menu">
 							<li>
-								<a href="./account.jsp"><i class="icon-user"></i> 账号设置  </a>
+								<a href="/bicycle/account.jsp"><i class="icon-user"></i> 账号设置  </a>
 							</li>
 							
 							<li>
-								<a href="./account.jsp"><i class="icon-lock"></i> 修改密码</a>
+								<a href="/bicycle/account.jsp"><i class="icon-lock"></i> 修改密码</a>
 							</li>
 							
 							<li class="divider"></li>
 							
 							<li>
-								<a href="./logoutServlet"><i class="icon-off"></i> 退出</a>
+								<a href="/bicycle/logoutServlet"><i class="icon-off"></i> 退出</a>
 							</li>
 						</ul>
 					</li>
@@ -104,7 +104,7 @@
 				<div class="account-container">
 				
 					<div class="account-avatar">
-						<img src="./img/headshot.png" alt="" class="thumbnail" />
+						<img src="/bicycle/img/headshot.png" alt="" class="thumbnail" />
 					</div> <!-- /account-avatar -->
 				
 					<div class="account-details">
@@ -114,9 +114,9 @@
 						<span class="account-role">管理员</span>
 						
 						<span class="account-actions">
-							<a href="./account.jsp">资料</a> |
+							<a href="/bicycle/account.jsp">资料</a> |
 							
-							<a href="./account.jsp">编辑设置</a>
+							<a href="/bicycle/account.jsp">编辑设置</a>
 						</span>
 					
 					</div> <!-- /account-details -->
@@ -128,28 +128,28 @@
 				<ul id="main-nav" class="nav nav-tabs nav-stacked">
 					
 					<li class="active">
-						<a href="./index.jsp">
+						<a href="/bicycle/index.jsp">
 							<i class="icon-home"></i>
 							首页 		
 						</a>
 					</li>
 					
 					<li>
-						<a href="./faq.jsp">
+						<a href="/bicycle/faq.jsp">
 							<i class="icon-pushpin"></i>
 							帮助页面	
 						</a>
 					</li>
 					
 					<li>
-						<a href="./plans.jsp">
+						<a href="/bicycle/plans.jsp">
 							<i class="icon-th-list"></i>
 							价目表单		
 						</a>
 					</li>
 					
 					<li>
-						<a href="./grid.jsp">
+						<a href="/bicycle/grid.jsp">
 							<i class="icon-th-large"></i>
 							网格布局
 							<span class="label label-warning pull-right">5</span>
@@ -157,21 +157,21 @@
 					</li>
 					
 					<li>
-						<a href="./listAdmServlet">
+						<a href="/bicycle/pa/listAdmServlet">
 							<i class="icon-signal"></i>
 							管理系统
 						</a>
 					</li>
 					
 					<li>
-						<a href="./account.jsp">
+						<a href="/bicycle/account.jsp">
 							<i class="icon-user"></i>
 							用户账号					
 						</a>
 					</li>
 					
 					<li>
-						<a href="./login.jsp">
+						<a href="/bicycle/login.jsp">
 							<i class="icon-lock"></i>
 							登录页面
 						</a>
@@ -455,16 +455,16 @@
 <!-- Le javascript
 ================================================== -->
 <!-- Placed at the end of the document so the pages load faster -->
-<script src="./js/jquery-1.7.2.min.js"></script>
-<script src="./js/excanvas.min.js"></script>
-<script src="./js/jquery.flot.js"></script>
-<script src="./js/jquery.flot.pie.js"></script>
-<script src="./js/jquery.flot.orderBars.js"></script>
-<script src="./js/jquery.flot.resize.js"></script>
+<script src="/bicycle/js/jquery-1.7.2.min.js"></script>
+<script src="/bicycle/js/excanvas.min.js"></script>
+<script src="/bicycle/js/jquery.flot.js"></script>
+<script src="/bicycle/js/jquery.flot.pie.js"></script>
+<script src="/bicycle/js/jquery.flot.orderBars.js"></script>
+<script src="/bicycle/js/jquery.flot.resize.js"></script>
 
 
-<script src="./js/bootstrap.js"></script>
-<script src="./js/charts/bar.js"></script>
+<script src="/bicycle/js/bootstrap.js"></script>
+<script src="/bicycle/js/charts/bar.js"></script>
 
   </body>
 </html>

@@ -14,7 +14,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class RelypurchaseServlet
  */
-@WebServlet("/RelypurchaseServlet")
+@WebServlet("/relypurchaseServlet")
 
 public class RelypurchaseServlet extends HttpServlet {				//admin批复采购单，传参decission，true or false
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class RelypurchaseServlet extends HttpServlet {				//admin批复采购单
 				Company_accountDao company_accountDao = new Company_accountDao();
 				AdminDao adminDao = new AdminDao();
 				
-				Admin admin = adminDao.findAdminByLoginName(person.getLoginName());
+				Admin admin = adminDao.findAdminByLoginName(person.getLoginname());
 				
 				if(admin==null){
 					session.setAttribute("message", "无效admin，请重新登录");

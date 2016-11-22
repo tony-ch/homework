@@ -14,7 +14,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class SubmitpurchaseServlet
  */
-@WebServlet("/SubmitpurchaseServlet")
+@WebServlet("/submitpurchaseServlet")
 
 public class SubmitpurchaseServlet extends HttpServlet {				//采购员提交采购单
 	private static final long serialVersionUID = 1L;
@@ -61,7 +61,7 @@ public class SubmitpurchaseServlet extends HttpServlet {				//采购员提交采
 				
 				int bikenum = Integer.parseInt(_bikenum);
 				int money = Integer.parseInt(_money);
-				String buyerLogiNname = person.getLoginName();
+				String buyerLogiNname = person.getLoginname();
 				int buyerId = workerDao.findWorkerByLoginName(buyerLogiNname).getId();		//已经登陆成功，则一定有此人ID
 				
 				Purchase purchase = new Purchase(0, buyerId, bikenum, money, null);

@@ -19,7 +19,7 @@ import com.javabean.entity.Worker;
 /**
  * Servlet implementation class UpdateServlet
  */
-/*@WebServlet("/UpdateServlet")*/
+@WebServlet("/updateServlet")
 public class UpdateServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

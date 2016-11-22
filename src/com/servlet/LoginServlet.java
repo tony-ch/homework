@@ -15,7 +15,7 @@ import com.commmon.*;
 /**
  * Servlet implementation class LoginServlet
  */
-/*@WebServlet("/LoginServlet")*/
+@WebServlet("/loginServlet")
 public class LoginServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -86,7 +86,7 @@ public class LoginServlet extends HttpServlet {
 	  			if(user!=null){
 	  				successed=true;
 	  				person=new Person();
-	  				person.setLoginname(user.getLoginName());
+	  				person.setLoginname(user.getLoginname());
 	  				person.setName(user.getName());
 	  				person.setTel(user.getTel());
 	  				person.setType(3);

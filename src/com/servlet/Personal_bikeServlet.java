@@ -16,7 +16,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class Personal_bikeServlet
  */
-@WebServlet("/Personal_bikeServlet")
+@WebServlet("/personal_bikeServlet")
 
 public class Personal_bikeServlet extends HttpServlet {				//发布个人自行车信息
 	private static final long serialVersionUID = 1L;
@@ -57,7 +57,7 @@ public class Personal_bikeServlet extends HttpServlet {				//发布个人自行�
 			else{	//用户
 				UserDao userDao = new UserDao();
 				Personal_bikeDao personal_bikeDao = new Personal_bikeDao();
-				User user = userDao.findUserByLoginName(person.getLoginName());
+				User user = userDao.findUserByLoginName(person.getLoginname());
 				String tel=request.getParameter("tel");
 				String _start=request.getParameter("start_time");
 				String _end=request.getParameter("end_time");

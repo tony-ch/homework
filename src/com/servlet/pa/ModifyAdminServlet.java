@@ -16,7 +16,7 @@ import com.javabean.entity.*;
 /**
  * Servlet implementation class ModifyAdminServlet
  */
-@WebServlet("/ModifyAdminServlet")
+@WebServlet("/pa/modifyAdminServlet")
 public class ModifyAdminServlet extends HttpServlet {				//人事管理 ——>修改管理员
 	private static final long serialVersionUID = 1L;
        

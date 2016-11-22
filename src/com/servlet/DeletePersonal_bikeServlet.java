@@ -15,7 +15,7 @@ import com.javabean.dao.*;
 /**
  * Servlet implementation class DeletePersonal_bikeServlet
  */
-@WebServlet("/DeletePersonal_bikeServlet")
+@WebServlet("/deletePersonal_bikeServlet")
 
 public class DeletePersonal_bikeServlet extends HttpServlet {				//删除个人自行车信息
 	private static final long serialVersionUID = 1L;
@@ -59,7 +59,7 @@ public class DeletePersonal_bikeServlet extends HttpServlet {				//删除个人�
 				
 				UserDao userDao = new UserDao();
 				Personal_bikeDao personal_bikeDao = new Personal_bikeDao();
-				User user = userDao.findUserByLoginName(person.getLoginName());
+				User user = userDao.findUserByLoginName(person.getLoginname());
 				
 				Personal_bike personal_bike = personal_bikeDao.findPersonal_bikeById(id);
 				if(personal_bike!=null && personal_bike.getUser()==user.getId()){	//信息存在，且这条信息是这个user发布的

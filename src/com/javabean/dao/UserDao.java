@@ -24,7 +24,7 @@ public class UserDao{
 			conn=ConnectionFactory.getConnection();
 			String sql="insert into user (login_name,password,name,tel) values(?,?,?,?)"; 
 			pstmt=conn.prepareStatement(sql);
-			pstmt.setString(1, user.getLoginName());
+			pstmt.setString(1, user.getLoginname());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getName());
 			pstmt.setString(4, user.getTel());
@@ -66,7 +66,7 @@ public class UserDao{
 			pstmt.setString(1, user.getName());
 			pstmt.setString(2, user.getPassword());
 			pstmt.setString(3, user.getTel());
-			pstmt.setString(4, user.getLoginName());
+			pstmt.setString(4, user.getLoginname());
 			pstmt.executeUpdate();
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -86,7 +86,7 @@ public class UserDao{
 			String sql="update user set balance=? where login_name=?"; 
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setDouble(1, user.getBalance());
-			pstmt.setString(2, user.getLoginName());
+			pstmt.setString(2, user.getLoginname());
 			pstmt.executeUpdate();
 		}catch (SQLException e) {
 			e.printStackTrace();
@@ -112,7 +112,7 @@ public class UserDao{
 			while(rs.next()){
 				user=new User();
 				user.setId(rs.getInt(1));
-				user.setLoginName(rs.getString(2));
+				user.setLoginname(rs.getString(2));
 				user.setPassword(rs.getString(3));
 				user.setBalance(rs.getDouble(4));
 				user.setName(rs.getString(5));
@@ -151,7 +151,7 @@ public class UserDao{
 				if(r.next()){
 					user=new User();
 					user.setId(rs.getInt(1));
-					user.setLoginName(rs.getString(2));
+					user.setLoginname(rs.getString(2));
 					user.setPassword(rs.getString(3));
 					user.setBalance(rs.getDouble(4));
 					user.setName(rs.getString(5));
@@ -189,7 +189,7 @@ public class UserDao{
 			while(rs.next()){
 				user=new User();
 				user.setId(rs.getInt(1));
-				user.setLoginName(rs.getString(2));
+				user.setLoginname(rs.getString(2));
 				user.setPassword(rs.getString(3));
 				user.setBalance(rs.getDouble(4));
 				user.setName(rs.getString(5));

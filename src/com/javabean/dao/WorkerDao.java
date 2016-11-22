@@ -62,15 +62,12 @@ public class WorkerDao {
 			ResultSet rs=null;
 			try{
 				conn=ConnectionFactory.getConnection();
-				String sql="update worker set name=?,password=?,department=?,salaryM=?,cnt=?,balance=? where login_name=?"; 
+				String sql="update worker set name=?,password=?,salaryM=? where login_name=?"; 
 				pstmt=conn.prepareStatement(sql);
 				pstmt.setString(1, worker.getName());
 				pstmt.setString(2, worker.getPassword());
-				pstmt.setString(3, worker.getDepartment());
-				pstmt.setDouble(4, worker.getSalary());
-				pstmt.setInt(5, worker.getCnt());
-				pstmt.setInt(6, worker.getBalance());
-				pstmt.setString(7, worker.getLoginname());
+				pstmt.setDouble(3, worker.getSalary());
+				pstmt.setString(4, worker.getLoginname());
 				pstmt.executeUpdate();
 			}catch (SQLException e) {
 				e.printStackTrace();
@@ -98,9 +95,9 @@ public class WorkerDao {
 					worker.setPassword(rs.getString(3));
 					worker.setDepartment(rs.getString(4));
 					worker.setName(rs.getString(5));
-					worker.setSalary(rs.getDouble(5));
-					pstmt.setInt(6, worker.getCnt());
-					pstmt.setInt(7, worker.getBalance());
+					worker.setSalary(rs.getDouble(6));
+					worker.setCnt(rs.getInt(7));
+					worker.setBalance(rs.getInt(8));
 				}
 			}catch (SQLException e) {
 				e.printStackTrace();

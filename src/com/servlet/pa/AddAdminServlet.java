@@ -14,7 +14,7 @@ import com.javabean.entity.*;
 /**
  * Servlet implementation class AddAdminServlet
  */
-@WebServlet("/AddAdminServlet")
+@WebServlet("/pa/addAdminServlet")
 public class AddAdminServlet extends HttpServlet {				//人事管理 ——>添加管理员
 	private static final long serialVersionUID = 1L;
        
@@ -52,14 +52,14 @@ public class AddAdminServlet extends HttpServlet {				//人事管理 ——>添�
 		try{
 			if(adminDao.findAdminByLoginName(loginname)!=null){
 				session.setAttribute("message", "登录名已被占用，请使用其他登录名");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				//request.setAttribute("activeTab", "adtab");
+				request.getRequestDispatcher("/pa/listAdmServlet").forward(request, response);		
 			}else{
-				Admin admin=new Admin(0, loginname, password, name, tel);
+				Admin admin=new Admin(0, name,loginname, password, tel);
 				adminDao.addAdmin(admin);
 		  		session.setAttribute("message", "管理员添加成功！");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				//request.setAttribute("activeTab", "adtab");
+				request.getRequestDispatcher("/pa/listAdmServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
