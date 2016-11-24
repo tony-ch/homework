@@ -57,3 +57,6 @@ select * from `company_account`;
 select * from `maintain`;
 
 insert into `admin` values('1','admin','admin','admin','12345678901');
+insert into `worker` values('1','buyer','buyer','B','buyer','3000','0','0');
+insert into `worker` values('2','maintainer','maintainer','M','maintainer','3000','0','0');
+update `bike` set state='I' where id=1;
