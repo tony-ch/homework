@@ -573,6 +573,7 @@
 											<th style="text-align: center;">终止时间</th>
 											<th style="text-align: center;">租金</th>
 											<th style="text-align: center;">自行车简介</th>
+											<th style="text-align: center;">操作</th>
 										</tr>
 									</thead>
 
@@ -586,6 +587,18 @@
 												<td style="text-align: center;">${personal_bike.end_time }</td>
 												<td style="text-align: center;">${personal_bike.rent }</td>
 												<td style="text-align: center;">${personal_bike.desc }</td>
+												<c:if test="${requestScope.uid==personal_bike.user }">
+														<td style="text-align: center;" class="action-td">
+															<a href='<c:url value="/deletePersonal_bikeServlet?id=${personal_bike.id }"></c:url>' class="btn btn-small">
+																<i class="icon-remove"></i>						
+															</a>
+														</td>
+												</c:if>
+												<c:if test="${requestScope.uid!=personal_bike.user }">
+														<td style="text-align: center;" class="action-td">
+															非本人发布
+														</td>
+												</c:if>
 											</tr>
 										</c:forEach>
 

@@ -7,9 +7,13 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.common.Page;
 import com.javabean.dao.Personal_bikeDao;
+import com.javabean.dao.UserDao;
+import com.javabean.entity.Person;
+import com.javabean.entity.User;
 @WebServlet("/listpersonalbikeServlet")
 public class ListPersonalbikeServlet extends HttpServlet {
 
@@ -19,6 +23,7 @@ public class ListPersonalbikeServlet extends HttpServlet {
 	}
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		
 		Personal_bikeDao personal_bikeDao = new Personal_bikeDao();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
@@ -28,6 +33,11 @@ public class ListPersonalbikeServlet extends HttpServlet {
 			curPage=Integer.parseInt(request.getParameter("curPage"));
 		}
 		try{
+			HttpSession session=request.getSession();
+			Person person=(Person)session.getAttribute("person");
+			User user=new UserDao().findUserByLoginName(person.getLoginname());
+			request.setAttribute("uid", user.getId());
+			
 			Map map=personal_bikeDao.findAllPersonal_bike(curPage);
 			ArrayList list=(ArrayList) map.get("list");
 			Page pa=(Page) map.get("pa");

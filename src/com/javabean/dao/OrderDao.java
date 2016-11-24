@@ -1,4 +1,5 @@
 package com.javabean.dao;
+import java.sql.Timestamp;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -15,6 +16,7 @@ import com.common.RTException;
 import com.common.ResourceClose;
 import com.javabean.entity.Admin;
 import com.javabean.entity.Order;
+import com.javabean.entity.Worker;
 public class OrderDao{
 	//添加订单方法
 	public void addOrder(Order order){
@@ -192,7 +194,7 @@ public class OrderDao{
 	
 	//列表显示所有管理员列表
 		public Map findAllOrder(int curPage){
-			Order order=new Order();
+			Order order=null;
 			ArrayList list=new ArrayList();
 			Connection conn=null;
 			Statement pstmt=null;
@@ -213,11 +215,66 @@ public class OrderDao{
 				r.previous();
 				for(int i=0;i<pa.getPageSize();i++){
 					if(r.next()){
+						order=new Order();
 						order.setId(rs.getInt(1));
 						order.setUser(rs.getInt(2));
 						order.setBike(rs.getInt(3));
 						order.setStart_time(rs.getTimestamp(4));
 						order.setEnd_time(rs.getTimestamp(5));
+						list.add(order);
+					}else{
+						break;
+					}
+				}
+				map=new HashMap();
+				map.put("list",list);
+				map.put("pa",pa);
+			}catch (SQLException e) {
+				e.printStackTrace();
+				throw new RTException("数据库操作异常，请稍后重试!");
+			}finally{
+				ResourceClose.close(rs, pstmt, conn);
+				ResourceClose.close(r, null, null);
+			}
+			return map;
+		}
+		public Map findAllOrderByTime(String start_time,String end_time,int curPage){
+			Order order=null;
+			ArrayList list=new ArrayList();
+			Connection conn=null;
+			Statement pstmt=null;
+			ResultSet rs=null;
+			ResultSet r=null;
+			Map map=null;
+			Page pa=null;
+			//构造多条件查询的SQL语句
+			String sql="select * from orde where 1=1 ";
+			//模糊查询
+			if(start_time!=null&&!start_time.equals("")){
+				sql+=" and start_time>='"+start_time+"'";
+			}
+			if(end_time!=null&&!end_time.equals("")){
+				sql+=" and start_time<='"+end_time+"'";
+			}
+			sql+=" order by id";
+			//System.out.println(sql);
+			try{
+				conn=ConnectionFactory.getConnection();
+				pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+				rs=pstmt.executeQuery(sql);
+				pa=new Page();//声明分页类对象
+				pa.setPageSize(5);
+				pa.setPageCount(rs);
+				pa.setCurPage(curPage);
+				r=pa.setRs(rs);
+				r.previous();
+				for(int i=0;i<pa.getPageSize();i++){
+					if(rs.next()){
+						order=new Order();
+						order.setId(rs.getInt(1));
+						order.setUser(rs.getInt(2));
+						order.setBike(rs.getInt(3));
+						order.setStart_time(rs.getTimestamp(4));
 						list.add(order);
 					}else{
 						break;

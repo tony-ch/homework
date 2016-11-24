@@ -13,6 +13,7 @@ import com.common.ConnectionFactory;
 import com.common.Page;
 import com.common.RTException;
 import com.common.ResourceClose;
+import com.javabean.entity.Admin;
 import com.javabean.entity.User;
 public class UserDao{
 	//添加用户方法
@@ -149,6 +150,68 @@ public class UserDao{
 			r.previous();
 			for(int i=0;i<pa.getPageSize();i++){
 				if(r.next()){
+					user=new User();
+					user.setId(rs.getInt(1));
+					user.setLoginname(rs.getString(2));
+					user.setPassword(rs.getString(3));
+					user.setBalance(rs.getDouble(4));
+					user.setName(rs.getString(5));
+					user.setTel(rs.getString(6));
+					list.add(user);
+				}else{
+					break;
+				}
+			}
+			map=new HashMap();
+			map.put("list",list);
+			map.put("pa",pa);
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new RTException("数据库操作异常，请稍后重试!");
+		}finally{
+			ResourceClose.close(rs, pstmt, conn);
+			ResourceClose.close(r, null, null);
+		}
+		return map;
+	}
+	
+	public Map findAllUserByMostCon(String id,String loginName,String name,String password,int curPage){
+		User user=null;
+		ArrayList list=new ArrayList();
+		Connection conn=null;
+		Statement pstmt=null;
+		ResultSet rs=null;
+		ResultSet r=null;
+		Map map=null;
+		Page pa=null;
+		//构造多条件查询的SQL语句
+		String sql="select * from user where 1=1 ";
+		//模糊查询
+		if(id!=null&&!id.equals("")){
+			sql+=" and id like '%"+id+"%'";
+		}
+		if(loginName!=null&&!loginName.equals("")){
+			sql+=" and login_name like '%"+loginName+"%'";
+		}
+		if(name!=null&&!name.equals("")){
+			sql+=" and name like '%"+name+"%'";
+		}
+		if(password!=null&&!password.equals("")){
+			sql+=" and password like '%"+password+"%'";
+		}
+		sql+=" order by id";
+		try{
+			conn=ConnectionFactory.getConnection();
+			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			rs=pstmt.executeQuery(sql);
+			pa=new Page();//声明分页类对象
+			pa.setPageSize(5);
+			pa.setPageCount(rs);
+			pa.setCurPage(curPage);
+			r=pa.setRs(rs);
+			r.previous();
+			for(int i=0;i<pa.getPageSize();i++){
+				if(rs.next()){
 					user=new User();
 					user.setId(rs.getInt(1));
 					user.setLoginname(rs.getString(2));

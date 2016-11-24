@@ -150,48 +150,7 @@ public class AdminDao{
 		return map;
 	}
 	//多条件查询管理员
-	public List findAllAdminByMostCon(String loginName,String name,String password){
-		Admin admin=null;
-		ArrayList list=new ArrayList();
-		Connection conn=null;
-		PreparedStatement pstmt=null;
-		ResultSet rs=null;
-		//构造多条件查询的SQL语句
-		String sql="select * from admin where 1=1 ";
-		//模糊查询
-		if(loginName!=null&&!loginName.equals("")){
-			sql+=" and login_name like '%"+loginName+"%'";
-		}
-		if(name!=null&&!name.equals("")){
-			sql+=" and name like '%"+name+"%'";
-		}
-		if(password!=null&&!password.equals("")){
-			sql+=" and password like '%"+password+"%'";
-		}
-		sql+=" order by login_name";
-		try{
-			conn=ConnectionFactory.getConnection();
-			pstmt=conn.prepareStatement(sql);
-			rs=pstmt.executeQuery();
-			while(rs.next()){
-				admin=new Admin();
-				admin.setId(rs.getInt(1));
-				admin.setLoginname(rs.getString(2));
-				admin.setPassword(rs.getString(3));
-				admin.setName(rs.getString(4));
-				admin.setTel(rs.getString(5));
-				list.add(admin);
-			}
-		}catch (SQLException e) {
-			e.printStackTrace();
-			throw new RTException("数据库操作异常，请稍后重试!");
-		}finally{
-			ResourceClose.close(rs, pstmt, conn);
-		}
-		return list;
-	}
-	//多条件查询管理员
-	public Map findAllAdminByMostCon(String loginName,String name,String password,int curPage){
+	public Map findAllAdminByMostCon(String id,String loginName,String name,String password,int curPage){
 		Admin admin=null;
 		ArrayList list=new ArrayList();
 		Connection conn=null;
@@ -203,6 +162,9 @@ public class AdminDao{
 		//构造多条件查询的SQL语句
 		String sql="select * from admin where 1=1 ";
 		//模糊查询
+		if(id!=null&&!id.equals("")){
+			sql+=" and id like '%"+id+"%'";
+		}
 		if(loginName!=null&&!loginName.equals("")){
 			sql+=" and login_name like '%"+loginName+"%'";
 		}
@@ -212,7 +174,7 @@ public class AdminDao{
 		if(password!=null&&!password.equals("")){
 			sql+=" and password like '%"+password+"%'";
 		}
-		sql+=" order by login_name";
+		sql+=" order by id";
 		try{
 			conn=ConnectionFactory.getConnection();
 			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);

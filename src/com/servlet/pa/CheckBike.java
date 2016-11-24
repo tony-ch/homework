@@ -46,19 +46,17 @@ public class CheckBike extends HttpServlet {
 		BikeDao bikeDao = new BikeDao();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		String loginName=request.getParameter("loginName");
-		String name=request.getParameter("name");
-		String password=request.getParameter("password");
-		request.setAttribute("loginName", loginName);
-		request.setAttribute("name", name);
-		request.setAttribute("password", password);
+		String id=request.getParameter("id");
+		String state=request.getParameter("state");
+		request.setAttribute("id", id);
+		request.setAttribute("state", state);
 		int curPage=1;
 		String temp=request.getParameter("curPage");
 		if(temp!=null){
 			curPage=Integer.parseInt(request.getParameter("curPage"));
 		}
   		try{
-  			Map map = bikeDao.findAllBike(curPage);
+  			Map map = bikeDao.findAllBikeByMostCon(id, state, curPage);
 			ArrayList list=(ArrayList) map.get("list");
 			Page pa=(Page) map.get("pa");
 			request.setAttribute("curPage", pa.getCurPage());//向显示页传递当前页页码

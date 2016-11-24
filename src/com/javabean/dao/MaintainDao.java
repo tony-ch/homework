@@ -13,6 +13,7 @@ import com.common.Page;
 import com.common.RTException;
 import com.common.ResourceClose;
 import com.javabean.entity.Maintain;
+import com.javabean.entity.Purchase;
 public class MaintainDao{
 	//添加维修单方法
 	public void addMaintain(Maintain maintain){
@@ -192,6 +193,62 @@ public class MaintainDao{
 			r.previous();
 			for(int i=0;i<pa.getPageSize();i++){
 				if(r.next()){
+					maintain=new Maintain();
+					maintain.setId(rs.getInt(1));
+					maintain.setUser(rs.getInt(2));
+					maintain.setBike(rs.getInt(3));
+					maintain.setMaintainer(rs.getInt(4));
+					maintain.setPlace(rs.getString(5));
+					maintain.setTime(rs.getTimestamp(6));
+					list.add(maintain);
+				}else{
+					break;
+				}
+			}
+			map=new HashMap();
+			map.put("list",list);
+			map.put("pa",pa);
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new RTException("数据库操作异常，请稍后重试!");
+		}finally{
+			ResourceClose.close(rs, pstmt, conn);
+			ResourceClose.close(r, null, null);
+		}
+		return map;
+	}
+	public Map findAllMaintainByTime(String start_time,String end_time,int curPage){
+		Maintain maintain=null;
+		ArrayList list=new ArrayList();
+		Connection conn=null;
+		Statement pstmt=null;
+		ResultSet rs=null;
+		ResultSet r=null;
+		Map map=null;
+		Page pa=null;
+		//构造多条件查询的SQL语句
+		String sql="select * from maintain where 1=1 ";
+		//模糊查询
+		if(start_time!=null&&!start_time.equals("")){
+			sql+=" and time>='"+start_time+"'";
+		}
+		if(end_time!=null&&!end_time.equals("")){
+			sql+=" and time<='"+end_time+"'";
+		}
+		sql+=" order by id";
+		//System.out.println(sql);
+		try{
+			conn=ConnectionFactory.getConnection();
+			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			rs=pstmt.executeQuery(sql);
+			pa=new Page();//声明分页类对象
+			pa.setPageSize(5);
+			pa.setPageCount(rs);
+			pa.setCurPage(curPage);
+			r=pa.setRs(rs);
+			r.previous();
+			for(int i=0;i<pa.getPageSize();i++){
+				if(rs.next()){
 					maintain=new Maintain();
 					maintain.setId(rs.getInt(1));
 					maintain.setUser(rs.getInt(2));

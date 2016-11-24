@@ -6,22 +6,15 @@
   <head>
     <meta charset="utf-8" />
     <title>管理系统</title>
-    
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
-    
     <link href="/bicycle/css/bootstrap.min.css" rel="stylesheet" />
     <link href="/bicycle/css/bootstrap-responsive.min.css" rel="stylesheet" />
-    
     <link href="http://fonts.googleapis.com/css?family=Open+Sans:400italic,600italic,400,600" rel="stylesheet" />
     <link href="/bicycle/css/font-awesome.css" rel="stylesheet" />
-    
     <link href="/bicycle/css/adminia.css" rel="stylesheet" /> 
     <link href="/bicycle/css/adminia-responsive.css" rel="stylesheet" /> 
-    
-    
     <link href="/bicycle/css/jquery.visualize.css" rel="stylesheet" /> 
-
     <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -34,19 +27,14 @@
 	<c:remove var="message" scope="session"/>
 </c:if>
 <body>
-
 <div class="navbar navbar-fixed-top">
-	
 	<div class="navbar-inner">
-		
 		<div class="container">
-			
 			<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> 
 				<span class="icon-bar"></span> 
 				<span class="icon-bar"></span> 
 				<span class="icon-bar"></span> 				
 			</a>
-			
 			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
@@ -289,6 +277,18 @@
 						
 							<div class="tab-content">
 								<div class="tab-pane <c:if test="${activeTab=='admtab'}">active</c:if>"   id="admtab">
+									<form action="/bicycle/pa/checkAdminServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>id:</b>
+										<input class="input-small" name="id" value="${requestScope.id }"/>
+										<b>登录名:</b>
+										<input class="input-small" name="loginname" value="${requestScope.loginname }"/>
+										<b>姓名:</b>
+										<input class="input-small" name="name" value="${requestScope.name }"/>
+										<b>密码:</b>
+										<input class="input-small" name="password" value="${requestScope.password }"/>
+										<input type="submit" value="查询"/>
+									</form>
 										<table class="table table-striped table-bordered">
 											<thead>
 											<tr>
@@ -337,13 +337,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkAdminServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkAdminServlet?curPage=1&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.curPage-1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.curPage+1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkAdminServlet?curPage=${requestScope.pageCount}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
@@ -352,9 +352,24 @@
 								               </td>
 											</tr>
 											</tbody>	
+											
 									  </table>
+						
 								</div>
+								
 								<div class="tab-pane <c:if test="${activeTab=='wktab'}">active</c:if>" id="wktab" >
+									<form action="/bicycle/pa/checkWorkerServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>id:</b>
+										<input class="input-small" name="id" value="${requestScope.id }"/>
+										<b>登录名:</b>
+										<input class="input-small" name="loginname" value="${requestScope.loginname }"/>
+										<b>姓名:</b>
+										<input class="input-small" name="name" value="${requestScope.name }"/>
+										<b>密码:</b>
+										<input class="input-small" name="password" value="${requestScope.password }"/>
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
 											<tr>
@@ -366,6 +381,7 @@
 												<th style="text-align: center;">操作</th>
 											</tr>
 											</thead>
+											
 											<tbody>		
 											<c:forEach items="${requestScope.wklist}" var="worker">						
 											<tr>
@@ -403,27 +419,43 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkWorkerServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkWorkerServlet?curPage=1&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.curPage-1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.curPage+1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkWorkerServlet?curPage=${requestScope.pageCount}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
 												第${requestScope.curPage}页/共${requestScope.pageCount}页
 												&nbsp;
 								               </td>
+							
+								               
 											</tr>
 											</tbody>	
+											
 									  </table>
 								</div>
 								<!-- 用户 -->	
 								<div class="tab-pane <c:if test="${activeTab=='ustab'}">active</c:if>" id="ustab" >
+									<form action="/bicycle/pa/checkUserServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>id:</b>
+										<input class="input-small" name="id" value="${requestScope.id }"/>
+										<b>登录名:</b>
+										<input class="input-small" name="loginname" value="${requestScope.loginname }"/>
+										<b>姓名:</b>
+										<input class="input-small" name="name" value="${requestScope.name }"/>
+										<b>密码:</b>
+										<input class="input-small" name="password" value="${requestScope.password }"/>
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
+											
 											<tr>
 												<th style="text-align: center;">id</th>
 												<th style="text-align: center;">登录名</th>
@@ -433,6 +465,7 @@
 												<th style="text-align: center;">操作</th>
 											</tr>
 											</thead>
+											
 											<tbody>		
 											<c:forEach items="${requestScope.uslist}" var="user">						
 											<tr>
@@ -457,6 +490,7 @@
 												</td>
 											</tr>
 											</c:forEach>							
+											
 											</tbody>						
 											<tbody>	
 											<tr>
@@ -465,27 +499,40 @@
 												</td>
 											</tr>
 											<tr>
+												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkUserServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkUserServlet?curPage=1&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.curPage-1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.curPage+1}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkUserServlet?curPage=${requestScope.pageCount}&id=${requestScope.id}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
 												第${requestScope.curPage}页/共${requestScope.pageCount}页
 												&nbsp;
 								               </td>
+							
+								               
 											</tr>
 											</tbody>	
+											
 									  </table>
 								</div>
 								<!-- 车辆 -->
 								<div class="tab-pane <c:if test="${activeTab=='biketab'}">active</c:if>" id="biketab" >
+									<form action="/bicycle/pa/checkBikeServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>id:</b>
+										<input class="input-small" name="id" value="${requestScope.id }"/>
+										<b>状态:</b>
+										<input class="input-medium" name="state"
+										placeholder="I:空闲  U:使用  R:维修" value="${requestScope.state }"/>
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
 											
@@ -531,13 +578,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkBikeServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkBikeServlet?curPage=1&id=${requestScope.id}&state=${requestScope.state}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.curPage-1}&id=${requestScope.id}&state=${requestScope.state}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.curPage+1}&id=${requestScope.id}&state=${requestScope.state}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkBikeServlet?curPage=${requestScope.pageCount}&id=${requestScope.id}&state=${requestScope.state}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
@@ -553,9 +600,17 @@
 								</div>
 								<!-- 订单 -->
 								<div class="tab-pane <c:if test="${activeTab=='ordtab'}">active</c:if>" id="ordtab" >
+									<form action="/bicycle/pa/checkOrderServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>开始时间:</b>
+										<input type="date" name="start_time" class="input-medium" value="${requestScope.start_time}">
+										<b>截止时间:</b>
+										<input type="date" name="end_time" class="input-medium" value="${requestScope.end_time}">
+										<input type="submit" value="查询"/>
+									</form>
+									
 									<table class="table table-striped table-bordered" >
 											<thead>
-											
 											<tr>
 												<th style="text-align: center;">订单ID</th>
 												<th style="text-align: center;">用户ID</th>
@@ -599,13 +654,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkOrderServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkOrderServlet?curPage=1&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.curPage-1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.curPage+1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkOrderServlet?curPage=${requestScope.pageCount}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
@@ -622,6 +677,14 @@
 								
 								<!-- 报修单管理 -->
 								<div class="tab-pane <c:if test="${activeTab=='mattab'}">active</c:if>" id="mattab" >
+									<form action="/bicycle/pa/checkAllMaintainServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>开始时间:</b>
+										<input type="date" name="start_time" class="input-medium" value="${requestScope.start_time}">
+										<b>截止时间:</b>
+										<input type="date" name="end_time" class="input-medium" value="${requestScope.end_time}">
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
 											
@@ -665,13 +728,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/listAllMaintainServlet?curPage=1"/>'>首页</a>
-													<a href='<c:url value="/pa/listAllMaintainServlet?curPage=${requestScope.curPage-1}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkAllMaintainServlet?curPage=1&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkAllMaintainServlet?curPage=${requestScope.curPage-1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/listAllMaintainServlet?curPage=${requestScope.curPage+1}"/>'>下一页</a>
-													<a href='<c:url value="/pa/listAllMaintainServlet?curPage=${requestScope.pageCount}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkAllMaintainServlet?curPage=${requestScope.curPage+1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkAllMaintainServlet?curPage=${requestScope.pageCount}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
@@ -687,6 +750,14 @@
 								</div>
 								<!-- 采购单管理 -->
 								<div class="tab-pane <c:if test="${activeTab=='purtab'}">active</c:if>" id="purtab" >
+									<form action="/bicycle/pa/checkPurchaseServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>开始时间:</b>
+										<input type="date" name="start_time" class="input-medium" value="${requestScope.start_time}">
+										<b>截止时间:</b>
+										<input type="date" name="end_time" class="input-medium" value="${requestScope.end_time}">
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
 											
@@ -735,13 +806,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=1&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.curPage-1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.curPage+1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkPurchaseServlet?curPage=${requestScope.pageCount}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;
@@ -757,6 +828,14 @@
 								</div>
 								<!-- 账户变动 -->
 								<div class="tab-pane <c:if test="${activeTab=='acttab'}">active</c:if>" id="acttab" >
+									<form action="/bicycle/pa/checkComAccountServlet" method="post">
+										<b><font color="red">请输入查询统计条件：</font></b>
+										<b>开始时间:</b>
+										<input type="date" name="start_time" class="input-medium" value="${requestScope.start_time}">
+										<b>截止时间:</b>
+										<input type="date" name="end_time" class="input-medium" value="${requestScope.end_time}">
+										<input type="submit" value="查询"/>
+									</form>
 									<table class="table table-striped table-bordered">
 											<thead>
 											
@@ -811,13 +890,13 @@
 												
 												<td style="text-align: center;" colspan="9">
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=1}">
-													<a href='<c:url value="/pa/checkComAccountServlet?curPage=1&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>首页</a>
-													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.curPage-1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>前一页</a>
+													<a href='<c:url value="/pa/checkComAccountServlet?curPage=1&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>首页</a>
+													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.curPage-1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>前一页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==1}">首页 前一页</c:if>
 												<c:if test="${requestScope.pageCount!=0&&requestScope.curPage!=requestScope.pageCount}">
-													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.curPage+1}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>下一页</a>
-													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.pageCount}&loginname=${requestScope.loginname}&name=${requestScope.name}&password=${requestScope.password}"/>'>尾页</a>
+													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.curPage+1}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>下一页</a>
+													<a href='<c:url value="/pa/checkComAccountServlet?curPage=${requestScope.pageCount}&start_time=${requestScope.start_time}&end_time=${requestScope.end_time}"/>'>尾页</a>
 												</c:if>
 												<c:if test="${requestScope.pageCount==0||requestScope.curPage==requestScope.pageCount}">下一页 尾页</c:if>
 												&nbsp;

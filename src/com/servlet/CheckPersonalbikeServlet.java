@@ -7,10 +7,14 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.common.Page;
 import com.common.RTException;
 import com.javabean.dao.Personal_bikeDao;
+import com.javabean.dao.UserDao;
+import com.javabean.entity.Person;
+import com.javabean.entity.User;
 @WebServlet("/checkPersonalbikeServlet")
 public class CheckPersonalbikeServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -35,7 +39,12 @@ public class CheckPersonalbikeServlet extends HttpServlet {
 			curPage=Integer.parseInt(request.getParameter("curPage"));
 		}
   		try{
-			Map map = service.findAllPersonal_bike(1);
+  			HttpSession session=request.getSession();
+			Person person=(Person)session.getAttribute("person");
+			User user=new UserDao().findUserByLoginName(person.getLoginname());
+			request.setAttribute("uid", user.getId());
+  			
+			Map map = service.findAllPersonal_bike(curPage);
 			ArrayList list=(ArrayList) map.get("list");
 			Page pa=(Page) map.get("pa");
 			request.setAttribute("curPage", pa.getCurPage());//向显示页传递当前页页码

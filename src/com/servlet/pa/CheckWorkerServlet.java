@@ -24,10 +24,12 @@ public class CheckWorkerServlet extends HttpServlet {
 		WorkerDao workerDao = new WorkerDao();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		String loginName=request.getParameter("loginName");
+		String id=request.getParameter("id");
+		String loginname=request.getParameter("loginname");
 		String name=request.getParameter("name");
 		String password=request.getParameter("password");
-		request.setAttribute("loginName", loginName);
+		request.setAttribute("id", id);
+		request.setAttribute("loginname", loginname);
 		request.setAttribute("name", name);
 		request.setAttribute("password", password);
 		int curPage=1;
@@ -36,7 +38,7 @@ public class CheckWorkerServlet extends HttpServlet {
 			curPage=Integer.parseInt(request.getParameter("curPage"));
 		}
   		try{
-  			Map map = workerDao.findAllWorker(curPage);
+  			Map map =workerDao.findAllWorkerByMostCon(id,loginname, name, password,curPage);
 			ArrayList list=(ArrayList) map.get("list");
 			Page pa=(Page) map.get("pa");
 			request.setAttribute("curPage", pa.getCurPage());//向显示页传递当前页页码

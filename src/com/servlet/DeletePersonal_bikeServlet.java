@@ -65,11 +65,11 @@ public class DeletePersonal_bikeServlet extends HttpServlet {				//删除个人�
 				if(personal_bike!=null && personal_bike.getUser()==user.getId()){	//信息存在，且这条信息是这个user发布的
 					personal_bikeDao.delPersonal_bike(id);
 					session.setAttribute("message", "个人自行车信息删除成功");
-					request.getRequestDispatcher("/personal_bike.jsp").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
+					request.getRequestDispatcher("/listpersonalbikeServlet").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
 				}
 				else{
 					session.setAttribute("message", "对不起，您不能删除此条个人自行车信息");
-					request.getRequestDispatcher("/personal_bike.jsp").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
+					request.getRequestDispatcher("/listpersonalbikeServlet").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
 				}
 			}
 		}catch (Exception e) {

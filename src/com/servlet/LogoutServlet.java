@@ -40,7 +40,7 @@ public class LogoutServlet extends HttpServlet {
 		session.removeAttribute("person");  //清空Session变量
 		//session.invalidate();
 		//!这里的根目录对应服务器的根目录
-		response.sendRedirect("/index.jsp"); 
+		response.sendRedirect("/bicycle/index.jsp"); 
 	}
 
 }

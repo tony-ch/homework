@@ -16,20 +16,20 @@ import javax.servlet.http.HttpSession;
 
 import com.common.Page;
 import com.common.RTException;
+import com.javabean.dao.MaintainDao;
 import com.javabean.dao.PurchaseDao;
-import com.javabean.dao.WorkerDao;
 
 /**
- * Servlet implementation class CheckPurchaseServlet
+ * Servlet implementation class CheckAllMaintainServlet
  */
-@WebServlet("/pa/checkPurchaseServlet")
-public class CheckPurchaseServlet extends HttpServlet {
+@WebServlet("/pa/checkAllMaintainServlet")
+public class CheckAllMaintainServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public CheckPurchaseServlet() {
+    public CheckAllMaintainServlet() {
         super();
     }
 
@@ -44,7 +44,7 @@ public class CheckPurchaseServlet extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		PurchaseDao purchaseDao = new PurchaseDao();
+		MaintainDao maintainDao = new MaintainDao();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
 		String _start_time=request.getParameter("start_time");
@@ -68,7 +68,7 @@ public class CheckPurchaseServlet extends HttpServlet {
 			e.printStackTrace();
 			HttpSession session=request.getSession();
 			session.setAttribute("message", "输入条件不正确");
-			request.getRequestDispatcher("/pa/listPurchaseServlet").forward(request, response);
+			request.getRequestDispatcher("/pa/listAllMaintainServlet").forward(request, response);
 			return;
 		}
 		
@@ -82,13 +82,13 @@ public class CheckPurchaseServlet extends HttpServlet {
   		try{
   			//System.out.println(start_t);
   			//System.out.println(end_t);
-  			Map map = purchaseDao.findAllPurchaseByTime(start_t, end_t, curPage);
+  			Map map = maintainDao.findAllMaintainByTime(start_t, end_t, curPage);
 			ArrayList list=(ArrayList) map.get("list");
 			Page pa=(Page) map.get("pa");
 			request.setAttribute("curPage", pa.getCurPage());//向显示页传递当前页页码
 			request.setAttribute("pageCount",pa.getPageCount());//向显示页传递总页数
-			request.setAttribute("purlist", list);//向显示页传递结果集
-			request.setAttribute("activeTab", "purtab");//adtab wktab ustab purtab
+			request.setAttribute("matlist", list);//向显示页传递结果集
+			request.setAttribute("activeTab", "mattab");//adtab wktab ustab purtab
 	  		request.getRequestDispatcher("/manager.jsp").forward(request, response);
   		}catch (RTException e) {
 			e.printStackTrace();

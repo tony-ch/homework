@@ -14,6 +14,7 @@ import com.common.Page;
 import com.common.RTException;
 import com.common.ResourceClose;
 import com.javabean.entity.Bike;
+import com.javabean.entity.User;
 public class BikeDao{
 	//添加自行车方法
 	public void addBike(Bike bike){
@@ -141,33 +142,58 @@ public class BikeDao{
 		}
 		return map;
 	}
-	//状态查询自行车	
-	public Bike findBikeByState(String state){
+	public Map findAllBikeByMostCon(String id,String state,int curPage){
 		Bike bike=null;
+		ArrayList list=new ArrayList();
 		Connection conn=null;
-		PreparedStatement pstmt=null;
+		Statement pstmt=null;
 		ResultSet rs=null;
+		ResultSet r=null;
+		Map map=null;
+		Page pa=null;
+		//构造多条件查询的SQL语句
+		String sql="select * from bike where 1=1 ";
+		//模糊查询
+		if(id!=null&&!id.equals("")){
+			sql+=" and id like '%"+id+"%'";
+		}
+		if(state!=null&&!state.equals("")){
+			sql+=" and state like '%"+state+"%'";
+		}
+		sql+=" order by id";
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="select * from bike where state=?"; 
-			pstmt=conn.prepareStatement(sql);
-			pstmt.setString(1, state);
-			rs=pstmt.executeQuery();
-			while(rs.next()){
-				bike=new Bike();
-				bike.setId(rs.getInt(1));
-				bike.setKey(rs.getString(2));
-				bike.setState(rs.getString(3));
+			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			rs=pstmt.executeQuery(sql);
+			pa=new Page();//声明分页类对象
+			pa.setPageSize(5);
+			pa.setPageCount(rs);
+			pa.setCurPage(curPage);
+			r=pa.setRs(rs);
+			r.previous();
+			for(int i=0;i<pa.getPageSize();i++){
+				if(rs.next()){
+					bike=new Bike();
+					bike.setId(rs.getInt(1));
+					bike.setKey(rs.getString(2));
+					bike.setState(rs.getString(3));
+					list.add(bike);
+				}else{
+					break;
+				}
 			}
+			map=new HashMap();
+			map.put("list",list);
+			map.put("pa",pa);
 		}catch (SQLException e) {
 			e.printStackTrace();
 			throw new RTException("数据库操作异常，请稍后重试!");
 		}finally{
 			ResourceClose.close(rs, pstmt, conn);
+			ResourceClose.close(r, null, null);
 		}
-		return bike;
+		return map;
 	}
-	
 	//自行车登录验证方法
 	public Bike login(int id,String key){
 		Bike bike=null;
