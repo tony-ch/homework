@@ -53,11 +53,6 @@ public class UpdateServlet extends HttpServlet {
   		String name=request.getParameter("name");
   		String password=request.getParameter("password");
   		Object perObj=session.getAttribute("person");
-  		if(perObj==null){
-  			System.out.println("person is null");
-  			request.getRequestDispatcher("/exception.jsp").forward(request, response);
-  			return;
-  		}
   		Person person=(Person)perObj;
   		String tel=request.getParameter("tel");
   		Boolean successed=false;
@@ -109,7 +104,7 @@ public class UpdateServlet extends HttpServlet {
 	  		//如果登录成功将获得的User对象存在session对象中（十分重要，程序以后要使用）
 			session.setAttribute("person",person);
 			//如果登录成功跳转系统主页面index.jsp
-			request.getRequestDispatcher("/account.jsp").forward(request, response);
+			request.getRequestDispatcher("/personDetailServlet").forward(request, response);
   		}catch (Exception e) {
 			e.printStackTrace();
 			request.setAttribute("exception", e);

@@ -74,7 +74,7 @@ public class DeletePersonal_bikeServlet extends HttpServlet {				//删除个人�
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

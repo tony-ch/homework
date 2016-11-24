@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.User;
 public class UserDao{
 	//添加用户方法
@@ -85,7 +85,7 @@ public class UserDao{
 			conn=ConnectionFactory.getConnection();
 			String sql="update user set balance=? where login_name=?"; 
 			pstmt=conn.prepareStatement(sql);
-			pstmt.setDouble(1, user.getBalance());
+			pstmt.setDouble(1, balance);
 			pstmt.setString(2, user.getLoginname());
 			pstmt.executeUpdate();
 		}catch (SQLException e) {

@@ -70,13 +70,45 @@ isErrorPage="true"%>
 	</div> <!-- /navbar-inner -->
 	
 </div> <!-- /navbar -->
-
-<div class=wraper>
 <br>
 <br>
-<h1>error</h1>
+<div id="content">
+	
+	<div class="container">
+		
+		<div class="row" >
+			
+					<div class="span12">
+									
+						<div class="widget">
+							
+							<div class="widget-header" align="center">
+								<h3>出现错误</h3>
+							</div>
+							<!-- /widget-header -->
 
-</div>
+							<div class="widget-content">
+								${requestScope.exception}
+								<%
+								StackTraceElement[] sElements=((Exception)request.getAttribute("exception")).getStackTrace();
+								for(StackTraceElement aElement : sElements){
+									out.print(aElement);%>
+									<br>
+								<%
+								}
+								 %>
+							</div>
+							<!-- /widget-content -->
+							
+						</div> <!-- /widget -->
+						
+					</div> <!-- /span9 -->
+					
+		</div> <!-- /row -->
+		
+	</div> <!-- /container -->
+	
+</div> <!-- /content -->
 
   </body>
 </html>

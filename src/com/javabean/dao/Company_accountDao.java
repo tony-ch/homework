@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.Company_account;
 public class Company_accountDao{
 	//添加公司账户记录
@@ -92,7 +92,7 @@ public class Company_accountDao{
 	}
 	
 	//列表显示所有管理员列表
-	public Map findAllAdmin(int curPage){
+	public Map findAllRecord(int curPage){
 		Company_account company_account=null;
 		ArrayList list=new ArrayList();
 		Connection conn=null;
@@ -120,7 +120,7 @@ public class Company_accountDao{
 					company_account.setTime(rs.getTimestamp(3)); 
 					company_account.setAdmin(rs.getInt(4));
 					company_account.setWorker(rs.getInt(5));
-					company_account.setType(rs.getString(5));
+					company_account.setType(rs.getString(6));
 					list.add(company_account);
 				}else{
 					break;

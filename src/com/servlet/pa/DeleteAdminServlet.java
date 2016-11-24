@@ -53,24 +53,21 @@ public class DeleteAdminServlet extends HttpServlet {				//人事管理 ——>�
 		try{
 			if(admin==null){
 				session.setAttribute("message", "该管理员不存在，请重试");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);	
 			}else{
 				if(person.getLoginname().equals(loginname)){
 					session.setAttribute("message", "对不起，您不能删除自己");
-					request.setAttribute("activeTab", "adtab");
-					request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+					request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);	
 				}
 				else{
 					adminDao.delAdmin(loginname);
 					session.setAttribute("message", "管理员删除成功！");
-					request.setAttribute("activeTab", "adtab");
-					request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+					request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);	
 				}
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.Admin;
 public class AdminDao{
 	//添加管理员方法
@@ -115,7 +115,7 @@ public class AdminDao{
 		Page pa=null;
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="select * from admin order by login_name"; 
+			String sql="select * from admin order by id"; 
 			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			rs=pstmt.executeQuery(sql);
 			pa=new Page();//声明分页类对象

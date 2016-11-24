@@ -1,20 +1,21 @@
 package com.javabean.entity;
 
+import java.sql.Date;
 import java.sql.Timestamp;
 
 public class Personal_bike {
 	private int id;
 	private int user;
 	private String tel;
-	private Timestamp start_time;
-	private Timestamp end_time;
+	private Date start_time;
+	private Date end_time;
 	private int rent;
 	private String desc;
 	
 	public Personal_bike(){
 	}
 	
-	public Personal_bike(int id,int user,String tel,Timestamp start_time,Timestamp end_time,int rent,String desc){
+	public Personal_bike(int id,int user,String tel,Date start_time,Date end_time,int rent,String desc){
 		this.id=id;
 		this.user=user;
 		this.tel=tel;
@@ -48,19 +49,19 @@ public class Personal_bike {
 		this.tel = tel;
 	}
 
-	public Timestamp getStart_time() {
+	public Date getStart_time() {
 		return start_time;
 	}
 
-	public void setStart_time(Timestamp start_time) {
+	public void setStart_time(Date start_time) {
 		this.start_time = start_time;
 	}
 
-	public Timestamp getEnd_time() {
+	public Date getEnd_time() {
 		return end_time;
 	}
 
-	public void setEnd_time(Timestamp end_time) {
+	public void setEnd_time(Date end_time) {
 		this.end_time = end_time;
 	}
 

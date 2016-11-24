@@ -1,11 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+    <%@ page import="com.common.CountListener"%>
+    <%@ page import="com.common.Counter"%>
     <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>Bicycle </title>
+    <title>首页 </title>
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="apple-mobile-web-app-capable" content="yes" />    
@@ -47,31 +49,31 @@
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="/bicycle/index.jsp">BlAdmin</a>
+			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
 			
 				<ul class="nav pull-right">
-					<li>
-						<a href="/bicycle/index.jsp"><span class="badge badge-warning">7</span></a>
-					</li>
 					
 					<li class="divider-vertical"></li>
 					
 					<li class="dropdown">
 						
 						<a data-toggle="dropdown" class="dropdown-toggle " href="#">
-							罗宾逊 <b class="caret"></b>							
+							<c:if test="${sessionScope.person!=null }">
+							<font size=2>${sessionScope.person.loginname }</font><b class="caret"></b>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							未登录<b class="caret"></b>
+							</c:if>	
 						</a>
 						
 						<ul class="dropdown-menu">
 							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-user"></i> 账号设置  </a>
+								<a href="/bicycle/personDetailServlet"><i class="icon-user"></i> 账号设置  </a>
 							</li>
 							
-							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-lock"></i> 修改密码</a>
-							</li>
 							
 							<li class="divider"></li>
 							
@@ -104,19 +106,49 @@
 				<div class="account-container">
 				
 					<div class="account-avatar">
-						<img src="/bicycle/img/headshot.png" alt="" class="thumbnail" />
+						<!-- <img src="/bicycle/img/headshot.png" alt="" class="thumbnail" /> -->
 					</div> <!-- /account-avatar -->
 				
 					<div class="account-details">
 					
-						<span class="account-name">罗宾逊</span>
+						<span class="account-name">
+							<c:if test="${sessionScope.person.loginname!=null }">
+							<font size=4>${sessionScope.person.loginname }</font>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							<font size=4>未登录</font>
+							</c:if>						
+						</span>
 						
-						<span class="account-role">管理员</span>
+						<span class="account-role">
+						<font size=0>
+							<c:if test="${sessionScope.person.loginname==null }">
+							${"&nbsp"}
+							</c:if>
+							
+							<c:if test="${sessionScope.person.loginname!=null }">
+								<c:if test="${sessionScope.person.type==3}">
+								用户
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==2}">
+								维修工
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==1}">
+								采购员
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==0}">
+								管理员
+								</c:if>
+							</c:if> 
+							</font>
+							</span>
 						
 						<span class="account-actions">
-							<a href="/bicycle/account.jsp">资料</a> |
-							
-							<a href="/bicycle/account.jsp">编辑设置</a>
+							<a href="/bicycle/personDetailServlet">资料</a> 
 						</span>
 					
 					</div> <!-- /account-details -->
@@ -134,38 +166,55 @@
 						</a>
 					</li>
 					
+					<!-- 
 					<li>
 						<a href="/bicycle/faq.jsp">
 							<i class="icon-pushpin"></i>
 							帮助页面	
 						</a>
 					</li>
+					 -->
 					
+					<c:if test="${empty sessionScope.person || sessionScope.person.type==3 }">
 					<li>
-						<a href="/bicycle/plans.jsp">
+						<a href="/bicycle/userHomeServlet">
+							<i class="icon-user"></i>
+							用车系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${empty sessionScope.person || sessionScope.person.type==1 }">
+					<li>
+						<a href="/bicycle/purchase.jsp">
+							<i class="icon-shopping-cart"></i>
+							采购系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${empty sessionScope.person || sessionScope.person.type==2 }">
+					<li>
+						<a href="/bicycle/ma/listMaintainServlet">
+							<i class="icon-check"></i>
+							报修系统
+							<!-- <span class="label label-warning pull-right">5</span> -->
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${empty sessionScope.person || sessionScope.person.type==0 }">
+					<li>
+						<a href="/bicycle/pa/listAdminServlet">
 							<i class="icon-th-list"></i>
-							价目表单		
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/grid.jsp">
-							<i class="icon-th-large"></i>
-							网格布局
-							<span class="label label-warning pull-right">5</span>
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/pa/listAdmServlet">
-							<i class="icon-signal"></i>
 							管理系统
 						</a>
 					</li>
+					</c:if>
 					
 					<li>
-						<a href="/bicycle/account.jsp">
-							<i class="icon-user"></i>
+						<a href="/bicycle/personDetailServlet">
+							<i class="icon-cog"></i>
 							用户账号					
 						</a>
 					</li>
@@ -182,7 +231,9 @@
 				<hr />
 				
 				<div class="sidebar-extra">
-					<p>这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字.</p>
+					<p>联系我们:</p>
+					<p>邮箱: changtao@buaa.edu.cn</p>
+					<p>邮箱: xyf1@buaa.edu.cn</p>
 				</div> <!-- .sidebar-extra -->
 				
 				<br />
@@ -202,236 +253,64 @@
 										
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>564</span>							
-							销售订单						
+							<span><%=Counter.countAdmin()%></span>							
+							管理人员数目						
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>423</span>							
-							增加订单							
+							<span><%=Counter.countWorker()%></span>							
+							员工总数							
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>96</span>							
-							退货订单							
+							<span><%=Counter.countUser()%></span>							
+							用户总数							
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
 					<div class="stat-holder">						
 						<div class="stat">							
-							<span>2</span>							
-							退款数量							
+							<span><%=CountListener.getLinedNumber()%></span>							
+							在线人数							
 						</div> <!-- /stat -->						
 					</div> <!-- /stat-holder -->
 					
-				</div> <!-- /stat-container -->
-				
-				<div class="widget">
-										
-					<div class="widget-header">
-						<i class="icon-signal"></i>
-						<h3>图表统计</h3>
-					</div> <!-- /widget-header -->
-														
-					<div class="widget-content">					
-						<div id="bar-chart" class="chart-holder"></div> <!-- /bar-chart -->				
-					</div> <!-- /widget-content -->
+				</div> <!-- /stat-container -->		
 					
-				</div> <!-- /widget -->
-				
-				<div class="widget widget-table">
-										
-					<div class="widget-header">
-						<i class="icon-th-list"></i>
-						<h3>表格</h3>
-					</div> <!-- /widget-header -->
+			</div> <!-- /span9 -->
+			<div class="row">
 					
-					<div class="widget-content">
-					
-						<table class="table table-striped table-bordered">
-							<thead>
-								<tr>
-									<th></th>
-									<th>名</th>
-									<th>姓</th>
-									<th>用户名</th>
-									<th>公司</th>
-									<th>操作</th>
-								</tr>
-							</thead>
-							
-							<tbody>
-								<tr>
-									<td>1</td>
-									<td>Michael</td>
-									<td>Jordan</td>
-									<td>@mjordan</td>
-									<td>Chicago Bulls</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>					
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>2</td>
-									<td>Magic</td>
-									<td>Johnson</td>
-									<td>@mjohnson</td>
-									<td>Los Angeles Lakers</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>3</td>
-									<td>Charles</td>
-									<td>Barkley</td>
-									<td>@cbarkley</td>
-									<td>Phoenix Suns</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>4</td>
-									<td>Karl</td>
-									<td>Malone</td>
-									<td>@kmalone</td>
-									<td>Utah Jazz</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>					
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>5</td>
-									<td>David</td>
-									<td>Robinson</td>
-									<td>@drobinson</td>
-									<td>San Antonio Spurs</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>6</td>
-									<td>Reggie</td>
-									<td>Miller</td>
-									<td>@rmiller</td>
-									<td>Indiana Pacers</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>7</td>
-									<td>Clyde</td>
-									<td>Drexler</td>
-									<td>@cdrexler</td>
-									<td>Portland Trail Blazers</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td>8</td>
-									<td>Hakeem</td>
-									<td>Olajuwon</td>
-									<td>@holajuwon</td>
-									<td>Houston Rockets</td>
-									<td class="action-td">
-										<a href="javascript:;" class="btn btn-small btn-warning">
-											<i class="icon-ok"></i>								
-										</a>						
-										<a href="javascript:;" class="btn btn-small">
-											<i class="icon-remove"></i>						
-										</a>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					
-					</div> <!-- /widget-content -->
-					
-				</div> <!-- /widget -->
-				
-				
-				
-				
-				<div class="row">
-					
-					<div class="span5">
+					<div class="span9">
 									
 						<div class="widget">
 							
 							<div class="widget-header">
-								<h3>5列标题</h3>
-							</div> <!-- /widget-header -->
-																
+								<h3>公司介绍</h3>
+							</div>
+							<!-- /widget-header -->
+
 							<div class="widget-content">
-								<p>5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示5列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示.</p>
-							</div> <!-- /widget-content -->
+								<p>&#12288;&#12288;“方涛任我行”将移动互联网技术引入自行车，让优质的自行车触手可得。无论都市通勤，还是休闲出游，通过“方涛任我行”，你可以轻松享受到品质、舒适、智能的自行车
+									。</p>
+								<p>&#12288;&#12288;“方涛任我行”的使命是，让用户“随时随地有车骑”。在未来“方涛任我行”希望不生产自行车，只连接自行车，让人们在全世界的每一个角落都可以通过“方涛任我行”解
+									锁自行车，满足短途代步的需求。</p>
+								<p>&#12288;&#12288;“方涛任我行”同样以开放平台和共享精神，欢迎用户共享自己的单车加入“方涛任我行”，以共享经济的互联网创新模式调动城市单车存量市场，提高自行车使用效率，为城
+									市节约更多间。“方涛任我行”倡导文明用车，通过技术手段引导用户规范使用“方涛任我行”共享单车，与市民和政府协同优化共享单车出行解决方案，让城市更美好。</p>
+								<p>&#12288;&#12288;“方涛任我行”相信通过移动互联网技术和Bicycle&#32;Sharing的理念，将有效提升城市交通效率，让人们享受到真正愉悦的骑行，实实在在为低碳环保的生态做贡献。Share
+									&#32;Green&#32;Fun！</p>
+
+							</div>
+							<!-- /widget-content -->
 							
 						</div> <!-- /widget -->
 						
-					</div> <!-- /span5 -->
-		
-					<div class="span4">
-						
-						<div class="widget">
-							
-							<div class="widget-header">
-								<h3>4列标题</h3>
-							</div> <!-- /widget-header -->
-																
-							<div class="widget-content">
-								<p>4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示4列布局内容显示.</p>
-							</div> <!-- /widget-content -->
-							
-						</div> <!-- /widget -->
-					</div> <!-- /span4 -->
+					</div> <!-- /span9 -->
 					
 				</div> <!-- /row -->
-				
-			</div> <!-- /span9 -->
-			
 			
 		</div> <!-- /row -->
 		

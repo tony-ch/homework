@@ -49,25 +49,24 @@ public class ModifyAdminServlet extends HttpServlet {				//人事管理 ——>�
 		String name=request.getParameter("name");
 		String tel=request.getParameter("tel");
 		
-		AdminDao adminDao = new AdminDao();
-		Admin admin = adminDao.findAdminByLoginName(loginname);
+		
 		
 		try{
+			AdminDao adminDao = new AdminDao();
+			Admin admin = adminDao.findAdminByLoginName(loginname);
 			if(admin==null){
 				session.setAttribute("message", "该管理员不存在，请重试");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);		
 			}else{
 				Admin newAdmin = new Admin(0, name, loginname, password, tel);
 				adminDao.updateAdmin(newAdmin);
 								
 		  		session.setAttribute("message", "管理员信息修改成功！");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

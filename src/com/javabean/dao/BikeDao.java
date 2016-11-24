@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.Bike;
 public class BikeDao{
 	//添加自行车方法

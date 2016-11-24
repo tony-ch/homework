@@ -49,31 +49,31 @@
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="/bicycle/index.jsp">BlAdmin</a>
+			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
 			
 				<ul class="nav pull-right">
-					<li>
-						<a href="/bicycle/index.jsp"><span class="badge badge-warning">7</span></a>
-					</li>
 					
 					<li class="divider-vertical"></li>
 					
 					<li class="dropdown">
 						
 						<a data-toggle="dropdown" class="dropdown-toggle " href="#">
-							罗宾逊 <b class="caret"></b>							
+							<c:if test="${sessionScope.person!=null }">
+							<font size=2>${sessionScope.person.loginname }</font><b class="caret"></b>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							未登录<b class="caret"></b>
+							</c:if>	
 						</a>
 						
 						<ul class="dropdown-menu">
 							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-user"></i> 账号设置  </a>
+								<a href="/bicycle/personDetailServlet"><i class="icon-user"></i> 账号设置  </a>
 							</li>
 							
-							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-lock"></i> 修改密码</a>
-							</li>
 							
 							<li class="divider"></li>
 							
@@ -106,19 +106,49 @@
 				<div class="account-container">
 				
 					<div class="account-avatar">
-						<img src="/bicycle/img/headshot.png" alt="" class="thumbnail" />
+						<!-- <img src="/bicycle/img/headshot.png" alt="" class="thumbnail" /> -->
 					</div> <!-- /account-avatar -->
 				
 					<div class="account-details">
 					
-						<span class="account-name">罗宾逊</span>
+						<span class="account-name">
+							<c:if test="${sessionScope.person.loginname!=null }">
+							<font size=4>${sessionScope.person.loginname }</font>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							<font size=4>未登录</font>
+							</c:if>						
+						</span>
 						
-						<span class="account-role">管理员</span>
+						<span class="account-role">
+						<font size=0>
+							<c:if test="${sessionScope.person.loginname==null }">
+							${"&nbsp"}
+							</c:if>
+							
+							<c:if test="${sessionScope.person.loginname!=null }">
+								<c:if test="${sessionScope.person.type==3}">
+								用户
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==2}">
+								维修工
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==1}">
+								采购员
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==0}">
+								管理员
+								</c:if>
+							</c:if> 
+							</font>
+							</span>
 						
 						<span class="account-actions">
-							<a href="/bicycle/account.jsp">资料</a> |
-							
-							<a href="/bicycle/account.jsp">编辑设置</a>
+							<a href="/bicycle/personDetailServlet">资料</a> 
 						</span>
 					
 					</div> <!-- /account-details -->
@@ -136,38 +166,55 @@
 						</a>
 					</li>
 					
+					<!-- 
 					<li>
 						<a href="/bicycle/faq.jsp">
 							<i class="icon-pushpin"></i>
 							帮助页面	
 						</a>
 					</li>
+					 -->
 					
+					<c:if test="${sessionScope.person.type==3 }">
 					<li>
-						<a href="/bicycle/plans.jsp">
+						<a href="/bicycle/userHomeServlet">
+							<i class="icon-user"></i>
+							用车系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==1 }">
+					<li>
+						<a href="/bicycle/purchase.jsp">
+							<i class="icon-shopping-cart"></i>
+							采购系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==2 }">
+					<li>
+						<a href="/bicycle/ma/listMaintainServlet">
+							<i class="icon-check"></i>
+							报修系统
+							<!-- <span class="label label-warning pull-right">5</span> -->
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==0 }">
+					<li class="active">
+						<a href="/bicycle/pa/listAdminServlet">
 							<i class="icon-th-list"></i>
-							价目表单		
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/grid.jsp">
-							<i class="icon-th-large"></i>
-							网格布局
-							<span class="label label-warning pull-right">5</span>
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/pa/listAdmServlet">
-							<i class="icon-signal"></i>
 							管理系统
 						</a>
 					</li>
+					</c:if>
 					
-					<li class="active">
-						<a href="/bicycle/account.jsp">
-							<i class="icon-user"></i>
+					<li>
+						<a href="/bicycle/personDetailServlet">
+							<i class="icon-cog"></i>
 							用户账号					
 						</a>
 					</li>
@@ -181,12 +228,12 @@
 					
 				</ul>	
 				
-				
-				
 				<hr />
 				
 				<div class="sidebar-extra">
-					<p>这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字.</p>
+					<p>联系我们:</p>
+					<p>邮箱: changtao@buaa.edu.cn</p>
+					<p>邮箱: @buaa.edu.cn</p>
 				</div> <!-- .sidebar-extra -->
 				
 				<br />
@@ -198,7 +245,7 @@
 			<div class="span9">
 				
 				<h1 class="page-title">
-					<i class="icon-th-large"></i>
+					<i class="icon-th-list"></i>
 					添加
 					<c:if test="${param.type=='admin'}">管理员</c:if>
 					<c:if test="${param.type=='worker'}">工人</c:if>

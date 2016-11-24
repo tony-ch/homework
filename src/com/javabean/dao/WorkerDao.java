@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.Worker;
 public class WorkerDao {
 	//添加员工方法
@@ -66,9 +66,9 @@ public class WorkerDao {
 				pstmt=conn.prepareStatement(sql);
 				pstmt.setString(1, worker.getName());
 				pstmt.setString(2, worker.getPassword());
-				pstmt.setDouble(3, worker.getSalary());
+				pstmt.setInt(3, worker.getSalary());
 				pstmt.setString(4, worker.getLoginname());
-				pstmt.executeUpdate();
+				System.out.println("after update:"+pstmt.executeUpdate());
 			}catch (SQLException e) {
 				e.printStackTrace();
 				throw new RTException("数据库操作异常，请稍后重试!");
@@ -95,7 +95,7 @@ public class WorkerDao {
 					worker.setPassword(rs.getString(3));
 					worker.setDepartment(rs.getString(4));
 					worker.setName(rs.getString(5));
-					worker.setSalary(rs.getDouble(6));
+					worker.setSalary(rs.getInt(6));
 					worker.setCnt(rs.getInt(7));
 					worker.setBalance(rs.getInt(8));
 				}
@@ -136,7 +136,7 @@ public class WorkerDao {
 						worker.setPassword(rs.getString(3));
 						worker.setDepartment(rs.getString(4));
 						worker.setName(rs.getString(5));
-						worker.setSalary(rs.getDouble(6));
+						worker.setSalary(rs.getInt(6));
 						worker.setCnt(rs.getInt(7));
 						worker.setBalance(rs.getInt(8));
 						list.add(worker);
@@ -277,7 +277,7 @@ public class WorkerDao {
 					worker.setPassword(rs.getString(3));
 					worker.setDepartment(rs.getString(4));
 					worker.setName(rs.getString(5));
-					worker.setSalary(rs.getDouble(6));
+					worker.setSalary(rs.getInt(6));
 					worker.setCnt(rs.getInt(7));
 					worker.setBalance(rs.getInt(8));
 				}

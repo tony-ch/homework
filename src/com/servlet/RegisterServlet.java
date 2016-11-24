@@ -59,7 +59,7 @@ public class RegisterServlet extends HttpServlet {
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

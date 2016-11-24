@@ -1,6 +1,8 @@
 package com.servlet;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -12,7 +14,7 @@ import com.javabean.entity.*;
 import com.javabean.dao.*;
 
 /**
- * Servlet implementation class UsebikeServlet
+ * Servlet implementation class usebikeServlet
  */
 @WebServlet("/usebikeServlet")
 
@@ -45,6 +47,7 @@ public class UsebikeServlet extends HttpServlet {				//用户用车
 		response.setCharacterEncoding("UTF-8");
 		Person person = (Person)session.getAttribute("person");
 		String bike=request.getParameter("bike");
+		System.out.print(bike);
 		int bikeId = Integer.parseInt(bike);
 
 		try{
@@ -58,24 +61,25 @@ public class UsebikeServlet extends HttpServlet {				//用户用车
 			}
 			else if(bikeDao.findBikeById(bikeId)==null){
 				session.setAttribute("message", "自行车编号错误，请重新输入");
-				request.getRequestDispatcher("/usebike.jsp").forward(request, response);		
+				request.getRequestDispatcher("/userHomeServlet").forward(request, response);		
 			}
-			else if(bikeDao.findBikeById(bikeId).getState()==null){
+			else if(!bikeDao.findBikeById(bikeId).getState().equalsIgnoreCase("I")){
 				session.setAttribute("message", "该车已被占用或停用，请使用其他自行车");
-				request.getRequestDispatcher("/usebike.jsp").forward(request, response);
+				request.getRequestDispatcher("/userHomeServlet").forward(request, response);
 			}else{
 				UserDao userDao = new UserDao();
 				OrderDao orderDao = new OrderDao();
 				int userId = userDao.findUserByLoginName(person.getLoginname()).getId();
-				Order order = new Order(0, userId, bikeId, null, null);
+				Order order = new Order(0, userId, bikeId, new Timestamp(System.currentTimeMillis()), null);
 				orderDao.addOrder(order);
 				String key = bikeDao.findBikeById(bikeId).getKey();				
-		  		session.setAttribute("message", "用车成功，密码是！");
-		  		request.getRequestDispatcher("/index.jsp").forward(request, response);
+		  		session.setAttribute("message", "用车成功，密码是:"+key);
+		  		request.setAttribute("key", key);
+		  		request.getRequestDispatcher("/userHomeServlet").forward(request, response);
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

@@ -52,18 +52,16 @@ public class AddAdminServlet extends HttpServlet {				//人事管理 ——>添�
 		try{
 			if(adminDao.findAdminByLoginName(loginname)!=null){
 				session.setAttribute("message", "登录名已被占用，请使用其他登录名");
-				//request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/pa/listAdmServlet").forward(request, response);		
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);		
 			}else{
 				Admin admin=new Admin(0, name,loginname, password, tel);
 				adminDao.addAdmin(admin);
 		  		session.setAttribute("message", "管理员添加成功！");
-				//request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/pa/listAdmServlet").forward(request, response);	
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

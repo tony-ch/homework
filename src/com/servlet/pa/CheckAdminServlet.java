@@ -7,8 +7,9 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.commmon.Page;
-import com.commmon.RTException;
+
+import com.common.Page;
+import com.common.RTException;
 import com.javabean.dao.AdminDao;
 @WebServlet("/pa/checkAdminServlet")
 public class CheckAdminServlet extends HttpServlet {
@@ -39,12 +40,12 @@ public class CheckAdminServlet extends HttpServlet {
 			Page pa=(Page) map.get("pa");
 			request.setAttribute("curPage", pa.getCurPage());//向显示页传递当前页页码
 			request.setAttribute("pageCount",pa.getPageCount());//向显示页传递总页数
-			request.setAttribute("list", list);//向显示页传递结果集
-			request.setAttribute("activeTab", "adtab");//adtab wktab ustab
+			request.setAttribute("adlist", list);//向显示页传递结果集
+			request.setAttribute("activeTab", "admtab");//adtab wktab ustab
 	  		request.getRequestDispatcher("/manager.jsp").forward(request, response);
   		}catch (RTException e) {
 			e.printStackTrace();
-			request.setAttribute("exceptiton", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

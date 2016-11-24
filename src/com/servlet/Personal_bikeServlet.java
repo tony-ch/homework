@@ -1,6 +1,7 @@
 package com.servlet;
 
 import java.io.IOException;
+import java.sql.Date;
 import java.sql.Timestamp;
 
 import javax.servlet.ServletException;
@@ -14,7 +15,7 @@ import com.javabean.entity.*;
 import com.javabean.dao.*;
 
 /**
- * Servlet implementation class Personal_bikeServlet
+ * Servlet implementation class personal_bikeServlet
  */
 @WebServlet("/personal_bikeServlet")
 
@@ -63,24 +64,35 @@ public class Personal_bikeServlet extends HttpServlet {				//发布个人自行�
 				String _end=request.getParameter("end_time");
 				String _rent=request.getParameter("rent");
 				String desc=request.getParameter("desc");
-				String start = _start + " 00:00:00";
-				String end = _end + " 00:00:00";
+				
 				
 				int userId=user.getId();
-				Timestamp start_time = Timestamp.valueOf(start);
-				Timestamp end_time = Timestamp.valueOf(end);
+				Date start_time = Date.valueOf(_start);
+				Date end_time = Date.valueOf(_end);
 				int rent = Integer.parseInt(_rent);
+				
+				System.out.println(start_time);
+				System.out.println(end_time);
 				
 				Personal_bike personal_bike = new Personal_bike(0, userId, tel, start_time, end_time, rent, desc);
 				personal_bikeDao.addPersonal_bike(personal_bike);
 				
+				/*System.out.println(personal_bike.getId());
+				System.out.println(personal_bike.getUser());
+				System.out.println(personal_bike.getTel());
+				System.out.println(personal_bike.getStart_time());
+				System.out.println(personal_bike.getEnd_time());
+				System.out.println(personal_bike.getRent());
+				System.out.println(personal_bike.getDesc());*/
+				
+				
 				session.setAttribute("message", "个人自行车信息发布成功");
-				request.getRequestDispatcher("/personal_bike.jsp").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
+				request.getRequestDispatcher("/userHomeServlet").forward(request, response);		//跳转到个人信息发布页面（即刷新当前界面）
 				
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

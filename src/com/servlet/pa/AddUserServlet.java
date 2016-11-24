@@ -52,18 +52,17 @@ public class AddUserServlet extends HttpServlet {				//人事管理 ——>添�
 		try{
 			if(userDao.findUserByLoginName(loginname)!=null){
 				session.setAttribute("message", "登录名已被占用，请使用其他登录名");
-				request.setAttribute("activeTab", "ustab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				request.getRequestDispatcher("/pa/listUserServlet").forward(request, response);	
 			}else{
 				User user=new User(0, loginname, password,0.0, name, tel);
 				userDao.addUser(user);
 		  		session.setAttribute("message", "用户添加成功！");
-				request.setAttribute("activeTab", "ustab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				//request.setAttribute("activeTab", "ustab");
+				request.getRequestDispatcher("/pa/listUserServlet").forward(request, response);		
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

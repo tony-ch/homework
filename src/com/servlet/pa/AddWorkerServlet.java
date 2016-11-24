@@ -53,8 +53,7 @@ public class AddWorkerServlet extends HttpServlet {				//人事管理 ——>添
 		try{
 			if(workerDao.findWorkerByLoginName(loginname)!=null){
 				session.setAttribute("message", "登录名已被占用，请使用其他登录名");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);		
 			}else{
 				Worker worker=new Worker();
 				worker.setLoginname(loginname);
@@ -64,12 +63,12 @@ public class AddWorkerServlet extends HttpServlet {				//人事管理 ——>添
 				
 				workerDao.addWorker(worker);
 		  		session.setAttribute("message", "员工添加成功！");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				//request.setAttribute("activeTab", "wktab");
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

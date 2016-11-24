@@ -39,7 +39,7 @@ CREATE TABLE `admin` (
 
 LOCK TABLES `admin` WRITE;
 /*!40000 ALTER TABLE `admin` DISABLE KEYS */;
-INSERT INTO `admin` VALUES (1,'tony','tony1234','tony','13095581609');
+INSERT INTO `admin` VALUES (1,'admin','admin','admin','12345678901');
 /*!40000 ALTER TABLE `admin` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,7 +144,7 @@ BEGIN
 declare w int;
 update `bike` set `state`='R' where `bike`.`id`=NEW.`bike`;
 set new.`time` = now();
-set w=(select id from woker where department='M' order by cnt limit 1);
+select `id` into w from `worker` where `department`='M' order by `cnt` limit 1;
 set new.`maintainer`=w;
 update `worker` set `cnt`=`cnt`+1 where `id`=w;
 END */;;
@@ -173,13 +173,13 @@ DELIMITER ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
 
 --
--- Table structure for table `order`
+-- Table structure for table `orde`
 --
 
-DROP TABLE IF EXISTS `order`;
+DROP TABLE IF EXISTS `orde`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `order` (
+CREATE TABLE `orde` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) NOT NULL,
   `bike` int(11) NOT NULL,
@@ -195,12 +195,12 @@ CREATE TABLE `order` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `order`
+-- Dumping data for table `orde`
 --
 
-LOCK TABLES `order` WRITE;
-/*!40000 ALTER TABLE `order` DISABLE KEYS */;
-/*!40000 ALTER TABLE `order` ENABLE KEYS */;
+LOCK TABLES `orde` WRITE;
+/*!40000 ALTER TABLE `orde` DISABLE KEYS */;
+/*!40000 ALTER TABLE `orde` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
 /*!50003 SET @saved_cs_results     = @@character_set_results */ ;
@@ -211,7 +211,7 @@ UNLOCK TABLES;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bicycle`.`order_BEFORE_INSERT` BEFORE INSERT ON `order` FOR EACH ROW
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bicycle`.`order_BEFORE_INSERT` BEFORE INSERT ON `orde` FOR EACH ROW
 BEGIN
 update `bike` set `state`='U' where `bike`.`id`=NEW.`bike`;
 set new.`start_time` = now();
@@ -230,7 +230,7 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bicycle`.`order_AFTER_DELETE` AFTER DELETE ON `order` FOR EACH ROW
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bicycle`.`order_AFTER_DELETE` AFTER DELETE ON `orde` FOR EACH ROW
 BEGIN
 declare sec int;
 declare m double default 0.0;
@@ -256,10 +256,10 @@ CREATE TABLE `personal_bike` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user` int(11) NOT NULL,
   `tel` varchar(13) NOT NULL,
-  `start_time` datetime NOT NULL,
-  `end_time` datetime NOT NULL,
+  `start_time` date NOT NULL,
+  `end_time` date NOT NULL,
   `rent` int(10) unsigned NOT NULL,
-  `desc` varchar(220) NOT NULL,
+  `descp` varchar(220) NOT NULL,
   PRIMARY KEY (`id`),
   KEY `uid_idx` (`user`),
   CONSTRAINT `pbike_uid` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -304,30 +304,6 @@ LOCK TABLES `purchase` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `timer`
---
-
-DROP TABLE IF EXISTS `timer`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `timer` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `time` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=utf8;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `timer`
---
-
-LOCK TABLES `timer` WRITE;
-/*!40000 ALTER TABLE `timer` DISABLE KEYS */;
-INSERT INTO `timer` VALUES (1,'2016-11-19 04:44:38'),(2,'2016-11-19 04:45:38'),(3,'2016-11-19 04:46:38'),(4,'2016-11-19 04:47:38'),(5,'2016-11-19 04:48:38'),(6,'2016-11-19 04:49:38'),(7,'2016-11-19 04:50:38'),(8,'2016-11-19 04:51:38'),(9,'2016-11-19 04:52:38'),(10,'2016-11-19 04:53:38'),(11,'2016-11-19 04:54:38'),(12,'2016-11-19 04:55:38'),(13,'2016-11-19 04:56:38'),(14,'2016-11-19 04:57:38'),(15,'2016-11-19 04:58:38'),(16,'2016-11-19 04:59:37'),(17,'2016-11-19 05:00:37'),(18,'2016-11-20 11:31:31'),(19,'2016-11-20 11:32:31'),(20,'2016-11-20 11:33:31'),(21,'2016-11-20 11:34:31'),(22,'2016-11-20 11:35:31'),(23,'2016-11-20 11:36:31'),(24,'2016-11-20 11:37:31'),(25,'2016-11-20 11:38:31'),(26,'2016-11-20 11:39:31');
-/*!40000 ALTER TABLE `timer` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `user`
 --
 
@@ -343,7 +319,7 @@ CREATE TABLE `user` (
   `tel` varchar(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login_name_UNIQUE` (`login_name`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -352,7 +328,6 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'tony','tony1234',100,'tony','13095581609');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -366,7 +341,9 @@ UNLOCK TABLES;
 DELIMITER ;;
 /*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER `bicycle`.`user_AFTER_UPDATE` AFTER UPDATE ON `user` FOR EACH ROW
 BEGIN
+if OLD.balance!=NEW.balance THEN
 insert into `user_account` (`user`,`money`,`time`) values (OLD.`id`,NEW.balance-OLD.balance,now());
+end if;
 END */;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -389,7 +366,7 @@ CREATE TABLE `user_account` (
   PRIMARY KEY (`id`),
   KEY `act_uid_idx` (`user`),
   CONSTRAINT `act_uid` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -398,7 +375,6 @@ CREATE TABLE `user_account` (
 
 LOCK TABLES `user_account` WRITE;
 /*!40000 ALTER TABLE `user_account` DISABLE KEYS */;
-INSERT INTO `user_account` VALUES (7,1,0,'2016-11-20 18:35:01'),(8,1,0,'2016-11-20 18:40:19'),(9,1,0,'2016-11-20 18:51:47'),(10,1,0,'2016-11-20 18:53:04'),(11,1,0,'2016-11-21 00:19:37');
 /*!40000 ALTER TABLE `user_account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -419,7 +395,7 @@ CREATE TABLE `worker` (
   `cnt` int(11) DEFAULT '0',
   `balance` int(11) DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -428,9 +404,33 @@ CREATE TABLE `worker` (
 
 LOCK TABLES `worker` WRITE;
 /*!40000 ALTER TABLE `worker` DISABLE KEYS */;
-INSERT INTO `worker` VALUES (1,'tony1','tony1234','M','tony',3000,0,0),(2,'tony2','tony1234','B','tony',3000,0,0);
 /*!40000 ALTER TABLE `worker` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping events for database 'bicycle'
+--
+/*!50106 SET @save_time_zone= @@TIME_ZONE */ ;
+/*!50106 DROP EVENT IF EXISTS `DIL_SALARY` */;
+DELIMITER ;;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;;
+/*!50003 SET character_set_client  = utf8 */ ;;
+/*!50003 SET character_set_results = utf8 */ ;;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;;
+/*!50003 SET @saved_time_zone      = @@time_zone */ ;;
+/*!50003 SET time_zone             = 'SYSTEM' */ ;;
+/*!50106 CREATE*/ /*!50117 DEFINER=`root`@`localhost`*/ /*!50106 EVENT `DIL_SALARY` ON SCHEDULE EVERY 1 MONTH STARTS '2016-11-01 00:00:00' ON COMPLETION PRESERVE ENABLE DO call DILIVER_SALARY() */ ;;
+/*!50003 SET time_zone             = @saved_time_zone */ ;;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;;
+/*!50003 SET character_set_results = @saved_cs_results */ ;;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;;
+DELIMITER ;
+/*!50106 SET TIME_ZONE= @save_time_zone */ ;
 
 --
 -- Dumping routines for database 'bicycle'
@@ -468,46 +468,30 @@ DELIMITER ;
 /*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
 /*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
 DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `HANDLE_PURCHASE`(aid int,num int,purid int,ds bool)
+CREATE DEFINER=`root`@`localhost` PROCEDURE `HANDLE_PURCHASE`(aid int,num int,purid int,ds boolean)
 BEGIN
-DECLARE wid,i int;
-declare m double;
-set wid=(select buyer from purchase where id=purid);
-set m=(select money from purchase where id=purid);
+DECLARE wid int default 0;
+declare m int default 0;
+declare i int default 0;
+select `buyer`  into wid from `purchase` where `id`=purid;
+select `money` into m from `purchase` where `id`=purid;
+select wid;
+select m;
 if ds then
 	insert into company_account(`money`,`admin`,`worker`,`time`,`type`) values(m,aid,wid,now(),'B');
 	set i=0;
 	ins:LOOP
-		if i<n then
+		if i<num then
 			insert into bike (`key`) values(CEILING(RAND()*900000+100000));
 		else
 			leave ins;
 		end if;
 		set i=i+1;
 	end LOOP ins;
-    delete from purchase where id=purid;
+    delete from `purchase` where `id`=purid;
 else
-	delete from purchase where id=purid;
+	delete from `purchase` where `id`=purid;
 end if;
-END ;;
-DELIMITER ;
-/*!50003 SET sql_mode              = @saved_sql_mode */ ;
-/*!50003 SET character_set_client  = @saved_cs_client */ ;
-/*!50003 SET character_set_results = @saved_cs_results */ ;
-/*!50003 SET collation_connection  = @saved_col_connection */ ;
-/*!50003 DROP PROCEDURE IF EXISTS `timer_up` */;
-/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
-/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
-/*!50003 SET @saved_col_connection = @@collation_connection */ ;
-/*!50003 SET character_set_client  = utf8 */ ;
-/*!50003 SET character_set_results = utf8 */ ;
-/*!50003 SET collation_connection  = utf8_general_ci */ ;
-/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
-/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
-DELIMITER ;;
-CREATE DEFINER=`root`@`localhost` PROCEDURE `timer_up`()
-BEGIN
-insert into timer (`time`) values(now());
 END ;;
 DELIMITER ;
 /*!50003 SET sql_mode              = @saved_sql_mode */ ;
@@ -524,4 +508,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-21 20:25:11
+-- Dump completed on 2016-11-24 22:54:18

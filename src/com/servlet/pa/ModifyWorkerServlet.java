@@ -48,32 +48,33 @@ public class ModifyWorkerServlet extends HttpServlet {				//人事管理 ——>
 		String password=request.getParameter("password");
 		String name=request.getParameter("name");
 		String _salary=request.getParameter("salary");
-		double salary=Double.parseDouble(_salary);
-		//String tel=request.getParameter("tel");			//员工没有电话属性
 		
+		int salary=Integer.parseInt(_salary);
+		//String tel=request.getParameter("tel");			//员工没有电话属性
+		System.out.println("loginname:"+loginname+",password:"+password+",name:"+name+",salary:"+_salary);
+		System.out.println(salary);
 		WorkerDao workerDao = new WorkerDao();
 		Worker worker = workerDao.findWorkerByLoginName(loginname);
 		
 		try{
 			if(worker==null){
 				session.setAttribute("message", "该员工不存在，请重试");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);		
 			}else{
 				Worker newWorker = new Worker();//(0, name, loginname, password, tel);
 				newWorker.setPassword(password);
 				newWorker.setName(name);
 				newWorker.setSalary(salary);
+				newWorker.setLoginname(loginname);
 				
 				workerDao.updateWorker(newWorker);
 								
 		  		session.setAttribute("message", "员工信息修改成功！");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

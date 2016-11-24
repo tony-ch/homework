@@ -6,7 +6,7 @@ public class Worker {
 	protected String password;//密码
 	protected String department;//部门 ，B采购员，M维修工
 	protected String name;//员工真实姓名	
-	protected double salary;//工资
+	protected int salary;//工资
 	protected int cnt;	//维修次数
 	protected int balance;//员工账户余额（体现发工资动作）
 	
@@ -53,11 +53,11 @@ public class Worker {
 		this.name = name;
 	}
 
-	public double getSalary() {
+	public int getSalary() {
 		return salary;
 	}
 
-	public void setSalary(double salary) {
+	public void setSalary(int salary) {
 		this.salary = salary;
 	}
 

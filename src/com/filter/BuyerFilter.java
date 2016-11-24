@@ -6,16 +6,19 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import com.javabean.entity.Person;
+@WebFilter({"/buy/*","/purchase.jsp"})
 public class BuyerFilter  implements Filter{
 	public void init(FilterConfig arg0) throws ServletException {
 		/*
 		 * 包含初始化Filter时需要执行的代码，该代码执行一次
 		 * */
 	}
+
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest req = (HttpServletRequest) request;//将request强制转换为HttpServletRequest类型
@@ -26,7 +29,7 @@ public class BuyerFilter  implements Filter{
 		//如果用户登录成功并且登录用户为教师类型或者管理员类型，将继续执行用户请求操作，否则返回越权操作或者未登录提示信息并跳转到系统首页或者登录页面
 		if(person!=null&&(person.getType()==1)){
 			chain.doFilter(req, res);//继续执行用户请求的操作		
-		}else if(person!=null&&person.getType()==2 ||person.getType()==0 ||person.getType()==3){
+		}else if(person!=null&&(person.getType()==2 ||person.getType()==0 ||person.getType()==3)){
 			//登录成功但是登录用户不是管理员或者教师类型用户类型，将返回越权操作提示信息并跳转到系统首页
 			session.setAttribute("message","对不起，该功能仅对采购人员开放！");
 			res.sendRedirect(req.getContextPath() + "/index.jsp");

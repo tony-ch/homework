@@ -48,8 +48,7 @@ public class ShowPersonServlet extends HttpServlet {
 		try{
 			if(type==null){
 				session.setAttribute("message", "出现错误，请重试");
-				request.setAttribute("activeTab", "adtab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listAdminServlet").forward(request, response);		
 			}else if(type.equalsIgnoreCase("admin")){
 				AdminDao adminDao = new AdminDao();
 				Admin admin = adminDao.findAdminByLoginName(loginname);				

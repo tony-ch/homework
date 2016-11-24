@@ -68,33 +68,33 @@ with (thisform)
 				<span class="icon-bar"></span> 				
 			</a>
 			
-			<a class="brand" href="/bicycle/index.jsp">BlAdmin</a>
+			<a class="brand" href="/bicycle/index.jsp">Bicycle</a>
 			
 			<div class="nav-collapse">
 			
 				<ul class="nav pull-right">
-					<li>
-						<a href="/bicycle/index.jsp"><span class="badge badge-warning">7</span></a>
-					</li>
 					
 					<li class="divider-vertical"></li>
 					
 					<li class="dropdown">
 						
 						<a data-toggle="dropdown" class="dropdown-toggle " href="#">
-							罗宾逊 <b class="caret"></b>							
+							<c:if test="${sessionScope.person!=null }">
+							<font size=2>${sessionScope.person.loginname }</font><b class="caret"></b>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							未登录<b class="caret"></b>
+							</c:if>	
 						</a>
 						
 						<ul class="dropdown-menu">
 							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-user"></i> 账号设置  </a>
+								<a href="/bicycle/personDetailServlet"><i class="icon-user"></i> 账号设置  </a>
 							</li>
 							
-							<li>
-								<a href="/bicycle/account.jsp"><i class="icon-lock"></i> 修改密码</a>
-							</li>
 							
-							<li class="/bicycle/divider"></li>
+							<li class="divider"></li>
 							
 							<li>
 								<a href="/bicycle/logoutServlet"><i class="icon-off"></i> 退出</a>
@@ -125,19 +125,49 @@ with (thisform)
 				<div class="account-container">
 				
 					<div class="account-avatar">
-						<img src="/bicycle/img/headshot.png" alt="" class="thumbnail" />
+						<!-- <img src="/bicycle/img/headshot.png" alt="" class="thumbnail" /> -->
 					</div> <!-- /account-avatar -->
 				
 					<div class="account-details">
 					
-						<span class="account-name">罗宾逊</span>
+						<span class="account-name">
+							<c:if test="${sessionScope.person.loginname!=null }">
+							<font size=4>${sessionScope.person.loginname }</font>
+							</c:if>
+							
+							<c:if test="${sessionScope.person==null }">
+							<font size=4>未登录</font>
+							</c:if>						
+						</span>
 						
-						<span class="account-role">管理员</span>
+						<span class="account-role">
+						<font size=0>
+							<c:if test="${sessionScope.person.loginname==null }">
+							${"&nbsp"}
+							</c:if>
+							
+							<c:if test="${sessionScope.person.loginname!=null }">
+								<c:if test="${sessionScope.person.type==3}">
+								用户
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==2}">
+								维修工
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==1}">
+								采购员
+								</c:if>
+								
+								<c:if test="${sessionScope.person.type==0}">
+								管理员
+								</c:if>
+							</c:if> 
+							</font>
+							</span>
 						
 						<span class="account-actions">
-							<a href="/bicycle/account.jsp">资料</a> |
-							
-							<a href="/bicycle/account.jsp">编辑设置</a>
+							<a href="/bicycle/personDetailServlet">资料</a> 
 						</span>
 					
 					</div> <!-- /account-details -->
@@ -155,38 +185,55 @@ with (thisform)
 						</a>
 					</li>
 					
+					<!-- 
 					<li>
 						<a href="/bicycle/faq.jsp">
 							<i class="icon-pushpin"></i>
 							帮助页面	
 						</a>
 					</li>
+					 -->
 					
+					<c:if test="${sessionScope.person.type==3 }">
 					<li>
-						<a href="/bicycle/plans.jsp">
+						<a href="/bicycle/userHomeServlet">
+							<i class="icon-user"></i>
+							用车系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==1 }">
+					<li>
+						<a href="/bicycle/purchase.jsp">
+							<i class="icon-shopping-cart"></i>
+							采购系统		
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==2 }">
+					<li>
+						<a href="/bicycle/ma/listMaintainServlet">
+							<i class="icon-check"></i>
+							报修系统
+							<!-- <span class="label label-warning pull-right">5</span> -->
+						</a>
+					</li>
+					</c:if>
+					
+					<c:if test="${sessionScope.person.type==0 }">
+					<li>
+						<a href="/bicycle/pa/listAdminServlet">
 							<i class="icon-th-list"></i>
-							价目表单		
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/grid.jsp">
-							<i class="icon-th-large"></i>
-							网格布局
-							<span class="label label-warning pull-right">5</span>
-						</a>
-					</li>
-					
-					<li>
-						<a href="/bicycle/pa/listAdmServlet">
-							<i class="icon-signal"></i>
 							管理系统
 						</a>
 					</li>
+					</c:if>
 					
 					<li class="active">
-						<a href="/bicycle/account.jsp">
-							<i class="icon-user"></i>
+						<a href="/bicycle/personDetailServlet">
+							<i class="icon-cog"></i>
 							用户账号					
 						</a>
 					</li>
@@ -200,12 +247,12 @@ with (thisform)
 					
 				</ul>	
 				
-				
-				
 				<hr />
 				
 				<div class="sidebar-extra">
-					<p>这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字这里是提示信息文字.</p>
+					<p>联系我们:</p>
+					<p>邮箱: changtao@buaa.edu.cn</p>
+					<p>邮箱: @buaa.edu.cn</p>
 				</div> <!-- .sidebar-extra -->
 				
 				<br />
@@ -217,7 +264,7 @@ with (thisform)
 			<div class="span9">
 				
 				<h1 class="page-title">
-					<i class="icon-th-large"></i>
+					<i class="icon-cog"></i>
 					用户设置			
 				</h1>
 				
@@ -236,15 +283,34 @@ with (thisform)
 								
 								
 								
-								<form id="edit-profile" onsubmit="return validate_form(this)" action="/bicycle/updateServlet"  class="form-horizontal" method="post" >
+								<form id="edit-profile" 
+								action="/bicycle/updateServlet"
+								class="form-horizontal" method="post" >
 									<fieldset>
+										<div class="control-group">											
+											<label class="control-label" for="id">ID：</label>
+											<div class="controls">
+												<input type="text" class="input-medium disabled" 
+												name="id"
+												id="id" 
+												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.id }"</c:if>
+												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.id }"</c:if>
+												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.id }"</c:if>
+												 readonly />
+												<p class="help-block">ID为唯一标识，不能更改</p>
+											</div> <!-- /controls -->				
+										</div> <!-- /control-group -->
 										
 										<div class="control-group">											
 											<label class="control-label" for="loginname">登录名：</label>
 											<div class="controls">
 												<input type="text" class="input-medium disabled" 
 												name="loginname"
-												id="loginname" value="${sessionScope.person.loginname }" readonly />
+												id="loginname" 
+												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.loginname }"</c:if>
+												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.loginname }"</c:if>
+												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.loginname }"</c:if>
+												 readonly />
 												<p class="help-block">登录名是为登录而用，不能修改.</p>
 											</div> <!-- /controls -->				
 										</div> <!-- /control-group -->
@@ -257,12 +323,15 @@ with (thisform)
 												maxlength=18
 												name="name"
 												id="name" 
-												value="${sessionScope.person.name }" />
+												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.name }"</c:if>
+												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.name }"</c:if>
+												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.name }"</c:if>
+												/>
 											</div> <!-- /controls -->				
 										</div> <!-- /control-group -->
 										
 										
-										<c:if test="${sessionScope.person.type }!=2 && ${sessionScope.person.type }!=3">
+										<c:if test="${requestScope.type!='worker' }">
 										<div class="control-group">											
 											<label class="control-label" for="tel">手机号码：</label>
 											<div class="controls">
@@ -271,7 +340,9 @@ with (thisform)
 												name="tel"
 												pattern="[0-9]{11}"
 												maxlength=11
-												value="${sessionScope.person.tel }" />
+												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.tel }"</c:if>
+												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.tel }"</c:if>
+												/>
 												<p class="help-block">输入11位手机号码</p>
 											</div> <!-- /controls -->				
 										</div> <!-- /control-group -->
@@ -279,35 +350,95 @@ with (thisform)
 										</c:if>
 										
 										
-										<br /><br />
+										<br />
 										
 										<div class="control-group">											
 											<label class="control-label" for="password">密码：</label>
 											<div class="controls">
-												<input type="password" 
+												<input type="text" 
 												pattern=".{6,18}"
 												name="password"
 												maxlength=18
 												class="input-medium" id="password" 
+												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.password }"</c:if>
+												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.password }"</c:if>
+												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.password }"</c:if>
 												 required/>
 												 <p class="help-block">输入6-18位密码</p>
 											</div> <!-- /controls -->				
 										</div> <!-- /control-group -->
 										
-										
-										<div class="control-group">											
-											<label class="control-label" for="password1">确认密码：</label>
-											<div class="controls">
-												<input type="password" 
-												name="password1"
-												pattern=".{6,18}"
-												maxlength=18
-												class="input-medium" 
-												id="password1"  required/>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										
+										<c:if test="${requestScope.type=='worker'}">
+											<div class="control-group">
+												<label class="control-label" for="department">员工类型</label>
+												<div class="controls">
+													<label>
+														<input type="radio" name="department" value="B"
+														<c:if test="${requestScope.worker.department=='B' }">checked="checked"</c:if>
+														 id="department" 
+														 disabled
+														 />
+														采购员
+													</label>
+													<label>
+														<input type="radio" name="department" value="M"
+														<c:if test="${requestScope.worker.department=='M' }">checked="checked"</c:if>
+														 disabled
+														 />
+														维修工
+													</label>
+													<p class="help-block">部门不支持更改</p>
+												</div>
+											</div>
+											</c:if>	
+											
+											<c:if test="${requestScope.type=='worker'}">
+											<div class="control-group">
+												<label class="control-label" for="salaryM">月工资</label>
+												<div class="controls">
+													<input type="text" 
+														pattern="[0-9]{1,4}"
+														name="salaryM"
+														maxlength=4
+														class="input-medium" id="salary" 
+														value='${requestScope.worker.salary }'
+														 readonly/>
+													<p class="help-block">此处不支持更改</p>
+												</div>
+											</div>
+											<c:if test="${requestScope.worker.department=='M' }">
+											<div class="control-group">
+												<label class="control-label" for="cnt">处理维修次数</label>
+												<div class="controls">
+													<input type="text" 
+														pattern="[0-9]{1,4}"
+														name="cnt"
+														
+														class="input-medium" id="cnt" 
+														value='${requestScope.worker.cnt }'
+														 readonly/>
+													<p class="help-block">不支持更改</p>
+												</div>
+											</div>
+											</c:if>
+											</c:if>	
+											
+											<c:if test="${requestScope.type!='admin'}">
+											<div class="control-group">
+												<label class="control-label" for="balance">余额</label>
+												<div class="controls">
+													<input type="text" 
+														pattern="[0-9]{1,10}"
+														name="balance"
+														maxlength=10
+														class="input-medium" id="balance" 
+														<c:if test="${requestScope.type=='worker' }">value='${requestScope.worker.balance }'</c:if>
+														<c:if test="${requestScope.type=='user' }">value='${requestScope.user.balance }'</c:if>
+														 readonly/>
+													<p class="help-block">此处不支持更改</p>
+												</div>
+											</div>
+											</c:if>	
 											
 											<br />
 										
@@ -318,13 +449,6 @@ with (thisform)
 										</div> <!-- /form-actions -->
 									</fieldset>
 								</form>
-								
-								
-								
-								
-								
-								
-								
 								
 							</div> <!-- /widget-content -->
 							

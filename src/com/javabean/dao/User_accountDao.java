@@ -9,10 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.User_account;
 public class User_accountDao{
 	//添加记录方法
@@ -76,14 +76,14 @@ public class User_accountDao{
 		}
 	}*/
 	//根据用户id查找记录
-	public User_account findUser_accountByUserId(int id){
+	public User_account findUser_accountById(int id){
 		User_account user_account=null;
 		Connection conn=null;
 		PreparedStatement pstmt=null;
 		ResultSet rs=null;
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="select * from user_account where id=?"; 
+			String sql="select * from user_account where user=?"; 
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setInt(1, id);
 			rs=pstmt.executeQuery();
@@ -103,20 +103,27 @@ public class User_accountDao{
 		return user_account;
 	}
 	//列表显示所有记录列表
-	public Map findUser_account(int curPage){
+	public Map findUser_account(int curPage,int userId){
 		User_account user_account=null;
 		ArrayList list=new ArrayList();
 		Connection conn=null;
-		Statement pstmt=null;
+		PreparedStatement pstmt=null;
 		ResultSet rs=null;
 		ResultSet r=null;
 		Map map=null;
 		Page pa=null;
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="select * from user_account order by id"; 
-			pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
-			rs=pstmt.executeQuery(sql);
+			String sql="select * from user_account where user=? order by id"; 
+			//pstmt=conn.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
+			//rs=pstmt.executeQuery(sql);
+			
+
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setInt(1, userId);
+			rs=pstmt.executeQuery();
+			
+			
 			pa=new Page();//声明分页类对象
 			pa.setPageSize(5);
 			pa.setPageCount(rs);

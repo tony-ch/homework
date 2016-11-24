@@ -17,7 +17,7 @@ import com.javabean.entity.Person;
 /**
  * Servlet Filter implementation class LogedFilter
  */
-/*@WebFilter("/LogedFilter")*/
+@WebFilter({"/login.jsp","/register.jsp","/loginServlet","/regServlet"})
 public class LogedFilter implements Filter {
 
     /**

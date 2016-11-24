@@ -50,17 +50,16 @@ public class DeleteUserServlet extends HttpServlet {				//人事管理 ——>�
 		try{
 			if(user==null){
 				session.setAttribute("message", "该用户不存在，请重试");
-				request.setAttribute("activeTab", "ustab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listUserServlet").forward(request, response);		
 			}else{
 				userDao.delUser(loginname);
 		  		session.setAttribute("message", "用户删除成功！");
-				request.setAttribute("activeTab", "ustab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				//request.setAttribute("activeTab", "ustab");
+				request.getRequestDispatcher("/pa/listUserServlet").forward(request, response);		
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

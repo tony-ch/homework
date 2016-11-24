@@ -8,10 +8,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.commmon.ConnectionFactory;
-import com.commmon.RTException;
-import com.commmon.Page;
-import com.commmon.ResourceClose;
+import com.common.ConnectionFactory;
+import com.common.Page;
+import com.common.RTException;
+import com.common.ResourceClose;
 import com.javabean.entity.Personal_bike;
 public class Personal_bikeDao{
 	//添加个人自行车信息
@@ -21,12 +21,12 @@ public class Personal_bikeDao{
 		ResultSet rs=null;
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="insert into personal_bike (user,tel,start_time,end_time,rent,desc) values(?,?,?,?,?,?)"; 
+			String sql="insert into personal_bike (user,tel,start_time,end_time,rent,descp) values(?,?,?,?,?,?)"; 
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setInt(1, personal_bike.getUser());
 			pstmt.setString(2, personal_bike.getTel());
-			pstmt.setTimestamp(3, personal_bike.getStart_time());
-			pstmt.setTimestamp(4, personal_bike.getEnd_time());
+			pstmt.setDate(3, personal_bike.getStart_time());
+			pstmt.setDate(4, personal_bike.getEnd_time());
 			pstmt.setInt(5, personal_bike.getRent());
 			pstmt.setString(6, personal_bike.getDesc());
 			pstmt.executeUpdate();
@@ -62,11 +62,11 @@ public class Personal_bikeDao{
 		ResultSet rs=null;
 		try{
 			conn=ConnectionFactory.getConnection();
-			String sql="update personal_bike set tel=?,start_time=?,end_time=? ,rent=?,desc=? where id=?"; 
+			String sql="update personal_bike set tel=?,start_time=?,end_time=? ,rent=?,descp=? where id=?"; 
 			pstmt=conn.prepareStatement(sql);
 			pstmt.setString(1, personal_bike.getTel());
-			pstmt.setTimestamp(2, personal_bike.getStart_time());
-			pstmt.setTimestamp(3, personal_bike.getEnd_time());
+			pstmt.setDate(2, personal_bike.getStart_time());
+			pstmt.setDate(3, personal_bike.getEnd_time());
 			pstmt.setInt(4, personal_bike.getRent());
 			pstmt.setString(5, personal_bike.getDesc());
 			pstmt.setInt(6, personal_bike.getId());
@@ -95,8 +95,8 @@ public class Personal_bikeDao{
 				personal_bike.setId(rs.getInt(1));
 				personal_bike.setUser(rs.getInt(2));
 				personal_bike.setTel(rs.getString(3));
-				personal_bike.setStart_time(rs.getTimestamp(4));
-				personal_bike.setEnd_time(rs.getTimestamp(5));
+				personal_bike.setStart_time(rs.getDate(4));
+				personal_bike.setEnd_time(rs.getDate(5));
 				personal_bike.setRent(rs.getInt(6));
 				personal_bike.setDesc(rs.getString(7));
 			}
@@ -125,8 +125,8 @@ public class Personal_bikeDao{
 					personal_bike.setId(rs.getInt(1));
 					personal_bike.setUser(rs.getInt(2));
 					personal_bike.setTel(rs.getString(3));
-					personal_bike.setStart_time(rs.getTimestamp(4));
-					personal_bike.setEnd_time(rs.getTimestamp(5));
+					personal_bike.setStart_time(rs.getDate(4));
+					personal_bike.setEnd_time(rs.getDate(5));
 					personal_bike.setRent(rs.getInt(6));
 					personal_bike.setDesc(rs.getString(7));
 				}
@@ -138,7 +138,7 @@ public class Personal_bikeDao{
 			}
 			return personal_bike;
 		}
-	//列表显示所有管理员列表
+	//列表显示所有个人自行车信息列表
 	public Map findAllPersonal_bike(int curPage){
 		Personal_bike personal_bike=null;
 		ArrayList list=new ArrayList();
@@ -165,8 +165,8 @@ public class Personal_bikeDao{
 					personal_bike.setId(rs.getInt(1));
 					personal_bike.setUser(rs.getInt(2));
 					personal_bike.setTel(rs.getString(3));
-					personal_bike.setStart_time(rs.getTimestamp(4));
-					personal_bike.setEnd_time(rs.getTimestamp(5));
+					personal_bike.setStart_time(rs.getDate(4));
+					personal_bike.setEnd_time(rs.getDate(5));
 					personal_bike.setRent(rs.getInt(6));
 					personal_bike.setDesc(rs.getString(7));
 					list.add(personal_bike);

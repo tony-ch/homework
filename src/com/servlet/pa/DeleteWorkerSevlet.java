@@ -50,17 +50,15 @@ public class DeleteWorkerSevlet extends HttpServlet {				//人事管理 ——>�
 		try{
 			if(worker==null){
 				session.setAttribute("message", "该员工不存在，请重试");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);		
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);		
 			}else{
 				workerDao.delWorker(loginname);
 		  		session.setAttribute("message", "员工删除成功！");
-				request.setAttribute("activeTab", "wktab");
-				request.getRequestDispatcher("/manager.jsp").forward(request, response);	
+				request.getRequestDispatcher("/pa/listWorkerServlet").forward(request, response);	
 			}
 		}catch (Exception e) {
 			e.printStackTrace();
-			request.setAttribute("se", e);
+			request.setAttribute("exception", e);
 			request.getRequestDispatcher("/exception.jsp").forward(request, response);
 		}
 	}

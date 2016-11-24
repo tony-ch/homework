@@ -37,9 +37,10 @@ public class LogoutServlet extends HttpServlet {
 		
 		HttpSession session=request.getSession();
 		session.setAttribute("message", "退出成功");
-		session.removeAttribute("person");  //清空Session变量 
+		session.removeAttribute("person");  //清空Session变量
+		//session.invalidate();
 		//!这里的根目录对应服务器的根目录
-		response.sendRedirect("./index.jsp"); 
+		response.sendRedirect("/index.jsp"); 
 	}
 
 }
