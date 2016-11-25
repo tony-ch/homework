@@ -55,7 +55,7 @@ CREATE TABLE `bike` (
   `key` varchar(6) NOT NULL,
   `state` enum('I','U','R') NOT NULL DEFAULT 'I',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -64,6 +64,7 @@ CREATE TABLE `bike` (
 
 LOCK TABLES `bike` WRITE;
 /*!40000 ALTER TABLE `bike` DISABLE KEYS */;
+INSERT INTO `bike` VALUES (1,'893666','U'),(2,'548358','R'),(3,'860789','I'),(4,'758871','I'),(5,'211990','I'),(6,'483335','I'),(7,'780704','I'),(8,'553517','I'),(9,'325470','I'),(10,'766798','I');
 /*!40000 ALTER TABLE `bike` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -86,7 +87,7 @@ CREATE TABLE `company_account` (
   KEY `act_adm_idx` (`admin`),
   CONSTRAINT `act_adm` FOREIGN KEY (`admin`) REFERENCES `admin` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `act_wid` FOREIGN KEY (`worker`) REFERENCES `worker` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,6 +96,7 @@ CREATE TABLE `company_account` (
 
 LOCK TABLES `company_account` WRITE;
 /*!40000 ALTER TABLE `company_account` DISABLE KEYS */;
+INSERT INTO `company_account` VALUES (1,1000,'2016-11-25 19:30:29',1,1,'B');
 /*!40000 ALTER TABLE `company_account` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -119,7 +121,7 @@ CREATE TABLE `maintain` (
   CONSTRAINT `mat_bid` FOREIGN KEY (`bike`) REFERENCES `bike` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `mat_uid` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `mat_wid` FOREIGN KEY (`maintainer`) REFERENCES `worker` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,6 +130,7 @@ CREATE TABLE `maintain` (
 
 LOCK TABLES `maintain` WRITE;
 /*!40000 ALTER TABLE `maintain` DISABLE KEYS */;
+INSERT INTO `maintain` VALUES (1,1,2,2,'here','2016-11-25 19:31:08');
 /*!40000 ALTER TABLE `maintain` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -186,12 +189,11 @@ CREATE TABLE `orde` (
   `start_time` datetime NOT NULL,
   `end_time` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `bike_UNIQUE` (`bike`),
   KEY `uid_idx` (`user`),
   KEY `bid_idx` (`bike`),
   CONSTRAINT `ord_bid` FOREIGN KEY (`bike`) REFERENCES `bike` (`id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `ord_uid` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE NO ACTION ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -200,6 +202,7 @@ CREATE TABLE `orde` (
 
 LOCK TABLES `orde` WRITE;
 /*!40000 ALTER TABLE `orde` DISABLE KEYS */;
+INSERT INTO `orde` VALUES (1,1,1,'2016-11-25 19:30:48',NULL);
 /*!40000 ALTER TABLE `orde` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -263,7 +266,7 @@ CREATE TABLE `personal_bike` (
   PRIMARY KEY (`id`),
   KEY `uid_idx` (`user`),
   CONSTRAINT `pbike_uid` FOREIGN KEY (`user`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -272,6 +275,7 @@ CREATE TABLE `personal_bike` (
 
 LOCK TABLES `personal_bike` WRITE;
 /*!40000 ALTER TABLE `personal_bike` DISABLE KEYS */;
+INSERT INTO `personal_bike` VALUES (1,1,'13095581609','2016-11-25','2016-12-25',1000,'good');
 /*!40000 ALTER TABLE `personal_bike` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -291,7 +295,7 @@ CREATE TABLE `purchase` (
   PRIMARY KEY (`id`),
   KEY `pur_wid_idx` (`buyer`),
   CONSTRAINT `pur_wid` FOREIGN KEY (`buyer`) REFERENCES `worker` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -319,7 +323,7 @@ CREATE TABLE `user` (
   `tel` varchar(11) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `login_name_UNIQUE` (`login_name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -328,6 +332,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'user01','user01',10,'user','12345678901');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!50003 SET @saved_cs_client      = @@character_set_client */ ;
@@ -404,7 +409,7 @@ CREATE TABLE `worker` (
 
 LOCK TABLES `worker` WRITE;
 /*!40000 ALTER TABLE `worker` DISABLE KEYS */;
-INSERT INTO `worker` VALUES (1,'buyer','buyer','B','buyer',3000,0,0),(2,'maintainer','maintainer','M','maintainer',3000,0,0);
+INSERT INTO `worker` VALUES (1,'buyer','buyer','B','buyer',3000,0,0),(2,'maintainer','maintainer','M','maintainer',3000,1,0);
 /*!40000 ALTER TABLE `worker` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -509,4 +514,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-11-25  5:57:10
+-- Dump completed on 2016-11-25 21:16:51

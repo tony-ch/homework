@@ -46,6 +46,8 @@ do call DILIVER_SALARY();
 alter event DIL_SALARY on completion preserve enable;
 select * from  mysql.event;
 
+insert into `admin` values('1','tony','tony1234','tony','12345678901');
+
 select * from `user`;
 select * from `orde`;
 select * from `purchase`;
@@ -55,8 +57,3 @@ select * from `admin`;
 select * from `worker`;
 select * from `company_account`;
 select * from `maintain`;
-
-insert into `admin` values('1','admin','admin','admin','12345678901');
-insert into `worker` values('1','buyer','buyer','B','buyer','3000','0','0');
-insert into `worker` values('2','maintainer','maintainer','M','maintainer','3000','0','0');
-update `bike` set state='I' where id=1;
