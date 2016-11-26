@@ -46,18 +46,6 @@ extern struct symStru symBuf[3];
 extern int symBufIdx;
 
 enum symbol ksym[KEYNO];//±£Áô×Ö
-/*
-enum kinds{vara,consta,func,arr};
-enum types{inte,chara};
-struct tabrecord{
-    char name[ALENMAX];
-    enum kinds kind;
-    enum types typ;
-    int ref;
-};
-struct tabrecord tab[TMAX];
-extern int tidx;//tab index
-*/
 void getch();
 void getsym();
 void initSymBuf();
@@ -92,4 +80,18 @@ void defaultCase();
 void readStat();
 void writeStat();
 void retStat();
+
+
+
+enum kinds{vara,consta,func,arr,para};
+enum types{inte,chara};
+struct tabrecord{
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types typ;
+    int value;
+};
+struct tabrecord tab[TMAX];
+extern int tidx;//tab index
+
 #endif // GLOBAL_H_INCLUDED
