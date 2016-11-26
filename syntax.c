@@ -1,5 +1,52 @@
 #include "global.h"
 #include "err.h"
+struct tabrecord tab[TMAX];
+int tidx=0;//tab top index
+struct btabrecord btab[TMAX];
+int btidx=0;//func tab top index
+
+char kindstr[5][10]={"var","const","func","arr","para"};
+char typestr[3][10]={"void","int","char"};
+void enter(char *name, enum kinds k, enum types t, int value){
+    if(tidx==TMAX){
+        error(99);//TODO
+        exit(1);
+    }
+    if(k==funkind){
+        int i;
+        for(i=0;i<btidx;i++){
+            if(strcmp(btab[i].name,name)==0){
+                error(99);//todo redef func
+                return;
+            }
+        }
+    } else{
+        int i;
+        i=(btidx==0)?0:btab[btidx-1].tidx+1;// if global field, search from 0; if func field, search after func name.
+        for(;i<tidx;i++){
+            if(strcmp(tab[i].name,name)==0){
+                error(99);//todo redef iden
+                return;
+            }
+        }
+    }
+    strcpy(tab[tidx].name,name);
+    tab[tidx].kind=k;
+    tab[tidx].typ=t;
+    tab[tidx].value=value;
+    fprintf(fout,"\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d\n",
+            tidx,tab[tidx].name,kindstr[tab[tidx].kind],typestr[tab[tidx].typ],tab[tidx].value);
+    if(k==funkind){
+        strcpy(btab[btidx].name,name);
+        btab[btidx].tidx=tidx;
+        fprintf(fout,"\t\tenter btab index: %d, name: %s, tidx: %d\n",
+                btidx,btab[btidx].name,btab[btidx].tidx);
+        btidx=btidx+1;
+    }
+    tidx=tidx+1;
+}
+
+
 void program(){
     if(symBuf[symBufIdx].id==constsy){//!头符号为const
         decConst();
@@ -26,6 +73,18 @@ void program(){
     }
     mainDef();
     fprintf(fout,"\t\tthis is a program.\n");
+
+    int i;
+    fprintf(fout,"\n");
+    for(i=0;i<tidx;i++){
+        fprintf(fout,"\t\ttab index: %d,\tname: %s,\tkind: %s,\ttype: %s,\tvalue: %d\n",
+        i,tab[i].name,kindstr[tab[i].kind],typestr[tab[i].typ],tab[i].value);
+    }
+    for(i=0;i<btidx;i++){
+        fprintf(fout,"\t\tbtab index: %d,\tname: %s,\ttidx: %d\n",
+                i,btab[i].name,btab[i].tidx);
+    }
+
 }
 //const 开头
 void decConst(){
@@ -53,12 +112,18 @@ void decConst(){
 }
 
 void constDef(){
+    enum kinds kind=conkind;
+    enum types type;
+    char name[ALENMAX];
+    int value;
     if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo 重复代码
             error(5);//应是标识符
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
             error(5);//应是=
@@ -69,13 +134,15 @@ void constDef(){
             error(5);//应是数字
             return;
         }
-        numDef();
+        value=numDef();
+        enter(name,kind,type,value);
         while(symBuf[symBufIdx].id==comma){//可选项
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
                 error(5);//应是标识符
                 return;
             }
+            strcpy(name,symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
                 error(5);//应是=
@@ -86,14 +153,17 @@ void constDef(){
                 error(5);//应是数字
                 return;
             }
-            numDef();
+            value=numDef();
+            enter(name,kind,type,value);
         }
     }else if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo 重复代码
             error(5);//应是标识符
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
             error(5);//应是=
@@ -101,9 +171,11 @@ void constDef(){
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=charcon){
-            error(5);//应是数字
+            error(5);//应是字符
             return;
         }
+        value=symBuf[symBufIdx].token[1];
+        enter(name,kind,type,value);
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//可选项
             updateSymBuf();
@@ -111,6 +183,7 @@ void constDef(){
                 error(5);//应是标识符
                 return;
             }
+            strcpy(name,symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
                 error(5);//应是=
@@ -118,9 +191,11 @@ void constDef(){
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charcon){
-                error(5);//应是数字
+                error(5);//应是字符
                 return;
             }
+            value=symBuf[symBufIdx].token[1];
+            enter(name,kind,type,value);
             updateSymBuf();
         }
     }else{
@@ -133,9 +208,17 @@ void constDef(){
 void decVar(){//＜变量说明＞::=＜变量定义＞;{＜变量定义＞;}
 }
 */
-void varDef(){
+void varDef(){//＜变量定义＞  ::= ＜类型标识符＞(＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’){,＜标识符＞|＜标识符＞‘[’＜无符号整数＞‘]’ }
     //enum symbol typ=sym;
-    if(symBuf[symBufIdx].id!=intsy && symBuf[symBufIdx].id!=charsy){
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types type;
+    int value;
+    if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
+    } else if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
+    }else{
         error(5);//todo 应为int或char
         return;
     }
@@ -144,6 +227,9 @@ void varDef(){
         error(5);//todo 应为标识符
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    kind=varkind;
+    value=0;
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){//!可选项
         updateSymBuf();
@@ -151,6 +237,8 @@ void varDef(){
             error(5);//todo 应为无符号整数
             return;
         }
+        kind=arrkind;
+        value=atoi(symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=rbrack){
             error(5);//todo )
@@ -158,12 +246,16 @@ void varDef(){
         }
         updateSymBuf();
     }
+    enter(name,kind,type,value);
     while(symBuf[symBufIdx].id==comma){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!不应有类型标识符
             error(5);//todo 应为标识符
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
+        kind=varkind;
+        value=0;
         updateSymBuf();
         if(symBuf[symBufIdx].id==lbrack){//!可选项
             updateSymBuf();
@@ -171,6 +263,8 @@ void varDef(){
                 error(5);//todo 应为无符号整数
                 return;
             }
+            kind=arrkind;
+            value=atoi(symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=rbrack){
                 error(5);//todo )
@@ -178,14 +272,17 @@ void varDef(){
             }
             updateSymBuf();
         }
+        enter(name,kind,type,value);
     }
     fprintf(fout,"\t\tthis is var def.\n");
 }
 
-void numDef(){//＜整数＞::= ［＋｜－］＜无符号整数＞｜０
+int numDef(){//＜整数＞::= ［＋｜－］＜无符号整数＞｜０
     int flag=0;
+    int num=0;
     if(symBuf[symBufIdx].id==zero){
         updateSymBuf();
+        num=0;
     }else{
         if(symBuf[symBufIdx].id==plus){//!可选项
             updateSymBuf();
@@ -194,24 +291,33 @@ void numDef(){//＜整数＞::= ［＋｜－］＜无符号整数＞｜０
             flag=1;
         }
         if(symBuf[symBufIdx].id==unsignum){
-            //if(flag==1){
-                //num=-num;
-            //}
+            num=atoi(symBuf[symBufIdx].token);
+            if(flag==1){
+                num=-num;
+            }
             updateSymBuf();
         }else{
             error(5);//todo 应是unsignnum
-            return;
+            return 0;
         }
     }
-    if(flag){
-        fprintf(fout,"\t\tthis is a num.\n");
-    }else{
-        fprintf(fout,"\t\tthis is a num.\n");
-    }
+    fprintf(fout,"\t\tthis is a num:%d.\n",num);
+    return num;
 }
 
 void retFuncDef(){//＜有返回值函数定义＞  ::=  ＜声明头部＞‘(’＜参数＞‘)’ ‘{’＜复合语句＞‘}’
-    if(symBuf[symBufIdx].id!=charsy&&symBuf[symBufIdx].id!=intsy){
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types type;
+    int value;
+    int tabIdxToEnter;
+    kind=funkind;
+    tabIdxToEnter=tidx;
+    if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
+    }else if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
+    } else{
         error(5);//todo 应是类型标识符
         return;
     }
@@ -220,26 +326,30 @@ void retFuncDef(){//＜有返回值函数定义＞  ::=  ＜声明头部＞‘(’＜参数＞‘)’ ‘
         error(5);//todo 应是标识符
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    enter(name,kind,type,0);
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo 应是(
         return;
     }
     updateSymBuf();
-    paraList();
+    value=paraList();
+    tab[tabIdxToEnter].value=value;
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tabIdxToEnter].name,tab[tabIdxToEnter].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo 应是)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo 应是(
+        error(5);//todo 应是{
         return;
     }
     updateSymBuf();
     complexStat();
     if(symBuf[symBufIdx].id!=rbrace){
-        error(5);//todo 应是(
+        error(5);//todo 应是}
         return;
     }
     updateSymBuf();
@@ -247,76 +357,117 @@ void retFuncDef(){//＜有返回值函数定义＞  ::=  ＜声明头部＞‘(’＜参数＞‘)’ ‘
 }
 
 void voidFuncDef(){//＜无返回值函数定义＞  ::= void＜标识符＞‘(’＜参数＞‘)’‘{’＜复合语句＞‘}’
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types type;
+    int value;
+    int tabIdxToEnter;
+    kind=funkind;
+    tabIdxToEnter=tidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo 应是类型标识符
         return;
     }
+    type=voidtyp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
         error(5);//todo 应是标识符
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    enter(name,kind,type,0);
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo 应是(
         return;
     }
     updateSymBuf();
-    paraList();
+    value=paraList();
+    tab[tabIdxToEnter].value=value;
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tabIdxToEnter].name,tab[tabIdxToEnter].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo 应是)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo 应是(
+        error(5);//todo 应是{
         return;
     }
     updateSymBuf();
     complexStat();
-    if(symBuf[symBufIdx].id!=rbrace){
-        error(5);//todo 应是(
+    if(symBuf[symBufIdx].id!=rbrace) {
+        error(5);//todo 应是}
         return;
     }
     updateSymBuf();
     fprintf(fout,"\t\tthis is a void func dec.\n");
 }
 
-void paraList(){//＜类型标识符＞＜标识符＞{,＜类型标识符＞＜标识符＞}|＜空＞
+int paraList(){//＜类型标识符＞＜标识符＞{,＜类型标识符＞＜标识符＞}|＜空＞
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types type;
+    kind=parakind;
+    int paraCnt=0;
     if(symBuf[symBufIdx].id==charsy||symBuf[symBufIdx].id==intsy){//!可以为空
+        if(symBuf[symBufIdx].id==charsy){
+            type=chtyp;
+        } else{
+            type=inttyp;
+        }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
             error(5);//todo
-            return;
+            return 0;
         }
+        strcpy(name,symBuf[symBufIdx].token);
+        enter(name,kind,type,0);
+        paraCnt=paraCnt+1;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charsy && symBuf[symBufIdx].id!=intsy){
                 error(5);//todo
-                return;
+                return 0;
+            }
+            if(symBuf[symBufIdx].id==charsy){
+                type=chtyp;
+            } else{
+                type=inttyp;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
                 error(5);//todo
-                return;
+                return 0;
             }
+            strcpy(name,symBuf[symBufIdx].token);
+            enter(name,kind,type,0);
+            paraCnt=paraCnt+1;
             updateSymBuf();
         }
     }
     fprintf(fout,"\t\tthis is para list.\n");
+    return paraCnt;
 }
 
 void mainDef(){//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
+    char name[ALENMAX];
+    enum kinds kind;
+    enum types type;
+    kind=funkind;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo 应是类型标识符
         return;
     }
+    type=voidtyp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=mainsy){
         error(5);//todo 应是标识符
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    enter(name,kind,type,0);
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo 应是(

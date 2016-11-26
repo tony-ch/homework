@@ -13,7 +13,7 @@
 #define SPSN 16//punc num
 #define ALENMAX 15//id len max
 #define STRMAX 100//max str len
-#define TMAX 300// tab max
+#define TMAX 512// tab max
 #define NMAX 10//num max len
 
 extern char* symbolstr[SYMNUM];
@@ -56,10 +56,10 @@ void decConst();
 void constDef();
 void decVar();
 void varDef();
-void numDef();
+int numDef();       //return num value
 void retFuncDef();
 void voidFuncDef();
-void paraList();
+int paraList();     //return para cnt
 void mainDef();
 void call();
 void valueParaList();
@@ -83,15 +83,24 @@ void retStat();
 
 
 
-enum kinds{vara,consta,func,arr,para};
-enum types{inte,chara};
+enum kinds{varkind,conkind,funkind,arrkind,parakind};
+enum types{voidtyp,inttyp,chtyp};
 struct tabrecord{
     char name[ALENMAX];
     enum kinds kind;
     enum types typ;
-    int value;
+    int value;//value for const; para num for funkind; arr element num for arr
 };
-struct tabrecord tab[TMAX];
+extern struct tabrecord tab[TMAX];
 extern int tidx;//tab index
+
+struct btabrecord{
+    char name[ALENMAX];
+    int tidx;//index in tab
+};
+extern struct btabrecord btab[TMAX];
+extern int btidx;//block tab index
+extern char kindstr[5][10];
+extern char typestr[3][10];
 
 #endif // GLOBAL_H_INCLUDED
