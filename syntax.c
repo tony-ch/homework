@@ -809,6 +809,7 @@ int factor(){//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞|
                 updateSymBuf();
                 ti2=expr();
                 resTi=getTemVar();
+                tab[resTi].typ=tab[ti1].typ;//!类型设为数组元素的类型
                 mCode[midx].op=getArrOp;
                 mCode[midx].arg1.tidx=ti1; mCode[midx].arg1Typ=tiarg;//const type value name
                 mCode[midx].arg2.tidx=ti2; mCode[midx].arg2Typ=tiarg;

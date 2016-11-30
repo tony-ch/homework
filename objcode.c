@@ -162,7 +162,7 @@ int isGlobal(int tidx){
 }
 
 void freeTemReg(int i){//todo check
-    if(tReg.tidx[i]==-1||tab[tReg.tidx[i]].kind!=varkind || tReg.dif[i]==0) {
+    if(tReg.tidx[i]==-1 || tReg.dif[i]==0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数；不为变量不需要写回
     }else if(isGlobal(tReg.tidx[i])){
         fprintf(codefile,"sw $t%d,glb_%s\n",i,tab[tReg.tidx[i]].name);
@@ -172,32 +172,14 @@ void freeTemReg(int i){//todo check
     tReg.dif[i]=0;
     tReg.tidx[i]=-1;
     tReg.busy[i]=0;
-    tReg.used=tReg.used-1;
-    printf("*********used %d**************\n",tReg.used);
-    for(i=0;i<8;i++){
-        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
-        if(tReg.tidx[i]>0){
-            printf(",name:%s",tab[tReg.tidx[i]].name);
-        }
-        printf("\n");
-    }
 }
 
 void clearTemReg(){
     int i;
     tReg.used=0;
     tReg.lastUsed=TREGNUM-1;
-    paraQue.cnt=0;
     for(i=0;i<TREGNUM;i++){
         freeTemReg(i);
-    }
-    printf("*********used %d**************\n",tReg.used);
-    for(i=0;i<8;i++){
-        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
-        if(tReg.tidx[i]>0){
-            printf(",name:%s",tab[tReg.tidx[i]].name);
-        }
-        printf("\n");
     }
 }
 
@@ -208,14 +190,14 @@ void loadToReg(int tid,int reg){
     }else{
         fprintf(codefile,"lw $t%d,%d($fp) # load %s\n",reg,(tab[tid].adr)*4,tab[tid].name);
     }
-    printf("*********used %d**************\n",tReg.used);
-    for(i=0;i<8;i++){
-        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
-        if(tReg.tidx[i]>0){
-            printf(",name:%s",tab[tReg.tidx[i]].name);
-        }
-        printf("\n");
-    }
+//    printf("*********used %d**************\n",tReg.used);
+//    for(i=0;i<8;i++){
+//        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
+//        if(tReg.tidx[i]>0){
+//            printf(",name:%s",tab[tReg.tidx[i]].name);
+//        }
+//        printf("\n");
+//    }
 }
 
 int findInTemReg(int tid){
@@ -235,6 +217,7 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
                 printf("reg :%d can't use.\n", res);
             }
         }
+        tReg.used=tReg.used+1;
     }else{
         res=tReg.lastUsed;
         do{
@@ -243,32 +226,22 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
         }while (res==regToUse1 || res==regToUse2);
         if(tReg.dif[res]==1){
             freeTemReg(res);
-        }else{
-            tReg.used=tReg.used-1;
         }
     }
-    tReg.used=tReg.used+1;
     tReg.busy[res]=1;
     tReg.dif[res]=0;
     tReg.tidx[res]=tid;
     tReg.lastUsed=res;
-    printf("\t\t\tget reg %d for %s\n",res,tab[tid].name);
-    printf("*********used %d**************\n",tReg.used);
-    for(i=0;i<8;i++){
-        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
-        if(tReg.tidx[i]>0){
-            printf(",name:%s",tab[tReg.tidx[i]].name);
-        }
-        printf("\n");
-    }
+//    printf("\t\t\tget reg %d for %s\n",res,tab[tid].name);
+//    printf("*********used %d**************\n",tReg.used);
+//    for(i=0;i<8;i++){
+//        printf("treg %d: busy:%d,tidx:%d,dirty:%d",i,tReg.busy[i],tReg.tidx[i],tReg.dif[i]);
+//        if(tReg.tidx[i]>0){
+//            printf(",name:%s",tab[tReg.tidx[i]].name);
+//        }
+//        printf("\n");
+//    }
     return res;
-}
-
-int test(int a,int b,int c,int d,int e){
-    isGlobal(a);
-    freeTemReg(b);
-    getEmpTemReg(c,d,e);
-    return findInTemReg(a);
 }
 
 /*
@@ -583,7 +556,7 @@ void storeGlobal(){//todo 向常量赋值
                 if(tab[i].typ==inttyp){
                     fprintf(codefile,"glb_%s: .word %d\n",tab[i].name,tab[i].value);
                 }else{
-                    fprintf(codefile,"glb_%s: .word %c\n",tab[i].name,tab[i].value);
+                    fprintf(codefile,"glb_%s: .word \'%c\'\n",tab[i].name,tab[i].value);
                 }
                 break;
             case varkind:
@@ -621,13 +594,7 @@ void rdToObj(){//todo read 内标识符的检验
 
 void wrToObj(){
     int hasStr=mCode[mIdxCur].arg2Typ!=earg?1:0;
-    int a0Move=0;
     int hasExp=mCode[mIdxCur].rTyp!=earg?1:0;
-    if(tab[btab[btidCur].tidx].value>0){
-        //fprintf(codefile,"sw $a0,0($fp)\n");//TODO
-        a0Move=1;
-        fprintf(codefile,"add $v1,$0,$a0# backup a0\n");
-    }
     if(hasStr){
         fprintf(codefile,"la $a0,str_%d\n",mCode[mIdxCur].arg2.stridx);
         fprintf(codefile,"addi $v0,$0,4\n");
@@ -649,12 +616,6 @@ void wrToObj(){
             fprintf(codefile,"syscall\n");
         }
     }//todo check avaliable
-    /*if(hasExp && mCode[mIdxCur].rTyp==varg){
-
-    }*/
-    if(a0Move){
-        fprintf(codefile,"add $a0,$0,$v1 #restore a0\n");
-    }
 }
 /*
 void addToObj(){
