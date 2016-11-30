@@ -1,50 +1,25 @@
 #include "global.h"
 #include "err.h"
-struct tabrecord tab[TMAX];
+
+struct TABREC tab[TMAX];
 int tidx=0;//tab top index
-struct btabrecord btab[TMAX];
+struct BTABREC btab[TMAX];
 int btidx=0;//func tab top index
 
-char kindstr[5][10]={"var","const","func","arr","para"};
-char typestr[3][10]={"void","int","char"};
-void enter(char *name, enum kinds k, enum types t, int value){
-    if(tidx==TMAX){
-        error(99);//TODO
-        exit(1);
-    }
-    if(k==funkind){
-        int i;
-        for(i=0;i<btidx;i++){
-            if(strcmp(btab[i].name,name)==0){
-                error(99);//todo redef func
-                return;
-            }
-        }
-    } else{
-        int i;
-        i=(btidx==0)?0:btab[btidx-1].tidx+1;// if global field, search from 0; if func field, search after func name.
-        for(;i<tidx;i++){
-            if(strcmp(tab[i].name,name)==0){
-                error(99);//todo redef iden
-                return;
-            }
-        }
-    }
-    strcpy(tab[tidx].name,name);
-    tab[tidx].kind=k;
-    tab[tidx].typ=t;
-    tab[tidx].value=value;
-    fprintf(fout,"\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d\n",
-            tidx,tab[tidx].name,kindstr[tab[tidx].kind],typestr[tab[tidx].typ],tab[tidx].value);
-    if(k==funkind){
-        strcpy(btab[btidx].name,name);
-        btab[btidx].tidx=tidx;
-        fprintf(fout,"\t\tenter btab index: %d, name: %s, tidx: %d\n",
-                btidx,btab[btidx].name,btab[btidx].tidx);
-        btidx=btidx+1;
-    }
-    tidx=tidx+1;
-}
+char kindstr[5][10]={"var","const","func","arr","para"};//todo debug
+char typestr[3][10]={"void","int","char"};//todo debug
+
+int adrOffset=0;
+int midx=0;
+struct MIDCODE mCode[CODEMAX];
+
+int temVarCnt=0;
+int labCnt=0;
+int lab[LABMAX];
+/*case record
+struct caseRecord caseTab[CASEMAX];
+int caseCnt=0;
+ */
 
 
 void program(){
@@ -77,13 +52,14 @@ void program(){
     int i;
     fprintf(fout,"\n");
     for(i=0;i<tidx;i++){
-        fprintf(fout,"\t\ttab index: %d,\tname: %s,\tkind: %s,\ttype: %s,\tvalue: %d\n",
-        i,tab[i].name,kindstr[tab[i].kind],typestr[tab[i].typ],tab[i].value);
+        fprintf(fout,"\t\ttab index: %d,\tname: %s,\tkind: %s,\ttype: %s,\tvalue: %d,\tadr: %d\n",
+        i,tab[i].name,kindstr[tab[i].kind],typestr[tab[i].typ],tab[i].value,tab[i].adr);
     }
     for(i=0;i<btidx;i++){
         fprintf(fout,"\t\tbtab index: %d,\tname: %s,\ttidx: %d\n",
                 i,btab[i].name,btab[i].tidx);
     }
+    printCode();
 
 }
 //const ¿ªÍ·
@@ -112,8 +88,8 @@ void decConst(){
 }
 
 void constDef(){
-    enum kinds kind=conkind;
-    enum types type;
+    enum KINDS kind=conkind;
+    enum TYPES type;
     char name[ALENMAX];
     int value;
     if(symBuf[symBufIdx].id==intsy){
@@ -135,7 +111,13 @@ void constDef(){
             return;
         }
         value=numDef();
+        mCode[midx].op=conOp;
+        mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+        mCode[midx].arg2.value=value;mCode[midx].arg2Typ=varg;
+        mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+        midx++;
         enter(name,kind,type,value);
+        adrOffset++;
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
@@ -154,7 +136,13 @@ void constDef(){
                 return;
             }
             value=numDef();
+            mCode[midx].op=conOp;
+            mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+            mCode[midx].arg2.value=value;mCode[midx].arg2Typ=varg;
+            mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+            midx++;
             enter(name,kind,type,value);
+            adrOffset++;
         }
     }else if(symBuf[symBufIdx].id==charsy){
         type=chtyp;
@@ -175,7 +163,13 @@ void constDef(){
             return;
         }
         value=symBuf[symBufIdx].token[1];
+        mCode[midx].op=conOp;
+        mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+        mCode[midx].arg2.value=value;mCode[midx].arg2Typ=varg;
+        mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+        midx++;
         enter(name,kind,type,value);
+        adrOffset++;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
@@ -195,7 +189,13 @@ void constDef(){
                 return;
             }
             value=symBuf[symBufIdx].token[1];
+            mCode[midx].op=conOp;
+            mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+            mCode[midx].arg2.value=value;mCode[midx].arg2Typ=varg;
+            mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+            midx++;
             enter(name,kind,type,value);
+            adrOffset++;
             updateSymBuf();
         }
     }else{
@@ -211,8 +211,8 @@ void decVar(){//£¼±äÁ¿ËµÃ÷£¾::=£¼±äÁ¿¶¨Òå£¾;{£¼±äÁ¿¶¨Òå£¾;}
 void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·ûºÅÕûÊý£¾¡®]¡¯){,£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·ûºÅÕûÊý£¾¡®]¡¯ }
     //enum symbol typ=sym;
     char name[ALENMAX];
-    enum kinds kind;
-    enum types type;
+    enum KINDS kind;
+    enum TYPES type;
     int value;
     if(symBuf[symBufIdx].id==intsy){
         type=inttyp;
@@ -229,7 +229,7 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
     }
     strcpy(name,symBuf[symBufIdx].token);
     kind=varkind;
-    value=0;
+    value=1;
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
         updateSymBuf();
@@ -246,7 +246,13 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
         }
         updateSymBuf();
     }
+    mCode[midx].op=(kind==arrkind?arrOp:varOp);
+    mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+    mCode[midx].arg2.value=value;mCode[midx].arg2Typ=(kind==arrkind?varg:earg);
+    mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+    midx++;
     enter(name,kind,type,value);
+    adrOffset=adrOffset+value;
     while(symBuf[symBufIdx].id==comma){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
@@ -255,7 +261,7 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
         }
         strcpy(name,symBuf[symBufIdx].token);
         kind=varkind;
-        value=0;
+        value=1;
         updateSymBuf();
         if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
             updateSymBuf();
@@ -272,7 +278,13 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
             }
             updateSymBuf();
         }
+        mCode[midx].op=(kind==arrkind?arrOp:varOp);
+        mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+        mCode[midx].arg2.value=value;mCode[midx].arg2Typ=(kind==arrkind?varg:earg);
+        mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+        midx++;
         enter(name,kind,type,value);
+        adrOffset=adrOffset+value;
     }
     fprintf(fout,"\t\tthis is var def.\n");
 }
@@ -307,12 +319,13 @@ int numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
 
 void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     char name[ALENMAX];
-    enum kinds kind;
-    enum types type;
+    enum KINDS kind;
+    enum TYPES type;
     int value;
-    int tabIdxToEnter;
+    int tIdxCur,btidCur;
+    int mIdxCur;
     kind=funkind;
-    tabIdxToEnter=tidx;
+    tIdxCur=tidx;btidCur=btidx;
     if(symBuf[symBufIdx].id==charsy){
         type=chtyp;
     }else if(symBuf[symBufIdx].id==intsy){
@@ -327,7 +340,15 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
         return;
     }
     strcpy(name,symBuf[symBufIdx].token);
+    mIdxCur=midx;
+    mCode[midx].op=funOp;
+    mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+    mCode[midx].arg2.value=0;mCode[midx].arg2Typ=varg;
+    mCode[midx].res.btid=btidx;mCode[midx].rTyp=btiarg;
+    midx++;
     enter(name,kind,type,0);
+    adrOffset=0;
+    //adrOffset++;//for $fp; todo
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
@@ -335,8 +356,10 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
     }
     updateSymBuf();
     value=paraList();
-    tab[tabIdxToEnter].value=value;
-    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tabIdxToEnter].name,tab[tabIdxToEnter].value);
+    tab[tIdxCur].value=value;
+    mCode[mIdxCur].arg2.value=value;
+    adrOffset=adrOffset+10;//todo for $ra and $s0-$s7
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tIdxCur].name,tab[tIdxCur].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
@@ -352,18 +375,26 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
         error(5);//todo Ó¦ÊÇ}
         return;
     }
+    mCode[midx].op=endFunOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.btid=btidCur;mCode[midx].rTyp=btiarg;
+    midx++;
+    btab[btidCur].spacesz=adrOffset;
+    btab[btidCur].paraN=value;
     updateSymBuf();
     fprintf(fout,"\t\tthis is a ret func dec.\n");
 }
 
 void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     char name[ALENMAX];
-    enum kinds kind;
-    enum types type;
+    enum KINDS kind;
+    enum TYPES type;
     int value;
-    int tabIdxToEnter;
+    int tIdxCur,btIdxCur;
+    int mIdxCur;
     kind=funkind;
-    tabIdxToEnter=tidx;
+    tIdxCur=tidx;btIdxCur=btidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
@@ -375,7 +406,15 @@ void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡
         return;
     }
     strcpy(name,symBuf[symBufIdx].token);
+    mIdxCur=midx;
+    mCode[midx].op=funOp;
+    mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+    mCode[midx].arg2.value=0;mCode[midx].arg2Typ=varg;
+    mCode[midx].res.btid=btidx;mCode[midx].rTyp=btiarg;
+    midx++;
     enter(name,kind,type,0);
+    adrOffset=0;
+    //adrOffset++;//todo for $fp
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
@@ -383,8 +422,10 @@ void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡
     }
     updateSymBuf();
     value=paraList();
-    tab[tabIdxToEnter].value=value;
-    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tabIdxToEnter].name,tab[tabIdxToEnter].value);
+    tab[tIdxCur].value=value;
+    mCode[mIdxCur].arg2.value=value;
+    adrOffset=adrOffset+10;//todo for $fp($sp+16) $ra($sp+20) and $s0-$s7
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tIdxCur].name,tab[tIdxCur].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
@@ -400,14 +441,21 @@ void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡
         error(5);//todo Ó¦ÊÇ}
         return;
     }
+    mCode[midx].op=endFunOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.btid=btIdxCur;mCode[midx].rTyp=btiarg;
+    midx++;
+    btab[btIdxCur].spacesz=adrOffset;
+    btab[btIdxCur].paraN=value;
     updateSymBuf();
     fprintf(fout,"\t\tthis is a void func dec.\n");
 }
 
 int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
     char name[ALENMAX];
-    enum kinds kind;
-    enum types type;
+    enum KINDS kind;
+    enum TYPES type;
     kind=parakind;
     int paraCnt=0;
     if(symBuf[symBufIdx].id==charsy||symBuf[symBufIdx].id==intsy){//!¿ÉÒÔÎª¿Õ
@@ -422,8 +470,14 @@ int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
             return 0;
         }
         strcpy(name,symBuf[symBufIdx].token);
+        mCode[midx].op=paraOp;
+        mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+        midx++;
         enter(name,kind,type,0);
         paraCnt=paraCnt+1;
+        adrOffset++;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
@@ -442,20 +496,29 @@ int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
                 return 0;
             }
             strcpy(name,symBuf[symBufIdx].token);
+            mCode[midx].op=paraOp;
+            mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+            mCode[midx].arg2Typ=earg;
+            mCode[midx].res.tidx=tidx;mCode[midx].rTyp=tiarg;
+            midx++;
             enter(name,kind,type,0);
+            adrOffset++;
             paraCnt=paraCnt+1;
             updateSymBuf();
         }
     }
+    adrOffset+=(4-paraCnt);
     fprintf(fout,"\t\tthis is para list.\n");
     return paraCnt;
 }
 
 void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     char name[ALENMAX];
-    enum kinds kind;
-    enum types type;
+    enum KINDS kind;
+    enum TYPES type;
     kind=funkind;
+    int tidCur=tidx;
+    int btidCur=btidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
@@ -467,7 +530,14 @@ void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
         return;
     }
     strcpy(name,symBuf[symBufIdx].token);
+    mCode[midx].op=funOp;
+    mCode[midx].arg1.typ=type;mCode[midx].arg1Typ=targ;//const type value name
+    mCode[midx].arg2.value=0; mCode[midx].arg2Typ=varg;
+    mCode[midx].res.btid=btidx;mCode[midx].rTyp=btiarg;
+    midx++;
     enter(name,kind,type,0);
+    adrOffset=0;
+    adrOffset++;//for fp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
@@ -490,41 +560,85 @@ void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
         error(5);//todo Ó¦ÊÇ(
         return;
     }//!!todo
+    mCode[midx].op=endFunOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.tidx=btidCur;mCode[midx].rTyp=tiarg;
+    midx++;
+    btab[btidCur].spacesz=adrOffset;
     fprintf(fout,"\t\tthis is main func dec.\n");
 }
 
-void call(){
+int call(int hasRet){
+    int funcId,resTid=0,paraCnt,funcBtid=0;
     if(symBuf[symBufIdx].id!=ident){
-        error(5);//tofo
-        return;
+        error(5);//todo
+        return -1;
+    }
+    funcId=lookup(symBuf[symBufIdx].token,1);
+    while (funcBtid<btidx && strcmp(btab[funcBtid].name,tab[funcId].name)!=0){
+        funcBtid++;
+    }
+    if(funcId==-1){
+        error(99);// todo º¯ÊýÎ´¶¨Òå
+        return -1;
+    }
+    if(tab[funcId].typ==voidtyp && hasRet==1){
+        error(99);//todo Ó¦ÊÇÓÖ·µ»ØÖµº¯Êý
+        return -1;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(5);//tofo
-        return;
+        error(5);//todo
+        return -1;
+    }
+    if(hasRet){
+        resTid=getTemVar();
+        tab[resTid].typ=tab[funcId].typ;
     }
     updateSymBuf();//£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
-    valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
+    paraCnt=valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
+    mCode[midx].op=callOp;
+    mCode[midx].arg1.tidx=resTid;mCode[midx].arg1Typ=hasRet==1?tiarg:earg;//const type value name
+    mCode[midx].arg2.value=paraCnt;mCode[midx].arg2Typ=varg;
+    mCode[midx].res.btid=funcBtid;mCode[midx].rTyp=btiarg;
+    midx++;
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
-        return;
+        return -1;
     }
     updateSymBuf();
     fprintf(fout,"\t\tthis is a call stat.\n");
+    return resTid;
 }
 
 
-void valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
+int valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
+    int paraCnt=0;
+    int resTid;
     if(symBuf[symBufIdx].id==rparent){//!¿Õ
         //getsym();//!
     }else{
-        expr();//!ÖÁÉÙÒ»¸ö
+        resTid=expr();//!ÖÁÉÙÒ»¸ö
+        mCode[midx].op=calPaOp;
+        mCode[midx].arg1Typ=earg;//const type value name
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.tidx=resTid;mCode[midx].rTyp=tiarg;
+        midx++;
+        paraCnt++;
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
-            expr();
+            resTid=expr();
+            mCode[midx].op=calPaOp;
+            mCode[midx].arg1Typ=earg;//const type value name
+            mCode[midx].arg2Typ=earg;
+            mCode[midx].res.tidx=resTid;mCode[midx].rTyp=tiarg;
+            midx++;
+            paraCnt++;
         }
     }
     fprintf(fout,"\t\tthis is value para list.\n");
+    return paraCnt;
 }
 
 void complexStat(){//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾äÁÐ£¾
@@ -585,11 +699,11 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
     }else if(symBuf[symBufIdx].id==switchsy){
         switchStat();
     }else if(symBuf[symBufIdx].id==ident){//!first¼¯ºÏÏà½»
-        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        enum SYMBOL nextSym=symBuf[(symBufIdx+1)%3].id;
         if(nextSym==become || nextSym==lbrack){
             assignment();
         }else if(nextSym==lparent){
-            call();
+            call(0);//todo ¿ÉÄÜÊÇÓÖ·µ»ØÖµµÄ
         }else{
             error(5);//·Ç·¨Óï¾ä
             return;
@@ -619,72 +733,138 @@ void statList(){
     fprintf(fout,"\t\tthis is a stat list.\n");
 }
 
-void expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
-    if(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus){//!¿ÉÑ¡Ïî
+int expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
+    int ti1,ti2,resTi,negflag;
+    negflag=0;
+    if(symBuf[symBufIdx].id==plus){//!¿ÉÑ¡Ïî
         updateSymBuf();
+    }else if(symBuf[symBufIdx].id==minus){
+        updateSymBuf();
+        negflag=1;
     }
-    term();
+    ti1=term();
+    if(negflag){
+        resTi=getTemVar();
+        mCode[midx].op=subOp;
+        mCode[midx].arg1.value=0; mCode[midx].arg1Typ=varg;//const type value name
+        mCode[midx].arg2.tidx=ti1; mCode[midx].arg2Typ=tiarg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
+    }else{
+        resTi=ti1;
+    }
     while(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus){//!ÒÔ+-·Ö¸ô
+        enum MOP op=symBuf[symBufIdx].id==plus?addOp:subOp;
         updateSymBuf();
-        term();
+        ti1=resTi;
+        ti2=term();
+        resTi=getTemVar();
+        mCode[midx].op=op;
+        mCode[midx].arg1.tidx=ti1; mCode[midx].arg1Typ=tiarg;//const type value name
+        mCode[midx].arg2.tidx=ti2; mCode[midx].arg2Typ=tiarg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
     }
     fprintf(fout,"\t\tthis is an expr.\n");
+    return resTi;
 }
 
-void term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
-    factor();
+int term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
+    int ti1,ti2,resTi;
+    ti1=factor();
+    resTi=ti1;
     while(symBuf[symBufIdx].id==mul || symBuf[symBufIdx].id==divd){
+        enum MOP op=symBuf[symBufIdx].id==mul?mulOp:divOp;
         updateSymBuf();
-        factor();
+        ti1=resTi;
+        ti2=factor();
+        resTi=getTemVar();
+        mCode[midx].op=op;
+        mCode[midx].arg1.tidx=ti1; mCode[midx].arg1Typ=tiarg;//const type value name
+        mCode[midx].arg2.tidx=ti2; mCode[midx].arg2Typ=tiarg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
+
     }
     fprintf(fout,"\t\tthis is a term.\n");
+    return resTi;
 }
 
-void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|£¼×Ö·û£¾£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾|¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+int factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|£¼×Ö·û£¾£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾|¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+    int resTi;
     if(symBuf[symBufIdx].id==ident){
-        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        enum SYMBOL nextSym=symBuf[(symBufIdx+1)%3].id;
         if(nextSym==lparent){
-            call();
+            return call(1);
         }else{
+            resTi=lookup(symBuf[symBufIdx].token,0);//±êÊ¶·û
             updateSymBuf();
             if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî £¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯
+                int ti1,ti2;
+                if(tab[resTi].kind!=arrkind){
+                    error(99);//todo ²»ÎªÊý×é
+                    return -1;
+                }
+                ti1=resTi;
                 updateSymBuf();
-                expr();
+                ti2=expr();
+                resTi=getTemVar();
+                mCode[midx].op=getArrOp;
+                mCode[midx].arg1.tidx=ti1; mCode[midx].arg1Typ=tiarg;//const type value name
+                mCode[midx].arg2.tidx=ti2; mCode[midx].arg2Typ=tiarg;
+                mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+                midx++;
                 if(symBuf[symBufIdx].id!=rbrack){
                     error(5);//todo Ó¦ÊÇ]
-                    return;
+                    return -1;
                 }
                 updateSymBuf();
             }
         }
     }else if(symBuf[symBufIdx].id==charcon){
+        resTi=getTemVar();
+        tab[resTi].typ=chtyp;
+        mCode[midx].op=liop;//todo ¸ÄÎª li
+        mCode[midx].arg1.value=symBuf[symBufIdx].token[1]; mCode[midx].arg1Typ=varg;//const type value name
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
         updateSymBuf();
     }else if(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus || symBuf[symBufIdx].id==zero || symBuf[symBufIdx].id==unsignum){//!ÕûÊý first ¼¯ºÏ
-        numDef();
+        resTi=getTemVar();
+        mCode[midx].op=liop;
+        mCode[midx].arg1.value=numDef(); mCode[midx].arg1Typ=varg;//const type value name
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
     }else if(symBuf[symBufIdx].id==lparent){//¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
         updateSymBuf();
-        expr();
+        resTi=expr();
         if(symBuf[symBufIdx].id!=rparent){
             error(5);//todo Ó¦ÊÇ])
-            return;
+            return -1;
         }
         updateSymBuf();
     }else{
         error(5);//todo ·Ç·¨Òò×Ó
-        return;
+        return -1;
     }
     fprintf(fout,"\t\tthis is a factor.\n");
+    return resTi;
 }
 
 void assignment(){//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
+    int resTid=-1,ti1=-1,ti2=-1;
+    int isArr=0;
     if(symBuf[symBufIdx].id!=ident){
         error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
+    resTid=lookup(symBuf[symBufIdx].token,0);
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){
         updateSymBuf();//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
-        expr();
+        ti2=expr();isArr=1;
         if(symBuf[symBufIdx].id!=rbrack){
             error(5);//todo Ó¦ÊÇ]
             return;
@@ -695,18 +875,40 @@ void assignment(){//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             return;
         }
         updateSymBuf();
-        expr();
+        ti1=expr();
     }else if(symBuf[symBufIdx].id==become){//±äÁ¿¸³Öµ£¼¸³ÖµÓï¾ä£¾   ::=  £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾
         updateSymBuf();
-        expr();//!Ö±½Óµ÷ÓÃ
+        ti1=expr();//!Ö±½Óµ÷ÓÃ
     }else{
         error(5);//todo ·Ç·¨Óï¾ä
         return;
     }
+    mCode[midx].op=isArr?setArrOp:becomeOp;
+    mCode[midx].arg1.tidx=ti1;mCode[midx].arg1Typ=tiarg;//const type value name
+    mCode[midx].arg2.tidx=ti2;mCode[midx].arg2Typ=isArr?tiarg:earg;
+    mCode[midx].res.tidx=resTid;mCode[midx].rTyp=tiarg;
+    midx++;
     fprintf(fout,"\t\tthis is a assignment.\n");
 }
+/*
+ * if cond
+ * (true)->
+ * (false)-> goto labElse(BP)
+ * then
+ *  ...
+ *  goto labNext(BP)
+ * else
+ * labElse:
+ *  ...
+ *  goto labNext
+ * end if
+ * labNext:
+ */
+
+
 //if¿ªÍ·
 void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
+    int midxElse=0,midxNext=0,brTi=-1;
     if(symBuf[symBufIdx].id!=ifsy){
         error(5);//Ó¦ÊÇif
         return;
@@ -717,66 +919,130 @@ void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
         return;
     }
     updateSymBuf();
-    condition();//!Ö±½Óµ÷ÓÃ
+    brTi=condition();//!Ö±½Óµ÷ÓÃ
+    midxElse=midx;
+    mCode[midx].op=brfOp;
+    mCode[midx].arg1.tidx=brTi;mCode[midx].arg1Typ=tiarg;
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//BACKPATCH
+    midx++;
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//Ó¦ÊÇ)
         return;
     }
 	updateSymBuf();//!read one more sym
     stat();//!Ö±½Óµ÷ÓÃ
+    midxNext=midx;
+    mCode[midx].op=jOp;
+    mCode[midx].arg1Typ=earg;
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//BACKPATCH
+    midx++;
+    mCode[midxElse].res.labIdx=getLab();
     if(symBuf[symBufIdx].id==elsesy){//!¿ÉÑ¡Ïî
 		updateSymBuf();//!one more sym
         stat();
     }
+    mCode[midxNext].res.labIdx=getLab();
     fprintf(fout,"\t\tthis is an if stat.\n");
 }
 
-void condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
-    expr();//!Ö±½Óµ÷ÓÃ
+int condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
+    int ti1,ti2=-1,resTi;
+    int hasOp=0;
+    enum MOP op=sltOp;
+    ti1=expr();//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id==les){//!¿ÉÑ¡Ïî
+        hasOp=1;op=sltOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==leq){
+        hasOp=1;op=sleOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==gtr){
+        hasOp=1;op=sgtOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==geq){
+        hasOp=1;op=sgeOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==eql){
+        hasOp=1;op=seqOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==neq){//!Â©Ð´
+        hasOp=1;op=sneOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
+    }
+    if(hasOp==1){
+        resTi=getTemVar();
+        mCode[midx].op=op;
+        mCode[midx].arg1.tidx=ti1;mCode[midx].arg1Typ=tiarg;//const type value name
+        mCode[midx].arg2.tidx=ti2;mCode[midx].arg2Typ=tiarg;
+        mCode[midx].res.tidx=resTi;mCode[midx].rTyp=tiarg;
+        midx++;
+    } else{
+        resTi=ti1;
     }
     fprintf(fout,"\t\tthis is a condition.\n");
+    return resTi;
 }
+/*
+ * /*
+ * labLoop:
+ * while cond
+ * (true)->
+ * (false)-> goto labNext(BP)
+ * do
+ *  ...
+ *  goto labLoop
+ * end if
+ * labNext:
+ */
 //while¿ªÍ·
-void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
+void  whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
+    int loopLabIdx=0,endLabIdx=0,brTi=-1,loopMidx=-1;
     if(symBuf[symBufIdx].id!=whilesy){
         error(5);//todo Ó¦ÊÇwhile
         return;
     }
+    loopLabIdx=getLab();
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
-    condition();//!Ö±½Óµ÷ÓÃ
+    brTi=condition();//!Ö±½Óµ÷ÓÃ
+    loopMidx=midx;
+    mCode[midx].op=brfOp;
+    mCode[midx].arg1.tidx=brTi;mCode[midx].arg1Typ=tiarg;
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//BACKPATCH
+    midx++;
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     stat();//!Ö±½Óµ÷ÓÃ
+    mCode[midx].op=jOp;
+    mCode[midx].arg1Typ=earg;
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=loopLabIdx;mCode[midx].rTyp=liarg;//BACKPATCH
+    midx++;
+    endLabIdx=getLab();
+    mCode[loopMidx].res.labIdx=endLabIdx;
     fprintf(fout,"\t\tthis is a while stat.\n");
 }
 //printf¿ªÍ·
 void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡®(¡¯£¼×Ö·û´®£¾ ¡®)¡¯|printf ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+    char str[STRMAX]="";
+    int expTid=-1;
+    int hasStr=0,hasExp=0;
     if(symBuf[symBufIdx].id!=printfsy){
         error(5);//todo Ó¦ÊÇprintf
         return;
@@ -788,14 +1054,24 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==strcon){
+        strcpy(str,symBuf[symBufIdx].token);hasStr=1;
         updateSymBuf();
         if(symBuf[symBufIdx].id==comma){//!¿ÉÑ¡Ïî
             updateSymBuf();
-            expr();
+            expTid=expr();hasExp=1;
         }
     }else{
-        expr();//!Ö±½Óµ÷ÓÃ todo expr first¼¯ºÏ
+        expTid=expr();//!Ö±½Óµ÷ÓÃ todo expr first¼¯ºÏ
+        hasExp=1;
     }
+    mCode[midx].op=writeOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    if(hasStr){
+        mCode[midx].arg2.stridx=enterStr(str);
+    }
+    mCode[midx].arg2Typ=hasStr?siarg:earg;
+    mCode[midx].res.tidx=expTid;mCode[midx].rTyp=hasExp?tiarg:earg;
+    midx++;
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
@@ -819,6 +1095,16 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==ident){
+        int ti=lookup(symBuf[symBufIdx].token,0);
+        if(ti==-1){
+            error(99);//todo ±êÊ¶·ûÎ´¶¨Òå
+            return;
+        }
+        mCode[midx].op=readOp;
+        mCode[midx].arg1Typ=earg;//const type value name
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.tidx=ti;mCode[midx].rTyp=tiarg;
+        midx++;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//!Ñ­»·ÒÔ,·Ö¸ô
             updateSymBuf();
@@ -826,6 +1112,16 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
                 error(5);//todo Ó¦ÊÇ±êÊ¶·û
                 return;
             }
+            ti=lookup(symBuf[symBufIdx].token,0);
+            if(ti==-1){
+                error(99);//todo ±êÊ¶·ûÎ´¶¨Òå
+                return;
+            }
+            mCode[midx].op=readOp;
+            mCode[midx].arg1Typ=earg;//const type value name
+            mCode[midx].arg2Typ=earg;
+            mCode[midx].res.tidx=ti;mCode[midx].rTyp=tiarg;
+            midx++;
             updateSymBuf();
         }
         if(symBuf[symBufIdx].id!=rparent){
@@ -842,32 +1138,84 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     }
     fprintf(fout,"\t\tthis is a read stat.\n");
 }
+/*
+ * swtich E
+ * goto labTest(BP)
+ * labCase1:
+ *      goto labNext(BP)
+ * labCase2:
+ *      goto labNext(BP)
+ * labDefault:
+ *      goto labNext(BP)
+ * labTest:
+ *      if E=e1 goto labCase1(already exits)
+ *      if E=e2 goto labCase2(already exits)
+ *      goto labDefault      (already exits)
+ * labNext:
+ */
+//switch:    cal E; gen labTest; gen labNext; goto labTest; BP labNext
+//case:      cmp E; gen labCase; goto labNext;
+//default:   gen labDefault;     goto labNext;
 //switch¿ªÍ·
 void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í£¾£Û£¼È±Ê¡£¾£Ý¡®}¡¯
-    if(symBuf[symBufIdx].id!=switchsy){
-        error(5);//todo Ó¦ÊÇswitch
-        return;
-    }
+    int eva=-1;
+    int swtMidx=-1;
+    int hasDefault=0;
+    int nextLabIdx=0;int i,brTi;
+    /*case record
+    int caseCntCur;
+    caseCnt++;
+    caseCntCur=caseCnt;
+     */
+    struct CASTAB casetb;
+    casetb.caseCnt=0;
+    if(symBuf[symBufIdx].id!=switchsy){ error(5);       return; }//todo Ó¦ÊÇswitch
     updateSymBuf();
-    if(symBuf[symBufIdx].id!=lparent){
-        error(5);//todo Ó¦ÊÇ(
-        return;
-    }
+    if(symBuf[symBufIdx].id!=lparent){        error(5);        return;    }//todo Ó¦ÊÇ(
     updateSymBuf();
-    expr();//!Ö±½Óµ÷ÓÃ
-    if(symBuf[symBufIdx].id!=rparent){
-        error(5);//todo Ó¦ÊÇ)
-        return;
-    }
+    eva=expr();//!Ö±½Óµ÷ÓÃ
+    swtMidx=midx;//FOR BACK PATCH goto TEST
+    mCode[midx].op=jOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//goto test
+    midx++;
+    if(symBuf[symBufIdx].id!=rparent){        error(5);        return;    }//todo Ó¦ÊÇ)
     updateSymBuf();
-    if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo Ó¦ÊÇswitch
-        return;
-    }
+    if(symBuf[symBufIdx].id!=lbrace){ error(5);return; }//todo Ó¦ÊÇ{
     updateSymBuf();
-    caseStat();//!Ö±½Óµ÷ÓÃ
+    caseStat(&casetb);//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id==defaultsy){//!first¼¯ºÏÎª{default}
-        defaultCase();//!¿ÉÑ¡Ïî
+        hasDefault=1;
+        defaultCase(&casetb);//!¿ÉÑ¡Ïî
+    }
+    mCode[swtMidx].res.labIdx=getLab();//gen labTest
+    //todo labTest code
+    for(i=0;i<casetb.caseCnt-hasDefault;i++){
+        brTi=getTemVar();
+        mCode[midx].op=sneOp;
+        mCode[midx].arg1.value=casetb.cValue[i];mCode[midx].arg1Typ=varg;
+        mCode[midx].arg2.tidx=eva;mCode[midx].arg2Typ=tiarg;
+        mCode[midx].res.tidx=brTi;mCode[midx].rTyp=tiarg;//goto test
+        midx++;
+        mCode[midx].op=brfOp;
+        mCode[midx].arg1.tidx=brTi;mCode[midx].arg1Typ=tiarg;
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.labIdx=casetb.labIdx[i];mCode[midx].rTyp=liarg;//goto test
+        midx++;
+    }
+    if(hasDefault==1){
+        mCode[midx].op=jOp;
+        mCode[midx].arg1Typ=earg;
+        mCode[midx].arg2Typ=earg;
+        mCode[midx].res.labIdx=casetb.labIdx[casetb.caseCnt-1];mCode[midx].rTyp=liarg;//goto test
+        midx++;
+    }
+    //gen nextLab
+    nextLabIdx=getLab();
+    //todo BP nextLab in case and default
+    for(i=0;i<casetb.caseCnt;i++){
+        mCode[casetb.midx[i]].res.labIdx=nextLabIdx;
     }
     if(symBuf[symBufIdx].id!=rbrace){
         error(5);//todo Ó¦ÊÇ}
@@ -877,38 +1225,56 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
     fprintf(fout,"\t\tthis is a switch stat.\n");
 }
 //case¿ªÍ·
-void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
+void caseStat(struct CASTAB* casetb){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
     if(symBuf[symBufIdx].id!=casesy){//!ÖÁÉÙÒ»¸öcaseÓï¾ä
         error(5);//todo Ó¦ÊÇcase
         return;
     }
     while(symBuf[symBufIdx].id==casesy){//! first¼¯ºÏÎª{case}
-        oneCase();
+        oneCase(casetb);
     }
     fprintf(fout,"\t\tthis is a case table.\n");
 }
 //case¿ªÍ·
-void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
+void oneCase(struct CASTAB* casetb){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
+    if(casetb->caseCnt==CASEMAX){
+        error(99);
+        return;//case±êÇ©¹ý¶à
+    }
     if(symBuf[symBufIdx].id!=casesy){
         error(5);//todo Ó¦ÊÇcase
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==charcon){
+        casetb->cValue[casetb->caseCnt]=symBuf[symBufIdx].token[1];
+        //caseTab[caseCnt].cValue=symBuf[symBufIdx].token[1];
         updateSymBuf();
     }else {
-        numDef();//!Ö±½Óµ÷ÓÃ
+        casetb->cValue[casetb->caseCnt]=numDef();
+        //caseTab[caseCnt].cValue=numDef();//!Ö±½Óµ÷ÓÃ
     }
     if(symBuf[symBufIdx].id!=colon){
         error(5);//todo Ó¦ÊÇ:
         return;
     }
     updateSymBuf();
+    casetb->labIdx[casetb->caseCnt]=getLab();
+    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
+    casetb->midx[casetb->caseCnt]=midx;
+    //caseTab[caseCnt].midx=midx;
+    mCode[midx].op=jOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//goto test
+    midx++;
+    casetb->caseCnt=casetb->caseCnt+1;
+    //caseCnt++;
     fprintf(fout,"\t\tthis is a one case.\n");
 }
 //default¿ªÍ·
-void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
+void defaultCase(struct CASTAB* casetb){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     if(symBuf[symBufIdx].id!=defaultsy){
         error(5);//todo Ó¦ÊÇdefault
         return;
@@ -919,11 +1285,24 @@ void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
         return;
     }
     updateSymBuf();
+    casetb->labIdx[casetb->caseCnt]=getLab();
+    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
+    mCode[midx].op=jOp;
+    casetb->midx[casetb->caseCnt]=midx;
+    //caseTab[caseCnt].midx=midx;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=0;mCode[midx].rTyp=liarg;//goto test
+    midx++;
+    //caseCnt++;
+    casetb->caseCnt=casetb->caseCnt+1;
     fprintf(fout,"\t\tthis is a default case.\n");
 }
 //return¿ªÍ·
 void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
+    int hasRet=0;
+    int expTid=-1;
     if(symBuf[symBufIdx].id!=returnsy){
         error(5);//todo Ó¦ÊÇreturn
         return;
@@ -931,7 +1310,8 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
     updateSymBuf();
     if(symBuf[symBufIdx].id==lparent){//!¿ÉÑ¡Ïî
         updateSymBuf();
-        expr();//!Ö±½Óµ÷ÓÃ
+        expTid=expr();//!Ö±½Óµ÷ÓÃ
+        hasRet=1;
         if(symBuf[symBufIdx].id==rparent){
             updateSymBuf();
         }else{
@@ -942,5 +1322,24 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
             return;
         }
     }
+    if(btidx==0){
+        error(99);//todo ·Ç·¨Óï¾ä
+        return;
+    }
+    if(tab[btab[btidx-1].tidx].typ==voidtyp && hasRet==1){
+        error(99);//todo Ó¦ÎªÎÞ·µ»ØÖµret
+        return;
+    }
+    if(tab[btab[btidx-1].tidx].typ==inttyp && (hasRet==0||tab[expTid].typ!=inttyp)){
+        error(99);//todo Ó¦Îªint·µ»ØÖµ
+    }
+    if(tab[btab[btidx-1].tidx].typ==chtyp && (hasRet==0||tab[expTid].typ!=chtyp)){
+        error(99);//todo Ó¦Îªchar·µ»ØÖµ
+    }
+    mCode[midx].op=retOp;
+    mCode[midx].arg1Typ=earg;//const type value name
+    mCode[midx].arg2Typ=earg;
+    mCode[midx].res.tidx=expTid;mCode[midx].rTyp=hasRet?tiarg:earg;
+    midx++;
     fprintf(fout,"\t\tthis is a return stat.\n");
 }

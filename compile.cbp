@@ -42,6 +42,13 @@
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="midcode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="objcode.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="objcode.h" />
 		<Unit filename="syntax.c">
 			<Option compilerVar="CC" />
 		</Unit>

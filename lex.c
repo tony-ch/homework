@@ -7,7 +7,7 @@ int lcnt=0;//line num
 int lleng=0;
 int ccnt=0;
 char punc[SPSN];//·Ö¸ô·ûºÅ
-struct symStru symBuf[3];
+struct SYMSTRC symBuf[3];
 int symBufIdx=0;
 char* key[KEYNO]=//±£Áô×Ö
 {
@@ -16,7 +16,7 @@ char* key[KEYNO]=//±£Áô×Ö
     "switch",   "case",     "default",  "scanf",
     "printf",   "return"
 };
-enum symbol ksym[KEYNO]=//±£Áô×Ö
+enum SYMBOL ksym[KEYNO]=//±£Áô×Ö
 {
     constsy,    intsy,      charsy,     voidsy,
     mainsy,     ifsy,       elsesy,     whilesy,
@@ -273,6 +273,7 @@ void initSymBuf(){
 
 void updateSymBuf(){
 	fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+	//printf("%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
     do{
         getsym();
     }while(symBuf[symBufIdx].id==nul);
