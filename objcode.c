@@ -9,7 +9,7 @@
 #define PAMAX 300
 int mIdxCur=0;
 int btidCur=-1;
-struct treg{
+struct {
     int used;
     int lastUsed;
     int tidx[TREGNUM];
@@ -184,7 +184,7 @@ void clearTemReg(){
 }
 
 void loadToReg(int tid,int reg){
-    int i;
+    //int i;
     if(isGlobal(tid)){
         fprintf(codefile,"lw $t%d,glb_%s\n",reg,tab[tid].name);
     }else{
@@ -208,7 +208,7 @@ int findInTemReg(int tid){
     return i;
 }
 int getEmpTemReg(int tid,int regToUse1,int regToUse2){
-    int res,i;
+    int res;
     if(tReg.used<TREGNUM){
         for(res=0;res<TREGNUM;res++) {
             if(tReg.busy[res]==0){
@@ -345,7 +345,7 @@ void mathToObj(int op){
     }
     if(code.arg2Typ==varg && op!=0){//not slt
         fprintf(codefile,"%s $t%d,$t%d,%d# des: %s\n",
-                calopStr[op],regDes,regSrc1,code.arg2.value,tab[code.res.tidx]);
+                calopStr[op],regDes,regSrc1,code.arg2.value,tab[code.res.tidx].name);
     }else if(code.arg2Typ==varg && op==0){
         regSrc2= getEmpTemReg(-1,regDes, regSrc1);
         fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
@@ -861,7 +861,7 @@ void callToObj(){//call,ret,paraN,func
     int retTid=hasRet==1?mCode[mIdxCur].arg1.tidx:0;
     int calparaN=mCode[mIdxCur].arg2.value;
     int paraN=btab[funcBtid].paraN;
-    int swFlag[]={0,0,0,0};
+    //int swFlag[]={0,0,0,0};
     int i,j;
     //todo 检查参数个数和类型
     fprintf(codefile,"addi,$sp,$sp,-%d\n",(btab[funcBtid].spacesz)*4);

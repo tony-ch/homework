@@ -6,7 +6,7 @@ char line[LLEN];
 int lcnt=0;//line num
 int lleng=0;
 int ccnt=0;
-char punc[SPSN];//·Ö¸ô·ûºÅ
+//char punc[SPSN];//·Ö¸ô·ûºÅ
 struct SYMSTRC symBuf[3];
 int symBufIdx=0;
 char* key[KEYNO]=//±£Áô×Ö
@@ -107,7 +107,7 @@ void getsym(){
         }
         symBuf[symBufIdx].token[i]=0;
     }else if(ch=='\''){
-        char con=' ';
+        char con;
         getch();
         if(!isalpha(ch) && !isdigit(ch) && ch!='+' && ch!='*'){
             error(1);//!todo invalid character(F)

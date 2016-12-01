@@ -23,7 +23,6 @@ void error(int n){
         fclose(fin);
         fclose(fout);
         exit(1);
-        break;
     case 1://"invalid character"
         fprintf(fout,"line:%d col:%d errno:%d %s: %c\n",lcnt,ccnt,n,emsg[n],ch);
         printf("line:%d col:%d errno:%d %s: %c\n",lcnt,ccnt,n,emsg[n],ch);

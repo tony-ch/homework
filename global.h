@@ -29,7 +29,7 @@ extern int lcnt;//line num
 extern int lleng;
 extern int ccnt;
 extern char* key[KEYNO];//±£Áô×Ö
-extern char punc[SPSN];//·Ö¸ô·ûºÅ
+//extern char punc[SPSN];//·Ö¸ô·ûºÅ
 enum SYMBOL{eofs=-1,constsy=0,intsy,charsy,voidsy,mainsy,ifsy,elsesy,whilesy,switchsy,casesy,defaultsy,scanfsy,printfsy,returnsy,
 plus,minus,mul,divd,les,gtr,become,semicolon,comma,lparent,rparent,lbrack,rbrack,lbrace,rbrace,colon,
 leq,geq,neq,eql,
@@ -61,7 +61,7 @@ extern int tidx;//tab index
 struct BTABREC{
     char name[ALENMAX];
     int tidx;//index in tab
-    int hasCall;
+    //int hasCall;
     int spacesz;
     int paraN;
 };
@@ -130,7 +130,7 @@ int reachEof();
 void program();
 void decConst();
 void constDef();
-void decVar();
+//void decVar();
 void varDef();
 int numDef();       //return num value
 void retFuncDef();
@@ -163,12 +163,12 @@ int lookup(char *name,int isfunc);
 int getTemVar();
 int getLab();
 void printCode();
-void genDeccode(enum MOP op,enum TYPES type,int value,int idx);//const var int func para
-void genRetCode(enum MOP op, int idx);// endfunc ret
-void genCallcode(enum MOP op, int value,int idx);//call callpara ret endfunc
-void genRW(enum MOP op,char* str,int idx);//read write
-void genMathcode(enum MOP op,int arg1,int arg2,int res);//read write
-void genBrcode(enum MOP op, int arg1,int arg2, int labidx);//br j genlab
+//void genDeccode(enum MOP op,enum TYPES type,int value,int idx);//const var int func para
+//void genRetCode(enum MOP op, int idx);// endfunc ret
+//void genCallcode(enum MOP op, int value,int idx);//call callpara ret endfunc
+//void genRW(enum MOP op,char* str,int idx);//read write
+//void genMathcode(enum MOP op,int arg1,int arg2,int res);//read write
+//void genBrcode(enum MOP op, int arg1,int arg2, int labidx);//br j genlab
 //objcode
 void generate();
 #endif // GLOBAL_H_INCLUDED
