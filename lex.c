@@ -7,7 +7,7 @@ int lcnt=0;//line num
 int lleng=0;
 int ccnt=0;
 //char punc[SPSN];//·Ö¸ô·ûºÅ
-struct SYMSTRC symBuf[3];
+//struct SYMSTRC symBuf[3];
 int symBufIdx=0;
 char* key[KEYNO]=//±£Áô×Ö
 {
@@ -272,7 +272,7 @@ void initSymBuf(){
 }
 
 void updateSymBuf(){
-	fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+	printSym();
 	//printf("%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
     do{
         getsym();
@@ -290,3 +290,6 @@ int reachEof(){
     return(symBuf[(symBufIdx+1)%3].id==eofs);
 }
 
+void printSym(){
+    fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+}

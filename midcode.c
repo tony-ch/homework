@@ -6,6 +6,8 @@
 char mopStr[][10]={"conOp","varOp","funOp","arrOp","paraOp","retOp","endFunOp","callOp","calPaOp","readOp","writeOp",
                    "jOp","brfOp","sltOp","sleOp","sgtOp","sgeOp","seqOp","sneOp",
                    "liop","addOp","subOp","mulOp","divOp","setArrOp","getArrOp","becomeOp","genOp"};
+char kindstr[5][10]={"var","const","func","arr","para"};//todo debug
+char typestr[3][10]={"void","int","char"};//todo debug
 
 char strtab[STRNUMMAX][STRMAX];
 int strCnt=0;
@@ -13,6 +15,18 @@ int enterStr(char * str){
     strcpy(strtab[strCnt],str);
     return (strCnt++);
 }
+//struct TABREC tab[TMAX];
+int tidx=0;//tab top index
+//struct BTABREC btab[TMAX];
+int btidx=0;//func tab top index
+
+int adrOffset=0;
+int midx=0;
+struct MIDCODE mCode[CODEMAX];
+
+int temVarCnt=0;
+int labCnt=0;
+int lab[LABMAX];
 
 void enter(char *name, enum KINDS k, enum TYPES t, int value){
     if(tidx==TMAX){
@@ -77,8 +91,50 @@ int lookup(char* name,int isfunc){
     return result;
 };
 
+
+int getTemVar(){
+    int ti=tidx;
+    char name[ALENMAX]="&";
+    itoa(temVarCnt,name+1,10);
+    temVarCnt++;
+    enter(name,varkind,inttyp,0);//将临时变量加入符号表
+    adrOffset++;//分配空间
+    return ti;
+}
+
+int getLab(){
+    mCode[midx].op=genOp;
+    mCode[midx].arg1Typ=earg;mCode[midx].arg2Typ=earg;
+    mCode[midx].res.labIdx=labCnt,mCode[midx].rTyp=liarg;
+    midx++;
+    lab[labCnt]=midx;
+    return (labCnt++);
+}
+
+void emitMid(enum MOP op,int a1,int a2,int r,enum ARGTYP a1t,enum ARGTYP a2t,enum ARGTYP rt){
+    mCode[midx].op=op;
+    mCode[midx].arg1.value=a1; mCode[midx].arg1Typ=a1t;
+    mCode[midx].arg2.value=a2; mCode[midx].arg2Typ=a2t;
+    mCode[midx].res.tidx=r; mCode[midx].rTyp=rt;
+    midx++;
+}
+
 void printCode(){
     int i;
+    for(i=0;i<tidx;i++){
+        fprintf(fout,"\t\ttab index: %d,\tname: %s,\tkind: %s,\ttype: %s,\tvalue: %d,\tadr: %d\n",
+                i,tab[i].name,kindstr[tab[i].kind],typestr[tab[i].typ],tab[i].value,tab[i].adr);
+    }
+    for(i=0;i<btidx;i++){
+        fprintf(fout,"\t\tbtab index: %d,\tname: %s,\ttidx: %d\n",
+                i,btab[i].name,btab[i].tidx);
+    }
+    for(i=0;i<strCnt;i++){
+        fprintf(fout,"\t\tstr index: %d,\tstr: %s\n",i,strtab[i]);
+    }
+    for(i=0;i<labCnt;i++){
+        fprintf(fout,"\t\tlab index: %d,\tmidx: %d\n",i,lab[i]);
+    }
     for(i=0;i<midx;i++){
         fprintf(fout,"%5d%20s",i,mopStr[mCode[i].op]);
         switch (mCode[i].arg1Typ){
@@ -116,23 +172,4 @@ void printCode(){
         }
         fprintf(fout,"\n");
     }
-}
-
-int getTemVar(){
-    int ti=tidx;
-    char name[ALENMAX]="&";
-    itoa(temVarCnt,name+1,10);
-    temVarCnt++;
-    enter(name,varkind,inttyp,0);//将临时变量加入符号表
-    adrOffset++;//分配空间
-    return ti;
-}
-
-int getLab(){
-    mCode[midx].op=genOp;
-    mCode[midx].arg1Typ=earg;mCode[midx].arg2Typ=earg;
-    mCode[midx].res.labIdx=labCnt,mCode[midx].rTyp=liarg;
-    midx++;
-    lab[labCnt]=midx;
-    return (labCnt++);
 }
