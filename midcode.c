@@ -95,7 +95,8 @@ int lookup(char* name,int isfunc){
 int getTemVar(){
     int ti=tidx;
     char name[ALENMAX]="&";
-    itoa(temVarCnt,name+1,10);
+//    itoa(temVarCnt,name+1,10);
+    sprintf(name+1,"%d",temVarCnt);
     temVarCnt++;
     enter(name,varkind,inttyp,0);//将临时变量加入符号表
     adrOffset++;//分配空间

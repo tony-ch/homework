@@ -203,7 +203,7 @@ int findInTemReg(int tid){
     int i;
     for(i=TREGNUM-1;i>=0 && tReg.tidx[i]!=tid;i--)
         ;
-    printf("\t\t\tfind %s, res:%d\n",tab[tid].name,i);
+    fprintf(fout,"\t\t\tfind %s, res:%d\n",tab[tid].name,i);
     return i;
 }
 int getEmpTemReg(int tid,int regToUse1,int regToUse2){
@@ -213,7 +213,7 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
             if(tReg.busy[res]==0){
                 break;
             }else{
-                printf("reg :%d can't use.\n", res);
+                fprintf(fout,"reg :%d can't use.\n", res);
             }
         }
         tReg.used=tReg.used+1;
