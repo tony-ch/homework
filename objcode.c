@@ -309,7 +309,7 @@ void liToObj(){
 
 void mathToObj(int op){
     struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
+    int regDes,regSrc1,regSrc2;
     regDes= findInTemReg(code.res.tidx);
     if(regDes==-1){
         regDes=getEmpTemReg(code.res.tidx,-1,-1);
@@ -400,7 +400,7 @@ void arrToObj(){//arr,type,size,name;
     fprintf(codefile,"# arr %s \n",tab[mCode[mIdxCur].res.tidx].name);
 }
 
-void storeGlobal(){//todo 向常量赋值
+void storeGlobal(){
     int i,limit=btab[0].tidx;
     fprintf(codefile,".data:\n");
     for(i=0;i<limit;i++){//const var arr (func para)
@@ -432,7 +432,7 @@ void storeGlobal(){//todo 向常量赋值
     fprintf(codefile,"nop\n");
 }
 
-void rdToObj(){//todo read 内标识符的检验
+void rdToObj(){
     int tid=mCode[mIdxCur].res.tidx;
     int v0=tab[tid].typ==inttyp?5:12;
     int reg= findInTemReg(tid);
@@ -620,7 +620,6 @@ void callToObj(){//call,ret,paraN,func
     int paraN=btab[funcBtid].paraN;
     //int swFlag[]={0,0,0,0};
     int i,j;
-    //todo 检查参数个数和类型
     fprintf(codefile,"addi,$sp,$sp,-%d\n",(btab[funcBtid].spacesz)*4);
     if(paraN!=0 && calparaN!=0){
         int regPara,vparaTid;
@@ -689,7 +688,8 @@ void callToObj(){//call,ret,paraN,func
 void calPaToObj(){//todo calpa can be value
     //paraQue.isVal=mCode[mIdxCur].rTyp==varg?1:0;
     if(paraQue.cnt==PAMAX){
-        fprintf(codefile,"#error, exit");
+        fprintf(codefile,"#fatal error: para quene is full\n");
+        printf("#fatal err: para quene is full\n");
         exit(1);
     }
     paraQue.para[paraQue.cnt].tidx=mCode[mIdxCur].res.tidx;

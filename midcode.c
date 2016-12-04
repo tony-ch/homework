@@ -30,14 +30,13 @@ int lab[LABMAX];
 
 void enter(char *name, enum KINDS k, enum TYPES t, int value){
     if(tidx==TMAX){
-        error(99);//TODO
-        exit(1);
+        error(99);//!fatal err ,exit
     }
     if(k==funkind){
         int i;
         for(i=0;i<btidx;i++){
             if(strcmp(btab[i].name,name)==0){
-                error(99);//todo redef func
+                error(5);//!redef func
                 return;
             }
         }
@@ -46,7 +45,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value){
         i=(btidx==0)?0:btab[btidx-1].tidx+1;// if global field, search from 0; if func field, search after func name.
         for(;i<tidx;i++){
             if(strcmp(tab[i].name,name)==0){
-                error(99);//todo redef iden
+                error(6);//! redef iden
                 return;
             }
         }
@@ -62,6 +61,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value){
         strcpy(btab[btidx].name,name);
         btab[btidx].tidx=tidx;
         btab[btidx].paraN=value;
+        btab[btidx].reted=0;
         fprintf(fout,"\t\tenter btab index: %d, name: %s, tidx: %d, spacesz:%d, paraN:%d\n",
                 btidx,btab[btidx].name,btab[btidx].tidx,btab[btidx].spacesz,btab[btidx].paraN);
         btidx=btidx+1;
@@ -96,7 +96,7 @@ int getTemVar(){
     int ti=tidx;
     char name[ALENMAX]="&";
 //    itoa(temVarCnt,name+1,10);
-    sprintf(name+1,"%d",temVarCnt);
+    sprintf(name+1,"%d",temVarCnt);//!itoa 改为sprintf
     temVarCnt++;
     enter(name,varkind,inttyp,0);//将临时变量加入符号表
     adrOffset++;//分配空间
@@ -127,8 +127,8 @@ void printCode(){
                 i,tab[i].name,kindstr[tab[i].kind],typestr[tab[i].typ],tab[i].value,tab[i].adr);
     }
     for(i=0;i<btidx;i++){
-        fprintf(fout,"\t\tbtab index: %d,\tname: %s,\ttidx: %d\n",
-                i,btab[i].name,btab[i].tidx);
+        fprintf(fout,"\t\tbtab index: %d,\tname: %20s,\t\tspacesz: %d,\t\tparaN: %d,\t\treted: %d,\t\ttidx: %d\n",
+                i,btab[i].name,btab[i].spacesz,btab[i].paraN,btab[i].reted,btab[i].tidx);
     }
     for(i=0;i<strCnt;i++){
         fprintf(fout,"\t\tstr index: %d,\tstr: %s\n",i,strtab[i]);

@@ -89,7 +89,7 @@ void getsym(){
         //num=0;
         getch();
         if(isdigit(ch)){
-            error(2);//!todo "0 before unsigned or num too long"(T)
+            error(2);//! "0 before unsigned or num too long"(T)
         }
     }else if(isdigit(ch)){
         int i=0;
@@ -102,7 +102,7 @@ void getsym(){
                 getch();
                 //num=num*10+(ch-'0');
             }else{
-                error(2);//!todo "0 before unsigned or num too long"(T)
+                error(2);//! "0 before unsigned or num too long"(T)
             }
         }
         symBuf[symBufIdx].token[i]=0;
@@ -110,7 +110,7 @@ void getsym(){
         char con;
         getch();
         if(!isalpha(ch) && !isdigit(ch) && ch!='+' && ch!='*'){
-            error(1);//!todo invalid character(F)
+            error(1);//! invalid character(F)
             //symBuf[symBufIdx].id=nul;
             //symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=0;
             ch='0';
@@ -122,7 +122,7 @@ void getsym(){
             symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=con;symBuf[symBufIdx].token[2]='\'';symBuf[symBufIdx].token[3]=0;
             getch();
         }else{
-            error(3);//!todo; 应是'(F)
+            error(3);//! 应是'(F)
             if(ch=='\"'){//!
                 symBuf[symBufIdx].id=charcon;
                 symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=con;symBuf[symBufIdx].token[2]='\'';symBuf[symBufIdx].token[3]=0;
@@ -142,7 +142,7 @@ void getsym(){
                     i++;
                 }
             }else{
-                error(1);//!todo invalid character (T)
+                error(1);//! invalid character (T)
             }
             getch();
         }while(ch!='\"');
@@ -179,7 +179,7 @@ void getsym(){
             symBuf[symBufIdx].token[2]=0;
             getch();
         }else{
-            error(1);//todo invalid character (F)
+            error(1);//! invalid character (F)
             symBuf[symBufIdx].id=neq;
             symBuf[symBufIdx].token[0]='!';
             symBuf[symBufIdx].token[1]='=';
@@ -254,7 +254,7 @@ void getsym(){
         if(ch==EOF){
             symBuf[symBufIdx].id=eofs;
         }else{
-            error(1);//!todo invalid character (T)
+            error(1);//! invalid character (T)
             symBuf[symBufIdx].id=nul;
             symBuf[symBufIdx].token[0]=ch;symBuf[symBufIdx].token[1]=0;
             getch();
@@ -279,7 +279,7 @@ void updateSymBuf(){
     }while(symBuf[symBufIdx].id==nul);
     symBufIdx+=1;
     if(symBuf[symBufIdx].id==eofs){
-        error(0);//!todo incomplete source file, exit (T)
+        error(0);//!incomplete source file, exit (T)
     }
     if(symBufIdx==3){
         symBufIdx=0;
