@@ -38,7 +38,6 @@ void generate(){
         tReg.tidx[i]=-1;
         tReg.dif[i]=0;
     }
-    //test(0,1,2,3,4);
     storeGlobal();
     while(mIdxCur<midx){
         //printf("%d\n",mIdxCur);
@@ -161,7 +160,7 @@ int isGlobal(int tidx){
     return tidx<btab[0].tidx?1:0;
 }
 
-void freeTemReg(int i){//todo check
+void freeTemReg(int i){
     if(tReg.tidx[i]==-1 || tReg.dif[i]==0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数；不为变量不需要写回
     }else if(isGlobal(tReg.tidx[i])){
@@ -204,7 +203,7 @@ int findInTemReg(int tid){
     int i;
     for(i=TREGNUM-1;i>=0 && tReg.tidx[i]!=tid;i--)
         ;
-    printf("\t\t\tfind %s, res:%d\n",tab[tid].name,i);
+    fprintf(fout,"\t\t\tfind %s, res:%d\n",tab[tid].name,i);
     return i;
 }
 int getEmpTemReg(int tid,int regToUse1,int regToUse2){
@@ -214,7 +213,7 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
             if(tReg.busy[res]==0){
                 break;
             }else{
-                printf("reg :%d can't use.\n", res);
+                fprintf(fout,"reg :%d can't use.\n", res);
             }
         }
         tReg.used=tReg.used+1;
@@ -243,23 +242,6 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
 //    }
     return res;
 }
-
-/*
-
-
-
-
-    int i=-1;
-    if(tidx!=-1){
-
-    }
-    if(i==-1){
-        i= askForReg(regToUse1, regToUse2);
-        tReg.tidx[i]=tidx;
-    }
-    return i;
-
- */
 
 void jmpToObj(){
     clearTemReg();
@@ -366,167 +348,38 @@ void mathToObj(int op){
 
 /*
 void sltToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"slt $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
 
 }
 void sleToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"sle $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
 }
 void sgtToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"sgt $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
 }
 void sgeToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"sge $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
 }
 void seqToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"seq $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
 }
 void sneToObj(){//todo
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        regSrc2= getTemReg(-1,regDes, regSrc1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc2,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-    }
-    fprintf(codefile,"sne $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        leaTemReg(regSrc2);
-    }
+
+}
+ void addToObj(){
+
+}
+
+void subToObj(){
+
+}
+
+void mulToObj(){
+
+}
+
+void divToObj(){
+
 }
  */
 void conToObj(){//con,type,value,name
@@ -617,103 +470,7 @@ void wrToObj(){
         }
     }//todo check avaliable
 }
-/*
-void addToObj(){
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        fprintf(codefile,"add $t%d,$t%d,%d\n",regDes,regSrc1,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-        fprintf(codefile,"add $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    }
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-}
 
-void subToObj(){
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        fprintf(codefile,"sub $t%d,$t%d,%d\n",regDes,regSrc1,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-        fprintf(codefile,"sub $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    }
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-}
-
-void mulToObj(){
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        fprintf(codefile,"mul $t%d,$t%d,%d\n",regDes,regSrc1,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-        fprintf(codefile,"mul $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    }
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-}
-
-void divToObj(){
-    struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regSrc1=-1,regSrc2=-1;
-    regDes= getTemReg(code.res.tidx, -1, -1);
-    tReg.dirty[regDes]=1;
-    if(code.arg1Typ==varg){
-        regSrc1= getTemReg(-1,regDes, -1);
-        fprintf(codefile,"addi $t%d,$0,%d\n",regSrc1,code.arg1.value);
-    }else{
-        regSrc1= getTemReg(code.arg1.tidx, regDes, -1);
-        loadToReg(code.arg1.tidx,regSrc1);
-    }
-    if(code.arg2Typ==varg){
-        fprintf(codefile,"div $t%d,$t%d,%d\n",regDes,regSrc1,code.arg2.value);
-    }else{
-        regSrc2= getTemReg(code.arg2.tidx, regDes, regSrc1);
-        loadToReg(code.arg2.tidx,regSrc2);
-        fprintf(codefile,"div $t%d,$t%d,$t%d\n",regDes,regSrc1,regSrc2);
-    }
-    if(code.arg1Typ==varg){
-        leaTemReg(regSrc1);
-    }
-}
-*/
 void getArrToObj(){//=[],arr,idx,des
     struct MIDCODE code=mCode[mIdxCur];
     int regDes=-1,regArr=-1,regIdx=-1;

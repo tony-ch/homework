@@ -6,7 +6,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define SYMNUM 40
 #define PATHLEN 100//
 #define KEYNO 14//number of key words
 #define LLEN 200//line len limit
@@ -48,15 +47,15 @@ struct{
     enum TYPES typ;
     int value;//value for const; para num for funkind; arr element num for arr
     int adr;// for not para adr relative to b base$fp
-    int inMem;
-    int regIdx;
+    int inMem;//todo
+    int regIdx;//todo
 }tab[TMAX];
 extern int adrOffset;
 extern int tidx;//tab index
 struct{
     char name[ALENMAX];
     int tidx;//index in tab
-    //int hasCall;
+    int callParaN;//todo
     int spacesz;
     int paraN;
 }btab[TMAX];

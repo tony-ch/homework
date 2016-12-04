@@ -30,7 +30,7 @@ void error(int n){
     case 2://"0 before unsigned or num too long"
         fprintf(fout,"line:%d col:%d errno:%d %s\n",lcnt,ccnt,n,emsg[n]);
         printf("line:%d col:%d errno:%d %s\n",lcnt,ccnt,n,emsg[n]);
-        while(isdigit(ch)){//todo skip
+        while(isdigit(ch)){
             getch();
         }
         break;

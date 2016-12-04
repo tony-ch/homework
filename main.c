@@ -16,7 +16,7 @@ int main()
             printf("can't open file\n");
     }
      while(fout==NULL){//打开结果文件
-        printf("please input result file path:\n");
+        printf("please input mid code file path:\n");
         if(getPath(foutPath)<0)
             continue;
         if((fout=fopen(foutPath,"w"))==NULL)
