@@ -3,6 +3,7 @@
 int getPath(char* path);//读取控制台输入的路径
 FILE* fin=NULL;//源文件
 FILE* fout=NULL;//结果文件
+FILE* codefile=NULL;//目标代码文件
 int main()
 {
     char finPath[PATHLEN];
@@ -15,7 +16,7 @@ int main()
             printf("can't open file\n");
     }
      while(fout==NULL){//打开结果文件
-        printf("please input result file path:\n");
+        printf("please input mid code file path:\n");
         if(getPath(foutPath)<0)
             continue;
         if((fout=fopen(foutPath,"w"))==NULL)
@@ -26,9 +27,22 @@ int main()
     program();
     if(!reachEof()){
         fprintf(fout,"there should be nothing after main func.\n");
+        printf("there should be nothing after main func.\n");
+    }
+    if(ecnt==0){
+        printf("no error, begin to generate obj code.");
+        while(codefile==NULL){//打开结果文件
+            printf("please input code file path:\n");
+            if(getPath(foutPath)<0)
+                continue;
+            if((codefile=fopen(foutPath,"w"))==NULL)
+                printf("can't open file\n");
+        }
+        generate();
     }
     fclose(fin);
     fclose(fout);
+    fclose(codefile);
     return 0;
 }
 

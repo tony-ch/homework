@@ -1,5 +1,7 @@
 #include "global.h"
 #include "err.h"
+
+
 void program(){
     if(symBuf[symBufIdx].id==constsy){//!Í··ûºÅÎªconst
         decConst();
@@ -26,6 +28,11 @@ void program(){
     }
     mainDef();
     fprintf(fout,"\t\tthis is a program.\n");
+
+    int i;
+    fprintf(fout,"\n");
+    printCode();
+
 }
 //const ¿ªÍ·
 void decConst(){
@@ -53,12 +60,18 @@ void decConst(){
 }
 
 void constDef(){
+    enum KINDS kind=conkind;
+    enum TYPES type;
+    char name[ALENMAX];
+    int value;
     if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo ÖØ¸´´úÂë
             error(5);//Ó¦ÊÇ±êÊ¶·û
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
             error(5);//Ó¦ÊÇ=
@@ -69,13 +82,17 @@ void constDef(){
             error(5);//Ó¦ÊÇÊý×Ö
             return;
         }
-        numDef();
+        value=numDef();
+        emitMid(conOp,type,value,tidx,targ,varg,tiarg);
+        enter(name,kind,type,value);
+        adrOffset++;
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
                 error(5);//Ó¦ÊÇ±êÊ¶·û
                 return;
             }
+            strcpy(name,symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
                 error(5);//Ó¦ÊÇ=
@@ -86,14 +103,19 @@ void constDef(){
                 error(5);//Ó¦ÊÇÊý×Ö
                 return;
             }
-            numDef();
+            value=numDef();
+            emitMid(conOp,type,value,tidx,targ,varg,tiarg);
+            enter(name,kind,type,value);
+            adrOffset++;
         }
     }else if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!todo ÖØ¸´´úÂë
             error(5);//Ó¦ÊÇ±êÊ¶·û
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=become){
             error(5);//Ó¦ÊÇ=
@@ -101,9 +123,13 @@ void constDef(){
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=charcon){
-            error(5);//Ó¦ÊÇÊý×Ö
+            error(5);//Ó¦ÊÇ×Ö·û
             return;
         }
+        value=symBuf[symBufIdx].token[1];
+        emitMid(conOp,type,value,tidx,targ,varg,tiarg);
+        enter(name,kind,type,value);
+        adrOffset++;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
@@ -111,6 +137,7 @@ void constDef(){
                 error(5);//Ó¦ÊÇ±êÊ¶·û
                 return;
             }
+            strcpy(name,symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=become){
                 error(5);//Ó¦ÊÇ=
@@ -118,9 +145,13 @@ void constDef(){
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charcon){
-                error(5);//Ó¦ÊÇÊý×Ö
+                error(5);//Ó¦ÊÇ×Ö·û
                 return;
             }
+            value=symBuf[symBufIdx].token[1];
+            emitMid(conOp,type,value,tidx,targ,varg,tiarg);
+            enter(name,kind,type,value);
+            adrOffset++;
             updateSymBuf();
         }
     }else{
@@ -133,9 +164,17 @@ void constDef(){
 void decVar(){//£¼±äÁ¿ËµÃ÷£¾::=£¼±äÁ¿¶¨Òå£¾;{£¼±äÁ¿¶¨Òå£¾;}
 }
 */
-void varDef(){
+void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·ûºÅÕûÊý£¾¡®]¡¯){,£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·ûºÅÕûÊý£¾¡®]¡¯ }
     //enum symbol typ=sym;
-    if(symBuf[symBufIdx].id!=intsy && symBuf[symBufIdx].id!=charsy){
+    char name[ALENMAX];
+    enum KINDS kind;
+    enum TYPES type;
+    int value;
+    if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
+    } else if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
+    }else{
         error(5);//todo Ó¦Îªint»òchar
         return;
     }
@@ -144,6 +183,9 @@ void varDef(){
         error(5);//todo Ó¦Îª±êÊ¶·û
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    kind=varkind;
+    value=1;
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
         updateSymBuf();
@@ -151,6 +193,8 @@ void varDef(){
             error(5);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
             return;
         }
+        kind=arrkind;
+        value=atoi(symBuf[symBufIdx].token);
         updateSymBuf();
         if(symBuf[symBufIdx].id!=rbrack){
             error(5);//todo )
@@ -158,12 +202,18 @@ void varDef(){
         }
         updateSymBuf();
     }
+    emitMid((kind==arrkind?arrOp:varOp),type,value,tidx,targ,(kind==arrkind?varg:earg),tiarg);
+    enter(name,kind,type,value);
+    adrOffset=adrOffset+value;
     while(symBuf[symBufIdx].id==comma){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
             error(5);//todo Ó¦Îª±êÊ¶·û
             return;
         }
+        strcpy(name,symBuf[symBufIdx].token);
+        kind=varkind;
+        value=1;
         updateSymBuf();
         if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî
             updateSymBuf();
@@ -171,6 +221,8 @@ void varDef(){
                 error(5);//todo Ó¦ÎªÎÞ·ûºÅÕûÊý
                 return;
             }
+            kind=arrkind;
+            value=atoi(symBuf[symBufIdx].token);
             updateSymBuf();
             if(symBuf[symBufIdx].id!=rbrack){
                 error(5);//todo )
@@ -178,14 +230,19 @@ void varDef(){
             }
             updateSymBuf();
         }
+        emitMid((kind==arrkind?arrOp:varOp),type,value,tidx,targ,(kind==arrkind?varg:earg),tiarg);
+        enter(name,kind,type,value);
+        adrOffset=adrOffset+value;
     }
     fprintf(fout,"\t\tthis is var def.\n");
 }
 
-void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
+int numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
     int flag=0;
+    int num=0;
     if(symBuf[symBufIdx].id==zero){
         updateSymBuf();
+        num=0;
     }else{
         if(symBuf[symBufIdx].id==plus){//!¿ÉÑ¡Ïî
             updateSymBuf();
@@ -194,24 +251,34 @@ void numDef(){//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
             flag=1;
         }
         if(symBuf[symBufIdx].id==unsignum){
-            //if(flag==1){
-                //num=-num;
-            //}
+            num=atoi(symBuf[symBufIdx].token);
+            if(flag==1){
+                num=-num;
+            }
             updateSymBuf();
         }else{
             error(5);//todo Ó¦ÊÇunsignnum
-            return;
+            return 0;
         }
     }
-    if(flag){
-        fprintf(fout,"\t\tthis is a num.\n");
-    }else{
-        fprintf(fout,"\t\tthis is a num.\n");
-    }
+    fprintf(fout,"\t\tthis is a num:%d.\n",num);
+    return num;
 }
 
 void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
-    if(symBuf[symBufIdx].id!=charsy&&symBuf[symBufIdx].id!=intsy){
+    char name[ALENMAX];
+    enum KINDS kind;
+    enum TYPES type;
+    int value;
+    int tIdxCur,btidCur;
+    int mIdxCur;
+    kind=funkind;
+    tIdxCur=tidx;btidCur=btidx;
+    if(symBuf[symBufIdx].id==charsy){
+        type=chtyp;
+    }else if(symBuf[symBufIdx].id==intsy){
+        type=inttyp;
+    } else{
         error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
@@ -220,103 +287,176 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
         error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    mIdxCur=midx;
+    emitMid(funOp,type,0,btidx,targ,varg,btiarg);
+    enter(name,kind,type,0);
+    adrOffset=0;
+    //adrOffset++;//for $fp; todo
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
-    paraList();
+    value=paraList();
+    tab[tIdxCur].value=value;
+    mCode[mIdxCur].arg2.value=value;
+    adrOffset=adrOffset+10;//todo for $ra and $s0-$s7
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tIdxCur].name,tab[tIdxCur].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ{
         return;
     }
     updateSymBuf();
     complexStat();
     if(symBuf[symBufIdx].id!=rbrace){
-        error(5);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ}
         return;
     }
+    emitMid(endFunOp,-1,-1,btidCur,earg,earg,btiarg);
+    btab[btidCur].spacesz=adrOffset;
+    btab[btidCur].paraN=value;
     updateSymBuf();
     fprintf(fout,"\t\tthis is a ret func dec.\n");
 }
 
 void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+    char name[ALENMAX];
+    enum KINDS kind;
+    enum TYPES type;
+    int value;
+    int tIdxCur,btIdxCur;
+    int mIdxCur;
+    kind=funkind;
+    tIdxCur=tidx;btIdxCur=btidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
+    type=voidtyp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
         error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    mIdxCur=midx;
+    emitMid(funOp,type,0,btidx,targ,varg,btiarg);
+    enter(name,kind,type,0);
+    adrOffset=0;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
-    paraList();
+    value=paraList();
+    tab[tIdxCur].value=value;
+    mCode[mIdxCur].arg2.value=value;
+    adrOffset=adrOffset+10;//todo for $fp($sp+16) $ra($sp+20) and $s0-$s7
+    fprintf(fout,"\t\tenter para num for func %s, para num: %d\n",tab[tIdxCur].name,tab[tIdxCur].value);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo Ó¦ÊÇ(
+        error(5);//todo Ó¦ÊÇ{
         return;
     }
     updateSymBuf();
     complexStat();
-    if(symBuf[symBufIdx].id!=rbrace){
-        error(5);//todo Ó¦ÊÇ(
+    if(symBuf[symBufIdx].id!=rbrace) {
+        error(5);//todo Ó¦ÊÇ}
         return;
     }
+    emitMid(endFunOp,-1,-1,btIdxCur,earg,earg,btiarg);
+    btab[btIdxCur].spacesz=adrOffset;
+    btab[btIdxCur].paraN=value;
     updateSymBuf();
     fprintf(fout,"\t\tthis is a void func dec.\n");
 }
 
-void paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
+int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
+    char name[ALENMAX];
+    enum KINDS kind;
+    enum TYPES type;
+    kind=parakind;
+    int paraCnt=0;
     if(symBuf[symBufIdx].id==charsy||symBuf[symBufIdx].id==intsy){//!¿ÉÒÔÎª¿Õ
+        if(symBuf[symBufIdx].id==charsy){
+            type=chtyp;
+        } else{
+            type=inttyp;
+        }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
             error(5);//todo
-            return;
+            return 0;
         }
+        strcpy(name,symBuf[symBufIdx].token);
+        emitMid(paraOp,type,-1,tidx,targ,earg,tiarg);
+        enter(name,kind,type,0);
+        paraCnt=paraCnt+1;
+        adrOffset++;
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
             if(symBuf[symBufIdx].id!=charsy && symBuf[symBufIdx].id!=intsy){
                 error(5);//todo
-                return;
+                return 0;
+            }
+            if(symBuf[symBufIdx].id==charsy){
+                type=chtyp;
+            } else{
+                type=inttyp;
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
                 error(5);//todo
-                return;
+                return 0;
             }
+            strcpy(name,symBuf[symBufIdx].token);
+            emitMid(paraOp,type,-1,tidx,targ,earg,tiarg);
+            enter(name,kind,type,0);
+            adrOffset++;
+            paraCnt=paraCnt+1;
             updateSymBuf();
         }
     }
+    adrOffset+=(4-paraCnt);
     fprintf(fout,"\t\tthis is para list.\n");
+    return paraCnt;
 }
 
 void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
+    char name[ALENMAX];
+    enum KINDS kind;
+    enum TYPES type;
+    kind=funkind;
+    int tidCur=tidx;
+    int btidCur=btidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(5);//todo Ó¦ÊÇÀàÐÍ±êÊ¶·û
         return;
     }
+    type=voidtyp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=mainsy){
         error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
+    strcpy(name,symBuf[symBufIdx].token);
+    emitMid(funOp,type,0,btidx,targ,varg,btiarg);
+    enter(name,kind,type,0);
+    adrOffset=0;
+    adrOffset++;//for fp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
@@ -334,46 +474,74 @@ void mainDef(){//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     }
     updateSymBuf();
     complexStat();
-    fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+    printSym();
     if(symBuf[symBufIdx].id!=rbrace){
         error(5);//todo Ó¦ÊÇ(
         return;
     }//!!todo
+    emitMid(endFunOp,-1,-1,btidCur,earg,earg,tiarg);
+    btab[btidCur].spacesz=adrOffset;
     fprintf(fout,"\t\tthis is main func dec.\n");
 }
 
-void call(){
+int call(int hasRet){
+    int funcId,resTid=0,paraCnt,funcBtid=0;
     if(symBuf[symBufIdx].id!=ident){
-        error(5);//tofo
-        return;
+        error(5);//todo
+        return -1;
+    }
+    funcId=lookup(symBuf[symBufIdx].token,1);
+    while (funcBtid<btidx && strcmp(btab[funcBtid].name,tab[funcId].name)!=0){
+        funcBtid++;
+    }
+    if(funcId==-1){
+        error(99);// todo º¯ÊýÎ´¶¨Òå
+        return -1;
+    }
+    if(tab[funcId].typ==voidtyp && hasRet==1){
+        error(99);//todo Ó¦ÊÇÓÖ·µ»ØÖµº¯Êý
+        return -1;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
-        error(5);//tofo
-        return;
+        error(5);//todo
+        return -1;
+    }
+    if(hasRet){
+        resTid=getTemVar();
+        tab[resTid].typ=tab[funcId].typ;
     }
     updateSymBuf();//£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
-    valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
+    paraCnt=valueParaList();//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
+    emitMid(callOp,resTid,paraCnt,funcBtid,hasRet==1?tiarg:earg,varg,btiarg);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
-        return;
+        return -1;
     }
     updateSymBuf();
     fprintf(fout,"\t\tthis is a call stat.\n");
+    return resTid;
 }
 
 
-void valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
+int valueParaList(){//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
+    int paraCnt=0;
+    int resTid;
     if(symBuf[symBufIdx].id==rparent){//!¿Õ
         //getsym();//!
     }else{
-        expr();//!ÖÁÉÙÒ»¸ö
+        resTid=expr();//!ÖÁÉÙÒ»¸ö
+        emitMid(calPaOp,-1,-1,resTid,earg,earg,tiarg);
+        paraCnt++;
         while(symBuf[symBufIdx].id==comma){
             updateSymBuf();
-            expr();
+            resTid=expr();
+            emitMid(calPaOp,-1,-1,resTid,earg,earg,tiarg);
+            paraCnt++;
         }
     }
     fprintf(fout,"\t\tthis is value para list.\n");
+    return paraCnt;
 }
 
 void complexStat(){//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾äÁÐ£¾
@@ -434,11 +602,11 @@ void stat(){//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ
     }else if(symBuf[symBufIdx].id==switchsy){
         switchStat();
     }else if(symBuf[symBufIdx].id==ident){//!first¼¯ºÏÏà½»
-        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        enum SYMBOL nextSym=symBuf[(symBufIdx+1)%3].id;
         if(nextSym==become || nextSym==lbrack){
             assignment();
         }else if(nextSym==lparent){
-            call();
+            call(0);//todo ¿ÉÄÜÊÇÓÖ·µ»ØÖµµÄ
         }else{
             error(5);//·Ç·¨Óï¾ä
             return;
@@ -468,72 +636,115 @@ void statList(){
     fprintf(fout,"\t\tthis is a stat list.\n");
 }
 
-void expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
-    if(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus){//!¿ÉÑ¡Ïî
+int expr(){//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
+    int ti1,ti2,resTi,negflag;
+    negflag=0;
+    if(symBuf[symBufIdx].id==plus){//!¿ÉÑ¡Ïî
         updateSymBuf();
+    }else if(symBuf[symBufIdx].id==minus){
+        updateSymBuf();
+        negflag=1;
     }
-    term();
+    ti1=term();
+    if(negflag){
+        resTi=getTemVar();
+        emitMid(subOp,0,ti1,resTi,varg,tiarg,tiarg);
+    }else{
+        resTi=ti1;
+    }
     while(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus){//!ÒÔ+-·Ö¸ô
+        enum MOP op=symBuf[symBufIdx].id==plus?addOp:subOp;
         updateSymBuf();
-        term();
+        ti1=resTi;
+        ti2=term();
+        resTi=getTemVar();
+        emitMid(op,ti1,ti2,resTi,tiarg,tiarg,tiarg);
     }
     fprintf(fout,"\t\tthis is an expr.\n");
+    return resTi;
 }
 
-void term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
-    factor();
+int term(){//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
+    int ti1,ti2,resTi;
+    ti1=factor();
+    resTi=ti1;
     while(symBuf[symBufIdx].id==mul || symBuf[symBufIdx].id==divd){
+        enum MOP op=symBuf[symBufIdx].id==mul?mulOp:divOp;
         updateSymBuf();
-        factor();
+        ti1=resTi;
+        ti2=factor();
+        resTi=getTemVar();
+        emitMid(op,ti1,ti2,resTi,tiarg,tiarg,tiarg);
+
     }
     fprintf(fout,"\t\tthis is a term.\n");
+    return resTi;
 }
 
-void factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|£¼×Ö·û£¾£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾|¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+int factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|£¼×Ö·û£¾£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾|¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+    int resTi;
     if(symBuf[symBufIdx].id==ident){
-        enum symbol nextSym=symBuf[(symBufIdx+1)%3].id;
+        enum SYMBOL nextSym=symBuf[(symBufIdx+1)%3].id;
         if(nextSym==lparent){
-            call();
+            return call(1);
         }else{
+            resTi=lookup(symBuf[symBufIdx].token,0);//±êÊ¶·û
             updateSymBuf();
             if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî £¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯
+                int ti1,ti2;
+                if(tab[resTi].kind!=arrkind){
+                    error(99);//todo ²»ÎªÊý×é
+                    return -1;
+                }
+                ti1=resTi;
                 updateSymBuf();
-                expr();
+                ti2=expr();
+                resTi=getTemVar();
+                tab[resTi].typ=tab[ti1].typ;//!ÀàÐÍÉèÎªÊý×éÔªËØµÄÀàÐÍ
+                emitMid(getArrOp,ti1,ti2,resTi,tiarg,tiarg,tiarg);
                 if(symBuf[symBufIdx].id!=rbrack){
                     error(5);//todo Ó¦ÊÇ]
-                    return;
+                    return -1;
                 }
                 updateSymBuf();
             }
         }
     }else if(symBuf[symBufIdx].id==charcon){
+        resTi=getTemVar();
+        tab[resTi].typ=chtyp;
+        emitMid(liop,symBuf[symBufIdx].token[1],-1,resTi,varg,earg,tiarg);
         updateSymBuf();
     }else if(symBuf[symBufIdx].id==plus || symBuf[symBufIdx].id==minus || symBuf[symBufIdx].id==zero || symBuf[symBufIdx].id==unsignum){//!ÕûÊý first ¼¯ºÏ
-        numDef();
+        resTi=getTemVar();
+        emitMid(liop,numDef(),-1,resTi,varg,earg,tiarg);
     }else if(symBuf[symBufIdx].id==lparent){//¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
         updateSymBuf();
-        expr();
+        resTi=expr();
         if(symBuf[symBufIdx].id!=rparent){
             error(5);//todo Ó¦ÊÇ])
-            return;
+            return -1;
         }
         updateSymBuf();
     }else{
         error(5);//todo ·Ç·¨Òò×Ó
-        return;
+        return -1;
     }
     fprintf(fout,"\t\tthis is a factor.\n");
+    return resTi;
 }
 
 void assignment(){//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
+    int resTid=-1,ti1=-1,ti2=-1;
+    int isArr=0;
     if(symBuf[symBufIdx].id!=ident){
         error(5);//todo Ó¦ÊÇ±êÊ¶·û
         return;
     }
+    resTid=lookup(symBuf[symBufIdx].token,0);
     updateSymBuf();
     if(symBuf[symBufIdx].id==lbrack){
         updateSymBuf();//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
-        expr();
+        ti2=expr();isArr=1;
         if(symBuf[symBufIdx].id!=rbrack){
             error(5);//todo Ó¦ÊÇ]
             return;
@@ -544,18 +755,36 @@ void assignment(){//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             return;
         }
         updateSymBuf();
-        expr();
+        ti1=expr();
     }else if(symBuf[symBufIdx].id==become){//±äÁ¿¸³Öµ£¼¸³ÖµÓï¾ä£¾   ::=  £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾
         updateSymBuf();
-        expr();//!Ö±½Óµ÷ÓÃ
+        ti1=expr();//!Ö±½Óµ÷ÓÃ
     }else{
         error(5);//todo ·Ç·¨Óï¾ä
         return;
     }
+    emitMid(isArr?setArrOp:becomeOp,ti1,ti2,resTid,tiarg,isArr?tiarg:earg,tiarg);
     fprintf(fout,"\t\tthis is a assignment.\n");
 }
+/*
+ * if cond
+ * (true)->
+ * (false)-> goto labElse(BP)
+ * then
+ *  ...
+ *  goto labNext(BP)
+ * else
+ * labElse:
+ *  ...
+ *  goto labNext
+ * end if
+ * labNext:
+ */
+
+
 //if¿ªÍ·
 void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
+    int midxElse=0,midxNext=0,brTi=-1;
     if(symBuf[symBufIdx].id!=ifsy){
         error(5);//Ó¦ÊÇif
         return;
@@ -566,66 +795,110 @@ void ifStat(){//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
         return;
     }
     updateSymBuf();
-    condition();//!Ö±½Óµ÷ÓÃ
+    brTi=condition();//!Ö±½Óµ÷ÓÃ
+    midxElse=midx;
+    emitMid(brfOp,brTi,0,0,tiarg,earg,liarg);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//Ó¦ÊÇ)
         return;
     }
 	updateSymBuf();//!read one more sym
     stat();//!Ö±½Óµ÷ÓÃ
+    midxNext=midx;
+    emitMid(jOp,-1,-1,0,earg,earg,liarg);
+    mCode[midxElse].res.labIdx=getLab();
     if(symBuf[symBufIdx].id==elsesy){//!¿ÉÑ¡Ïî
 		updateSymBuf();//!one more sym
         stat();
     }
+    mCode[midxNext].res.labIdx=getLab();
     fprintf(fout,"\t\tthis is an if stat.\n");
 }
 
-void condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
-    expr();//!Ö±½Óµ÷ÓÃ
+int condition(){//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
+    int ti1,ti2=-1,resTi;
+    int hasOp=0;
+    enum MOP op=sltOp;
+    ti1=expr();//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id==les){//!¿ÉÑ¡Ïî
+        hasOp=1;op=sltOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==leq){
+        hasOp=1;op=sleOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==gtr){
+        hasOp=1;op=sgtOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==geq){
+        hasOp=1;op=sgeOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==eql){
+        hasOp=1;op=seqOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
     }else if(symBuf[symBufIdx].id==neq){//!Â©Ð´
+        hasOp=1;op=sneOp;
         updateSymBuf();
-        expr();
+        ti2=expr();
+    }
+    if(hasOp==1){
+        resTi=getTemVar();
+        emitMid(op,ti1,ti2,resTi,tiarg,tiarg,tiarg);
+    } else{
+        resTi=ti1;
     }
     fprintf(fout,"\t\tthis is a condition.\n");
+    return resTi;
 }
+/*
+ * /*
+ * labLoop:
+ * while cond
+ * (true)->
+ * (false)-> goto labNext(BP)
+ * do
+ *  ...
+ *  goto labLoop
+ * end if
+ * labNext:
+ */
 //while¿ªÍ·
-void whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
+void  whileStat(){//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
+    int loopLabIdx=0,endLabIdx=0,brTi=-1,loopMidx=-1;
     if(symBuf[symBufIdx].id!=whilesy){
         error(5);//todo Ó¦ÊÇwhile
         return;
     }
+    loopLabIdx=getLab();
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(5);//todo Ó¦ÊÇ(
         return;
     }
     updateSymBuf();
-    condition();//!Ö±½Óµ÷ÓÃ
+    brTi=condition();//!Ö±½Óµ÷ÓÃ
+    loopMidx=midx;
+    emitMid(brfOp,brTi,-1,0,tiarg,earg,liarg);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         return;
     }
     updateSymBuf();
     stat();//!Ö±½Óµ÷ÓÃ
+    emitMid(jOp,-1,-1,loopLabIdx,earg,earg,liarg);
+    endLabIdx=getLab();
+    mCode[loopMidx].res.labIdx=endLabIdx;
     fprintf(fout,"\t\tthis is a while stat.\n");
 }
 //printf¿ªÍ·
 void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡®(¡¯£¼×Ö·û´®£¾ ¡®)¡¯|printf ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
+    char str[STRMAX]="";
+    int expTid=-1,strTid=-1;
+    int hasStr=0,hasExp=0;
     if(symBuf[symBufIdx].id!=printfsy){
         error(5);//todo Ó¦ÊÇprintf
         return;
@@ -637,18 +910,24 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==strcon){
+        strcpy(str,symBuf[symBufIdx].token);hasStr=1;
         updateSymBuf();
         if(symBuf[symBufIdx].id==comma){//!¿ÉÑ¡Ïî
             updateSymBuf();
-            expr();
+            expTid=expr();hasExp=1;
         }
     }else{
-        expr();//!Ö±½Óµ÷ÓÃ todo expr first¼¯ºÏ
+        expTid=expr();//!Ö±½Óµ÷ÓÃ todo expr first¼¯ºÏ
+        hasExp=1;
     }
+    if(hasStr){
+        strTid=enterStr(str);
+    }
+    emitMid(writeOp,-1,strTid,expTid,earg,hasStr?siarg:earg,hasExp?tiarg:earg);
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
-            updateSymBuf();//todo
+            updateSymBuf();
         }
         return;
     }
@@ -668,6 +947,12 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==ident){
+        int ti=lookup(symBuf[symBufIdx].token,0);
+        if(ti==-1){
+            error(99);//todo ±êÊ¶·ûÎ´¶¨Òå
+            return;
+        }
+        emitMid(readOp,-1,-1,ti,earg,earg,tiarg);
         updateSymBuf();
         while(symBuf[symBufIdx].id==comma){//!Ñ­»·ÒÔ,·Ö¸ô
             updateSymBuf();
@@ -675,12 +960,18 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
                 error(5);//todo Ó¦ÊÇ±êÊ¶·û
                 return;
             }
+            ti=lookup(symBuf[symBufIdx].token,0);
+            if(ti==-1){
+                error(99);//todo ±êÊ¶·ûÎ´¶¨Òå
+                return;
+            }
+            emitMid(readOp,-1,-1,ti,earg,earg,tiarg);
             updateSymBuf();
         }
         if(symBuf[symBufIdx].id!=rparent){
             error(5);//todo Ó¦ÊÇ)
             if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
-                updateSymBuf();//todo
+                updateSymBuf();
             }
             return;
         }
@@ -691,32 +982,66 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     }
     fprintf(fout,"\t\tthis is a read stat.\n");
 }
+/*
+ * swtich E
+ * goto labTest(BP)
+ * labCase1:
+ *      goto labNext(BP)
+ * labCase2:
+ *      goto labNext(BP)
+ * labDefault:
+ *      goto labNext(BP)
+ * labTest:
+ *      if E=e1 goto labCase1(already exits)
+ *      if E=e2 goto labCase2(already exits)
+ *      goto labDefault      (already exits)
+ * labNext:
+ */
+//switch:    cal E; gen labTest; gen labNext; goto labTest; BP labNext
+//case:      cmp E; gen labCase; goto labNext;
+//default:   gen labDefault;     goto labNext;
 //switch¿ªÍ·
 void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í£¾£Û£¼È±Ê¡£¾£Ý¡®}¡¯
-    if(symBuf[symBufIdx].id!=switchsy){
-        error(5);//todo Ó¦ÊÇswitch
-        return;
-    }
+    int eva=-1;
+    int swtMidx=-1;
+    int hasDefault=0;
+    int nextLabIdx=0;int i,brTi;
+    /*case record
+    int caseCntCur;
+    caseCnt++;
+    caseCntCur=caseCnt;
+     */
+    struct CASTAB casetb;
+    casetb.caseCnt=0;
+    if(symBuf[symBufIdx].id!=switchsy){ error(5);       return; }//todo Ó¦ÊÇswitch
     updateSymBuf();
-    if(symBuf[symBufIdx].id!=lparent){
-        error(5);//todo Ó¦ÊÇ(
-        return;
-    }
+    if(symBuf[symBufIdx].id!=lparent){        error(5);        return;    }//todo Ó¦ÊÇ(
     updateSymBuf();
-    expr();//!Ö±½Óµ÷ÓÃ
-    if(symBuf[symBufIdx].id!=rparent){
-        error(5);//todo Ó¦ÊÇ)
-        return;
-    }
+    eva=expr();//!Ö±½Óµ÷ÓÃ
+    swtMidx=midx;//FOR BACK PATCH goto TEST
+    emitMid(jOp,-1,-1,0,earg,earg,liarg);
+    if(symBuf[symBufIdx].id!=rparent){        error(5);        return;    }//todo Ó¦ÊÇ)
     updateSymBuf();
-    if(symBuf[symBufIdx].id!=lbrace){
-        error(5);//todo Ó¦ÊÇswitch
-        return;
-    }
+    if(symBuf[symBufIdx].id!=lbrace){ error(5);return; }//todo Ó¦ÊÇ{
     updateSymBuf();
-    caseStat();//!Ö±½Óµ÷ÓÃ
+    caseStat(&casetb);//!Ö±½Óµ÷ÓÃ
     if(symBuf[symBufIdx].id==defaultsy){//!first¼¯ºÏÎª{default}
-        defaultCase();//!¿ÉÑ¡Ïî
+        hasDefault=1;
+        defaultCase(&casetb);//!¿ÉÑ¡Ïî
+    }
+    mCode[swtMidx].res.labIdx=getLab();//gen labTest
+    for(i=0;i<casetb.caseCnt-hasDefault;i++){
+        brTi=getTemVar();
+        emitMid(sneOp,casetb.cValue[i],eva,brTi,varg,tiarg,tiarg);
+        emitMid(brfOp,brTi,-1,casetb.labIdx[i],tiarg,earg,liarg);
+    }
+    if(hasDefault==1){
+        emitMid(jOp,-1,-1,casetb.labIdx[casetb.caseCnt-1],earg,earg,liarg);
+    }
+    //gen nextLab
+    nextLabIdx=getLab();
+    for(i=0;i<casetb.caseCnt;i++){
+        mCode[casetb.midx[i]].res.labIdx=nextLabIdx;
     }
     if(symBuf[symBufIdx].id!=rbrace){
         error(5);//todo Ó¦ÊÇ}
@@ -726,38 +1051,52 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
     fprintf(fout,"\t\tthis is a switch stat.\n");
 }
 //case¿ªÍ·
-void caseStat(){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
+void caseStat(struct CASTAB* casetb){//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×ÓÓï¾ä£¾}
     if(symBuf[symBufIdx].id!=casesy){//!ÖÁÉÙÒ»¸öcaseÓï¾ä
         error(5);//todo Ó¦ÊÇcase
         return;
     }
     while(symBuf[symBufIdx].id==casesy){//! first¼¯ºÏÎª{case}
-        oneCase();
+        oneCase(casetb);
     }
     fprintf(fout,"\t\tthis is a case table.\n");
 }
 //case¿ªÍ·
-void oneCase(){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
+void oneCase(struct CASTAB* casetb){//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
+    if(casetb->caseCnt==CASEMAX){
+        error(99);
+        return;//case±êÇ©¹ý¶à
+    }
     if(symBuf[symBufIdx].id!=casesy){
         error(5);//todo Ó¦ÊÇcase
         return;
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id==charcon){
+        casetb->cValue[casetb->caseCnt]=symBuf[symBufIdx].token[1];
+        //caseTab[caseCnt].cValue=symBuf[symBufIdx].token[1];
         updateSymBuf();
     }else {
-        numDef();//!Ö±½Óµ÷ÓÃ
+        casetb->cValue[casetb->caseCnt]=numDef();
+        //caseTab[caseCnt].cValue=numDef();//!Ö±½Óµ÷ÓÃ
     }
     if(symBuf[symBufIdx].id!=colon){
         error(5);//todo Ó¦ÊÇ:
         return;
     }
     updateSymBuf();
+    casetb->labIdx[casetb->caseCnt]=getLab();
+    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
+    casetb->midx[casetb->caseCnt]=midx;
+    //caseTab[caseCnt].midx=midx;
+    emitMid(jOp,-1,-1,0,earg,earg,liarg);
+    casetb->caseCnt=casetb->caseCnt+1;
+    //caseCnt++;
     fprintf(fout,"\t\tthis is a one case.\n");
 }
 //default¿ªÍ·
-void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
+void defaultCase(struct CASTAB* casetb){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     if(symBuf[symBufIdx].id!=defaultsy){
         error(5);//todo Ó¦ÊÇdefault
         return;
@@ -768,11 +1107,20 @@ void defaultCase(){//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
         return;
     }
     updateSymBuf();
+    casetb->labIdx[casetb->caseCnt]=getLab();
+    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
+    casetb->midx[casetb->caseCnt]=midx;
+    //caseTab[caseCnt].midx=midx;
+    emitMid(jOp,-1,-1,0,earg,earg,liarg);
+    //caseCnt++;
+    casetb->caseCnt=casetb->caseCnt+1;
     fprintf(fout,"\t\tthis is a default case.\n");
 }
 //return¿ªÍ·
 void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
+    int hasRet=0;
+    int expTid=-1;
     if(symBuf[symBufIdx].id!=returnsy){
         error(5);//todo Ó¦ÊÇreturn
         return;
@@ -780,7 +1128,8 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
     updateSymBuf();
     if(symBuf[symBufIdx].id==lparent){//!¿ÉÑ¡Ïî
         updateSymBuf();
-        expr();//!Ö±½Óµ÷ÓÃ
+        expTid=expr();//!Ö±½Óµ÷ÓÃ
+        hasRet=1;
         if(symBuf[symBufIdx].id==rparent){
             updateSymBuf();
         }else{
@@ -791,5 +1140,20 @@ void retStat(){//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
             return;
         }
     }
+    if(btidx==0){
+        error(99);//todo ·Ç·¨Óï¾ä
+        return;
+    }
+    if(tab[btab[btidx-1].tidx].typ==voidtyp && hasRet==1){
+        error(99);//todo Ó¦ÎªÎÞ·µ»ØÖµret
+        return;
+    }
+    if(tab[btab[btidx-1].tidx].typ==inttyp && (hasRet==0||tab[expTid].typ!=inttyp)){
+        error(99);//todo Ó¦Îªint·µ»ØÖµ
+    }
+    if(tab[btab[btidx-1].tidx].typ==chtyp && (hasRet==0||tab[expTid].typ!=chtyp)){
+        error(99);//todo Ó¦Îªchar·µ»ØÖµ
+    }
+    emitMid(retOp,-1,-1,expTid,earg,earg,hasRet?tiarg:earg);
     fprintf(fout,"\t\tthis is a return stat.\n");
 }

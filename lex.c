@@ -6,8 +6,8 @@ char line[LLEN];
 int lcnt=0;//line num
 int lleng=0;
 int ccnt=0;
-char punc[SPSN];//·Ö¸ô·ûºÅ
-struct symStru symBuf[3];
+//char punc[SPSN];//·Ö¸ô·ûºÅ
+//struct SYMSTRC symBuf[3];
 int symBufIdx=0;
 char* key[KEYNO]=//±£Áô×Ö
 {
@@ -16,7 +16,7 @@ char* key[KEYNO]=//±£Áô×Ö
     "switch",   "case",     "default",  "scanf",
     "printf",   "return"
 };
-enum symbol ksym[KEYNO]=//±£Áô×Ö
+enum SYMBOL ksym[KEYNO]=//±£Áô×Ö
 {
     constsy,    intsy,      charsy,     voidsy,
     mainsy,     ifsy,       elsesy,     whilesy,
@@ -107,7 +107,7 @@ void getsym(){
         }
         symBuf[symBufIdx].token[i]=0;
     }else if(ch=='\''){
-        char con=' ';
+        char con;
         getch();
         if(!isalpha(ch) && !isdigit(ch) && ch!='+' && ch!='*'){
             error(1);//!todo invalid character(F)
@@ -272,7 +272,8 @@ void initSymBuf(){
 }
 
 void updateSymBuf(){
-	fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+	printSym();
+	//printf("%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
     do{
         getsym();
     }while(symBuf[symBufIdx].id==nul);
@@ -289,3 +290,6 @@ int reachEof(){
     return(symBuf[(symBufIdx+1)%3].id==eofs);
 }
 
+void printSym(){
+    fprintf(fout,"%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+}
