@@ -927,7 +927,7 @@ void writeStat(){//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf ¡
     if(symBuf[symBufIdx].id!=rparent){
         error(5);//todo Ó¦ÊÇ)
         if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
-            updateSymBuf();//todo
+            updateSymBuf();
         }
         return;
     }
@@ -971,7 +971,7 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
         if(symBuf[symBufIdx].id!=rparent){
             error(5);//todo Ó¦ÊÇ)
             if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack){
-                updateSymBuf();//todo
+                updateSymBuf();
             }
             return;
         }
@@ -1030,7 +1030,6 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
         defaultCase(&casetb);//!¿ÉÑ¡Ïî
     }
     mCode[swtMidx].res.labIdx=getLab();//gen labTest
-    //todo labTest code
     for(i=0;i<casetb.caseCnt-hasDefault;i++){
         brTi=getTemVar();
         emitMid(sneOp,casetb.cValue[i],eva,brTi,varg,tiarg,tiarg);
@@ -1041,7 +1040,6 @@ void switchStat(){//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±í
     }
     //gen nextLab
     nextLabIdx=getLab();
-    //todo BP nextLab in case and default
     for(i=0;i<casetb.caseCnt;i++){
         mCode[casetb.midx[i]].res.labIdx=nextLabIdx;
     }

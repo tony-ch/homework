@@ -6,8 +6,8 @@
 char mopStr[][10]={"conOp","varOp","funOp","arrOp","paraOp","retOp","endFunOp","callOp","calPaOp","readOp","writeOp",
                    "jOp","brfOp","sltOp","sleOp","sgtOp","sgeOp","seqOp","sneOp",
                    "liop","addOp","subOp","mulOp","divOp","setArrOp","getArrOp","becomeOp","genOp"};
-char kindstr[5][10]={"var","const","func","arr","para"};//todo debug
-char typestr[3][10]={"void","int","char"};//todo debug
+char kindstr[5][10]={"var","const","func","arr","para"};
+char typestr[3][10]={"void","int","char"};
 
 char strtab[STRNUMMAX][STRMAX];
 int strCnt=0;
@@ -55,7 +55,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value){
     tab[tidx].kind=k;
     tab[tidx].typ=t;
     tab[tidx].value=value;
-    tab[tidx].adr=adrOffset;//todo
+    tab[tidx].adr=adrOffset;
     fprintf(fout,"\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d, adr:%d\n",
             tidx,tab[tidx].name,kindstr[tab[tidx].kind],typestr[tab[tidx].typ],tab[tidx].value,tab[tidx].adr);
     if(k==funkind){
