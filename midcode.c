@@ -37,7 +37,8 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value){
         for(i=0;i<btidx;i++){
             if(strcmp(btab[i].name,name)==0){
                 error(5);//!redef func
-                return;
+                sprintf(name,"#func_%d",btidx);
+                //return;//!should't return
             }
         }
     } else{

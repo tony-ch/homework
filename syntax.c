@@ -67,8 +67,8 @@ void constDef(){
         type=inttyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
-            error(9);//!Ó¦ÊÇ±êÊ¶·û
             strcpy(errPlace,"condef");
+            error(9);//!Ó¦ÊÇ±êÊ¶·û
             return;
         }
         strcpy(name,symBuf[symBufIdx].token);
@@ -91,8 +91,8 @@ void constDef(){
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 strcpy(errPlace,"condef");
+                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 return;
             }
             strcpy(name,symBuf[symBufIdx].token);
@@ -117,8 +117,8 @@ void constDef(){
         type=chtyp;
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
-            error(9);//!Ó¦ÊÇ±êÊ¶·û
             strcpy(errPlace,"condef");
+            error(9);//!Ó¦ÊÇ±êÊ¶·û
             return;
         }
         strcpy(name,symBuf[symBufIdx].token);
@@ -142,8 +142,8 @@ void constDef(){
         while(symBuf[symBufIdx].id==comma){//¿ÉÑ¡Ïî
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 strcpy(errPlace,"condef");
+                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 return;
             }
             strcpy(name,symBuf[symBufIdx].token);
@@ -190,8 +190,8 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(9);//!Ó¦ÊÇ±êÊ¶·û
         strcpy(errPlace,"vardef");
+        error(9);//!Ó¦ÊÇ±êÊ¶·û
     }else{
         strcpy(name,symBuf[symBufIdx].token);
         kind=varkind;
@@ -219,8 +219,8 @@ void varDef(){//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ·
     while(symBuf[symBufIdx].id==comma){
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
-            error(9);//!Ó¦ÊÇ±êÊ¶·û
             strcpy(errPlace,"vardef");
+            error(9);//!Ó¦ÊÇ±êÊ¶·û
             continue;
         }
         strcpy(name,symBuf[symBufIdx].token);
@@ -298,8 +298,8 @@ void retFuncDef(){//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡®
     }
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(9);//!Ó¦ÊÇ±êÊ¶·û
         strcpy(errPlace,"fundef");
+        error(9);//!Ó¦ÊÇ±êÊ¶·û
         sprintf(name,"#fun_%d",btidx);
     } else{
         strcpy(name,symBuf[symBufIdx].token);
@@ -357,8 +357,8 @@ void voidFuncDef(){//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡
     type=voidtyp;
     updateSymBuf();
     if(symBuf[symBufIdx].id!=ident){
-        error(9);//!Ó¦ÊÇ±êÊ¶·û
         strcpy(errPlace,"fundef");
+        error(9);//!Ó¦ÊÇ±êÊ¶·û
         sprintf(name,"#func_%d",btidx);
     } else{
         strcpy(name,symBuf[symBufIdx].token);
@@ -411,8 +411,8 @@ int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
         }
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
-            error(9);//!Ó¦ÊÇ±êÊ¶·û
             strcpy(errPlace,"paralist");
+            error(9);//!Ó¦ÊÇ±êÊ¶·û
             sprintf(name,"#p_%d_%d",btidx,paraCnt);
         }else{
             strcpy(name,symBuf[symBufIdx].token);
@@ -435,8 +435,8 @@ int paraList(){//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id!=ident){
-                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 strcpy(errPlace,"paralist");
+                error(9);//!Ó¦ÊÇ±êÊ¶·û
                 sprintf(name,"#p_%d_%d",btidx,paraCnt);
             }else{
                 strcpy(name,symBuf[symBufIdx].token);
@@ -715,22 +715,22 @@ int factor(){//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾|
         }else{
             resTi=lookup(symBuf[symBufIdx].token,0);//±êÊ¶·û
             if(resTi==-1){
-                error(17);//!±êÊ¶·ûÎ´¶¨Òå
                 strcpy(errPlace,"fac");
-                return -1;
+                error(17);//!±êÊ¶·ûÎ´¶¨Òå
+                //return -1; ! ²»Ó¦return
             }
             updateSymBuf();
             if(symBuf[symBufIdx].id==lbrack){//!¿ÉÑ¡Ïî £¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯
                 int ti1,ti2;
-                if(tab[resTi].kind!=arrkind){
+                if(resTi!=-1 && tab[resTi].kind!=arrkind){
                     error(28);//!²»ÎªÊý×é
-                    return -1;
+                    //!²»Ó¦return return -1;
                 }
                 ti1=resTi;
                 updateSymBuf();
                 ti2=expr();
                 resTi=getTemVar();
-                tab[resTi].typ=tab[ti1].typ;//!ÀàÐÍÉèÎªÊý×éÔªËØµÄÀàÐÍ
+                tab[resTi].typ=ti1==-1?inttyp:tab[ti1].typ;//!ÀàÐÍÉèÎªÊý×éÔªËØµÄÀàÐÍ
                 emitMid(getArrOp,ti1,ti2,resTi,tiarg,tiarg,tiarg);
                 if(symBuf[symBufIdx].id!=rbrack)
                     error(14);//!Ó¦ÊÇ]
@@ -771,8 +771,8 @@ void assignment(){//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
 //    }
     resTid=lookup(symBuf[symBufIdx].token,0);
     if(resTid==-1){
-        error(17);//!±êÊ¶·ûÎ´¶¨Òå
         strcpy(errPlace,"assign");
+        error(17);//!±êÊ¶·ûÎ´¶¨Òå
         return;
     }
     if(tab[resTid].kind==conkind && tab[resTid].kind==funkind){
@@ -991,13 +991,13 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     //todo read ÄÚ±êÊ¶·ûµÄ¼ìÑé
     int ti;
     if(symBuf[symBufIdx].id!=ident) {
-        error(9);//!Ó¦ÊÇ±êÊ¶·û
         strcpy(errPlace,"read");
+        error(9);//!Ó¦ÊÇ±êÊ¶·û
     }else{
         ti=lookup(symBuf[symBufIdx].token,0);
         if(ti==-1){
-            error(17);//!±êÊ¶·ûÎ´¶¨Òå
             strcpy(errPlace,"read");
+            error(17);//!±êÊ¶·ûÎ´¶¨Òå
         }
         emitMid(readOp,-1,-1,ti,earg,earg,tiarg);
         updateSymBuf();
@@ -1005,14 +1005,14 @@ void readStat(){//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     while(symBuf[symBufIdx].id==comma){//!Ñ­»·ÒÔ,·Ö¸ô
         updateSymBuf();
         if(symBuf[symBufIdx].id!=ident){
-            error(9);//!Ó¦ÊÇ±êÊ¶·û
             strcpy(errPlace,"read");
+            error(9);//!Ó¦ÊÇ±êÊ¶·û
             continue;
         }
         ti=lookup(symBuf[symBufIdx].token,0);
         if(ti==-1){
-            error(17);//!±êÊ¶·ûÎ´¶¨Òå
             strcpy(errPlace,"read");
+            error(17);//!±êÊ¶·ûÎ´¶¨Òå
         }
         emitMid(readOp,-1,-1,ti,earg,earg,tiarg);
         updateSymBuf();
