@@ -58,6 +58,7 @@ struct{
     int callParaN;//todo
     int spacesz;
     int paraN;
+    int reted;
 }btab[TMAX];
 extern int btidx;//block tab index
 //midcode
@@ -123,13 +124,13 @@ void decConst();
 void constDef();
 //void decVar();
 void varDef();
-int numDef();       //return num value
+int numDef(int);       //return num value
 void retFuncDef();
 void voidFuncDef();
 int paraList();     //return para cnt
 void mainDef();
 int call(int hasRet);
-int valueParaList();
+int valueParaList(int funcid);
 void complexStat();
 void stat();
 void statList();
