@@ -162,7 +162,7 @@ int isGlobal(int tidx){
 
 void freeTemReg(int i){
     if(tReg.tidx[i]==-1 || tReg.dif[i]==0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
-        //-1´ú±íÎª³ÌĞòÖĞµÄÁ¢¼´Êı£»²»Îª±äÁ¿²»ĞèÒªĞ´»Ø
+        //-1ä»£è¡¨ä¸ºç¨‹åºä¸­çš„ç«‹å³æ•°ï¼›ä¸ä¸ºå˜é‡ä¸éœ€è¦å†™å›
     }else if(isGlobal(tReg.tidx[i])){
         fprintf(codefile,"sw $t%d,glb_%s\n",i,tab[tReg.tidx[i]].name);
     }else{
@@ -221,7 +221,7 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
         res=tReg.lastUsed;
         do{
             res=(res+1)%TREGNUM;
-            //printf("loop2£ºi:%d,use1:%d,use2:%d\n",i,regToUse1,regToUse2);
+            //printf("loop2ï¼ši:%d,use1:%d,use2:%d\n",i,regToUse1,regToUse2);
         }while (res==regToUse1 || res==regToUse2);
         if(tReg.dif[res]==1){
             freeTemReg(res);
@@ -309,7 +309,7 @@ void liToObj(){
 
 void mathToObj(int op){
     struct MIDCODE code=mCode[mIdxCur];
-    int regDes,regSrc1,regSrc2;
+    int regDes=-1,regSrc1=-1,regSrc2=-1;
     regDes= findInTemReg(code.res.tidx);
     if(regDes==-1){
         regDes=getEmpTemReg(code.res.tidx,-1,-1);
@@ -385,7 +385,7 @@ void divToObj(){
 void conToObj(){//con,type,value,name
     int tid=mCode[mIdxCur].res.tidx;
     int reg= getEmpTemReg(tid,-1, -1);
-    //tReg.dirty[reg]=1;//ÔËĞĞÕ»ÖĞ¸ÃÊı×ÖµÄ
+    //tReg.dirty[reg]=1;//è¿è¡Œæ ˆä¸­è¯¥æ•°å­—çš„
     fprintf(codefile,"addi $t%d,$0,%d  #code %d\n",reg,mCode[mIdxCur].arg2.value,mIdxCur);
     fprintf(codefile,"sw $t%d,%d($fp) #const %s code %d\n",reg,tab[tid].adr*4,tab[tid].name,mIdxCur);
 }
@@ -400,7 +400,7 @@ void arrToObj(){//arr,type,size,name;
     fprintf(codefile,"# arr %s \n",tab[mCode[mIdxCur].res.tidx].name);
 }
 
-void storeGlobal(){
+void storeGlobal(){//todo å‘å¸¸é‡èµ‹å€¼
     int i,limit=btab[0].tidx;
     fprintf(codefile,".data:\n");
     for(i=0;i<limit;i++){//const var arr (func para)
@@ -432,7 +432,7 @@ void storeGlobal(){
     fprintf(codefile,"nop\n");
 }
 
-void rdToObj(){
+void rdToObj(){//todo read å†…æ ‡è¯†ç¬¦çš„æ£€éªŒ
     int tid=mCode[mIdxCur].res.tidx;
     int v0=tab[tid].typ==inttyp?5:12;
     int reg= findInTemReg(tid);
@@ -473,7 +473,7 @@ void wrToObj(){
 
 void getArrToObj(){//=[],arr,idx,des
     struct MIDCODE code=mCode[mIdxCur];
-    int regDes,regArr,regIdx;
+    int regDes=-1,regArr=-1,regIdx=-1;
     int arrTid=code.arg1.tidx;
     regDes= findInTemReg(code.res.tidx);
     if(regDes==-1){
@@ -496,7 +496,7 @@ void getArrToObj(){//=[],arr,idx,des
         if(regIdx==-1){
             regIdx=getEmpTemReg(-1, regDes, regArr);
             loadToReg(code.arg2.tidx,regIdx);
-            freeTemReg(regIdx);//ÈôÊÇÖ®Ç°²»ÔÚ¼Ä´æÆ÷ÖĞ£¬ÌáÇ°ÊÍ·Å
+            freeTemReg(regIdx);//è‹¥æ˜¯ä¹‹å‰ä¸åœ¨å¯„å­˜å™¨ä¸­ï¼Œæå‰é‡Šæ”¾
         }
         fprintf(codefile,"sll $at,$t%d,2\n",regIdx);
         fprintf(codefile,"add $at,$at,$t%d\n",regArr);
@@ -507,7 +507,7 @@ void getArrToObj(){//=[],arr,idx,des
 
 void setArrToObj(){//[]=,src,idx,arr
     struct MIDCODE code=mCode[mIdxCur];
-    int regSrc,regArr,regIdx;
+    int regSrc=-1,regArr=-1,regIdx=-1;
     int arrtid=code.res.tidx;
     if(code.arg1Typ==varg){
         regSrc=getEmpTemReg(-1,-1,-1);//to be free
@@ -535,7 +535,7 @@ void setArrToObj(){//[]=,src,idx,arr
         if(regIdx==-1){
             regIdx=getEmpTemReg(-1, regSrc, regArr);
             loadToReg(code.arg2.tidx,regIdx);
-            freeTemReg(regIdx);//ÈôÊÇÖ®Ç°²»ÔÚ¼Ä´æÆ÷ÖĞ£¬ÌáÇ°ÊÍ·Å
+            freeTemReg(regIdx);//è‹¥æ˜¯ä¹‹å‰ä¸åœ¨å¯„å­˜å™¨ä¸­ï¼Œæå‰é‡Šæ”¾
         }
         fprintf(codefile,"sll $at,$t%d,2 # cal arr offset\n",regIdx);
         fprintf(codefile,"add $at,$at,$t%d #cal adr\n",regArr);
@@ -620,6 +620,7 @@ void callToObj(){//call,ret,paraN,func
     int paraN=btab[funcBtid].paraN;
     //int swFlag[]={0,0,0,0};
     int i,j;
+    //todo æ£€æŸ¥å‚æ•°ä¸ªæ•°å’Œç±»å‹
     fprintf(codefile,"addi,$sp,$sp,-%d\n",(btab[funcBtid].spacesz)*4);
     if(paraN!=0 && calparaN!=0){
         int regPara,vparaTid;
@@ -688,8 +689,7 @@ void callToObj(){//call,ret,paraN,func
 void calPaToObj(){//todo calpa can be value
     //paraQue.isVal=mCode[mIdxCur].rTyp==varg?1:0;
     if(paraQue.cnt==PAMAX){
-        fprintf(codefile,"#fatal error: para quene is full\n");
-        printf("#fatal err: para quene is full\n");
+        fprintf(codefile,"#error, exit");
         exit(1);
     }
     paraQue.para[paraQue.cnt].tidx=mCode[mIdxCur].res.tidx;

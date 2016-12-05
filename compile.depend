@@ -23,37 +23,37 @@
 	"global.h"
 	"err.h"
 
-1480907170 source:d:\clion\compile\err.c
+1480559563 source:d:\clion\compile\err.c
 	"err.h"
 	"global.h"
 
-1480877160 d:\clion\compile\err.h
+1480140044 d:\clion\compile\err.h
 
-1480877160 d:\clion\compile\global.h
+1480559563 d:\clion\compile\global.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
 
-1480877160 source:d:\clion\compile\lex.c
+1480559855 source:d:\clion\compile\lex.c
 	"global.h"
 	"err.h"
 
-1480844441 source:d:\clion\compile\main.c
+1480528999 source:d:\clion\compile\main.c
 	"global.h"
 	"err.h"
 
-1480906937 source:d:\clion\compile\syntax.c
+1480528999 source:d:\clion\compile\syntax.c
 	"global.h"
 	"err.h"
 
-1480877160 source:d:\clion\compile\midcode.c
+1480528999 source:d:\clion\compile\midcode.c
 	"global.h"
 	"err.h"
 
-1480906617 source:d:\clion\compile\objcode.c
+1480530927 source:d:\clion\compile\objcode.c
 	"global.h"
 	"objcode.h"
 
-1480844441 d:\clion\compile\objcode.h
+1480528999 d:\clion\compile\objcode.h
 
