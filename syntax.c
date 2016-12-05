@@ -493,7 +493,7 @@ void mainDef(){//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
     if(symBuf[symBufIdx].id!=rbrace){
         error(13);//!应是}
     }
-    emitMid(endFunOp,-1,-1,btidCur,earg,earg,tiarg);
+    emitMid(endFunOp,-1,-1,btidCur,earg,earg,btiarg);
     btab[btidCur].spacesz=adrOffset;
     fprintf(fout,"\t\tthis is main func dec.\n");
 }

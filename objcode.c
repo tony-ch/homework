@@ -614,7 +614,7 @@ void retToObj(){
 
 void callToObj(){//call,ret,paraN,func
     int funcBtid=mCode[mIdxCur].res.btid;
-    int hasRet=mCode[mIdxCur].arg2Typ!=earg?1:0;
+    int hasRet=mCode[mIdxCur].arg1Typ!=earg?1:0;
     int retTid=hasRet==1?mCode[mIdxCur].arg1.tidx:0;
     int calparaN=mCode[mIdxCur].arg2.value;
     int paraN=btab[funcBtid].paraN;
@@ -637,15 +637,15 @@ void callToObj(){//call,ret,paraN,func
 //                    if(j<4){
 //                        fprintf(codefile,"lw $a%d,glb_%s\n",j,tab[vparaTid].name);
 //                    }else{
-                        fprintf(codefile,"lw $v0,glb_%s\n",tab[vparaTid].name);//v0 use for temp reg
-                        fprintf(codefile,"sw $v0,%d($sp)\n",j*4);
+                        fprintf(codefile,"lw $v1,glb_%s\n",tab[vparaTid].name);//v0 use for temp reg
+                        fprintf(codefile,"sw $v1,%d($sp)\n",j*4);
 //                    }
                 }else{
 //                    if(j<4){
 //                        fprintf(codefile,"lw $a%d,%d($fp)\n",j,tab[vparaTid].adr*4);
 //                    }else{
-                        fprintf(codefile,"lw $v0,%d($fp)\n",tab[vparaTid].adr*4);
-                        fprintf(codefile,"sw $v0,%d($sp)\n",j*4);
+                        fprintf(codefile,"lw $v1,%d($fp)\n",tab[vparaTid].adr*4);
+                        fprintf(codefile,"sw $v1,%d($sp)\n",j*4);
 //                    }
                 }
             }else{
