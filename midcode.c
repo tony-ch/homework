@@ -96,10 +96,10 @@ int getTemVar(){
     int ti=tidx;
     char name[ALENMAX]="&";
 //    itoa(temVarCnt,name+1,10);
-    sprintf(name+1,"%d",temVarCnt);//!itoa 鏀逛负sprintf
+    sprintf(name+1,"%d",temVarCnt);//!itoa 改为sprintf
     temVarCnt++;
-    enter(name,varkind,inttyp,0);//灏嗕复鏃跺彉閲忓姞鍏ョ鍙疯〃
-    adrOffset++;//鍒嗛厤绌洪棿
+    enter(name,varkind,inttyp,0);//将临时变量加入符号表
+    adrOffset++;//分配空间
     return ti;
 }
 

@@ -162,7 +162,7 @@ int isGlobal(int tidx){
 
 void freeTemReg(int i){
     if(tReg.tidx[i]==-1 || tReg.dif[i]==0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
-        //-1ä»£è¡¨ä¸ºç¨‹åºä¸­çš„ç«‹å³æ•°ï¼›ä¸ä¸ºå˜é‡ä¸éœ€è¦å†™å›
+        //-1´ú±íÎª³ÌĞòÖĞµÄÁ¢¼´Êı£»²»Îª±äÁ¿²»ĞèÒªĞ´»Ø
     }else if(isGlobal(tReg.tidx[i])){
         fprintf(codefile,"sw $t%d,glb_%s\n",i,tab[tReg.tidx[i]].name);
     }else{
@@ -221,7 +221,7 @@ int getEmpTemReg(int tid,int regToUse1,int regToUse2){
         res=tReg.lastUsed;
         do{
             res=(res+1)%TREGNUM;
-            //printf("loop2ï¼ši:%d,use1:%d,use2:%d\n",i,regToUse1,regToUse2);
+            //printf("loop2£ºi:%d,use1:%d,use2:%d\n",i,regToUse1,regToUse2);
         }while (res==regToUse1 || res==regToUse2);
         if(tReg.dif[res]==1){
             freeTemReg(res);
@@ -385,7 +385,7 @@ void divToObj(){
 void conToObj(){//con,type,value,name
     int tid=mCode[mIdxCur].res.tidx;
     int reg= getEmpTemReg(tid,-1, -1);
-    //tReg.dirty[reg]=1;//è¿è¡Œæ ˆä¸­è¯¥æ•°å­—çš„
+    //tReg.dirty[reg]=1;//ÔËĞĞÕ»ÖĞ¸ÃÊı×ÖµÄ
     fprintf(codefile,"addi $t%d,$0,%d  #code %d\n",reg,mCode[mIdxCur].arg2.value,mIdxCur);
     fprintf(codefile,"sw $t%d,%d($fp) #const %s code %d\n",reg,tab[tid].adr*4,tab[tid].name,mIdxCur);
 }
@@ -473,7 +473,7 @@ void wrToObj(){
 
 void getArrToObj(){//=[],arr,idx,des
     struct MIDCODE code=mCode[mIdxCur];
-    int regDes=-1,regArr=-1,regIdx=-1;
+    int regDes,regArr,regIdx;
     int arrTid=code.arg1.tidx;
     regDes= findInTemReg(code.res.tidx);
     if(regDes==-1){
@@ -496,7 +496,7 @@ void getArrToObj(){//=[],arr,idx,des
         if(regIdx==-1){
             regIdx=getEmpTemReg(-1, regDes, regArr);
             loadToReg(code.arg2.tidx,regIdx);
-            freeTemReg(regIdx);//è‹¥æ˜¯ä¹‹å‰ä¸åœ¨å¯„å­˜å™¨ä¸­ï¼Œæå‰é‡Šæ”¾
+            freeTemReg(regIdx);//ÈôÊÇÖ®Ç°²»ÔÚ¼Ä´æÆ÷ÖĞ£¬ÌáÇ°ÊÍ·Å
         }
         fprintf(codefile,"sll $at,$t%d,2\n",regIdx);
         fprintf(codefile,"add $at,$at,$t%d\n",regArr);
@@ -507,7 +507,7 @@ void getArrToObj(){//=[],arr,idx,des
 
 void setArrToObj(){//[]=,src,idx,arr
     struct MIDCODE code=mCode[mIdxCur];
-    int regSrc=-1,regArr=-1,regIdx=-1;
+    int regSrc,regArr,regIdx;
     int arrtid=code.res.tidx;
     if(code.arg1Typ==varg){
         regSrc=getEmpTemReg(-1,-1,-1);//to be free
@@ -535,7 +535,7 @@ void setArrToObj(){//[]=,src,idx,arr
         if(regIdx==-1){
             regIdx=getEmpTemReg(-1, regSrc, regArr);
             loadToReg(code.arg2.tidx,regIdx);
-            freeTemReg(regIdx);//è‹¥æ˜¯ä¹‹å‰ä¸åœ¨å¯„å­˜å™¨ä¸­ï¼Œæå‰é‡Šæ”¾
+            freeTemReg(regIdx);//ÈôÊÇÖ®Ç°²»ÔÚ¼Ä´æÆ÷ÖĞ£¬ÌáÇ°ÊÍ·Å
         }
         fprintf(codefile,"sll $at,$t%d,2 # cal arr offset\n",regIdx);
         fprintf(codefile,"add $at,$at,$t%d #cal adr\n",regArr);

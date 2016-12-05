@@ -1,44 +1,44 @@
 #include "err.h"
 #include "global.h"
 
-int err[ERRMAX][3];
+//int err[ERRMAX][3];
 char errPlace[30];
 int ecnt=0;//err cnt;
 char* emsg[ERRMAX]={
-        "æºæ–‡ä»¶ä¸å®Œæ•´",//0 updatesymBuf
-        "éæ³•å­—ç¬¦",//1 getsym
-        "æ•°æœ‰å‰å¯¼0æˆ–æ•´æ•°å¤ªé•¿",//2 getsym
-        "åº”æ˜¯ \' ",//3 getsym
-        "åº”æ˜¯ ; ",//4
-        "å‡½æ•°é‡å®šä¹‰",//5 enter
-        "æ ‡è¯†ç¬¦é‡å®šä¹‰",//6 enter
-        "æœªçŸ¥çš„å¸¸é‡ç±»å‹æ ‡è¯†",//7
-        "æœªçŸ¥çš„å‚æ•°ç±»å‹",//8
-        "åº”æ˜¯æ ‡è¯†ç¬¦",//9
-        "åº”æ˜¯ (",//10
-        "åº”æ˜¯ )",//11
-        "åº”æ˜¯{",//12
-        "åº”æ˜¯}",//13
-        "åº”æ˜¯]",//14
-        "åº”æ˜¯:",//15
-        "å‡½æ•°æœªå®šä¹‰,call()ä¸­å‡ºç°,å› å­å’Œè¯­å¥åˆ†åˆ«è°ƒç”¨",//16
-        "æ ‡è¯†ç¬¦æœªå®šä¹‰,readä¸­ä½¿ç”¨",//17
-        "å¸¸é‡å¿…é¡»æœ‰åˆå§‹å€¼",//18
-        "intå¸¸é‡çš„åˆå§‹å€¼åº”ä¸ºæ•´æ•°ï¼Œcharå¸¸é‡çš„åˆå§‹å€¼åº”ä¸ºå­—ç¬¦",//19
-        "æ•°ç»„çš„å¤§å°åº”ä¸ºé0æ— ç¬¦å·æ•´æ•°",//20
-        "éæ³•çš„æ•´æ•° numdefä¸­é‡åˆ°",//21
-        "mainå‡½æ•°è¿”å›ç±»å‹åº”ä¸ºvoid",//22
-        "å¿…é¡»æœ‰mainå‡½æ•°",//23
-        "éæ³•å› å­",//24
-        "éæ³•è¯­å¥",//25
-        "switchè‡³å°‘æœ‰ä¸€ä¸ªcase",//26
-        "caseæ ‡ç­¾è¿‡å¤š",//27
-        "[]åªç”¨äºè®¿é—®æ•°ç»„",//28
-        "returnè¯­å¥ä¸å‡½æ•°å®šä¹‰ä¸ä¸€è‡´",//29
-        "ç¼ºå°‘returnè¯­å¥",//30
-        "å‡½æ•°è°ƒç”¨å‚æ•°ä¸ªæ•°ä¸æ­£ç¡®",//31
-        "å‡½æ•°è°ƒç”¨å‚æ•°ç±»å‹ä¸æ­£ç¡®",//32
-        "ä¸èƒ½å¯¹æ•°ç»„ç›´æ¥èµ‹å€¼"//33
+        "Ô´ÎÄ¼ş²»ÍêÕû",//0 updatesymBuf
+        "·Ç·¨×Ö·û",//1 getsym
+        "ÊıÓĞÇ°µ¼0»òÕûÊıÌ«³¤",//2 getsym
+        "Ó¦ÊÇ \' ",//3 getsym
+        "Ó¦ÊÇ ; ",//4
+        "º¯ÊıÖØ¶¨Òå",//5 enter
+        "±êÊ¶·ûÖØ¶¨Òå",//6 enter
+        "Î´ÖªµÄ³£Á¿ÀàĞÍ±êÊ¶",//7
+        "Î´ÖªµÄ²ÎÊıÀàĞÍ",//8
+        "Ó¦ÊÇ±êÊ¶·û",//9
+        "Ó¦ÊÇ (",//10
+        "Ó¦ÊÇ )",//11
+        "Ó¦ÊÇ{",//12
+        "Ó¦ÊÇ}",//13
+        "Ó¦ÊÇ]",//14
+        "Ó¦ÊÇ:",//15
+        "º¯ÊıÎ´¶¨Òå,call()ÖĞ³öÏÖ,Òò×ÓºÍÓï¾ä·Ö±ğµ÷ÓÃ",//16
+        "±êÊ¶·ûÎ´¶¨Òå,readÖĞÊ¹ÓÃ",//17
+        "³£Á¿±ØĞëÓĞ³õÊ¼Öµ",//18
+        "int³£Á¿µÄ³õÊ¼ÖµÓ¦ÎªÕûÊı£¬char³£Á¿µÄ³õÊ¼ÖµÓ¦Îª×Ö·û",//19
+        "Êı×éµÄ´óĞ¡Ó¦Îª·Ç0ÎŞ·ûºÅÕûÊı",//20
+        "·Ç·¨µÄÕûÊı numdefÖĞÓöµ½",//21
+        "mainº¯Êı·µ»ØÀàĞÍÓ¦Îªvoid",//22
+        "±ØĞëÓĞmainº¯Êı",//23
+        "·Ç·¨Òò×Ó",//24
+        "·Ç·¨Óï¾ä",//25
+        "switchÖÁÉÙÓĞÒ»¸öcase",//26
+        "case±êÇ©¹ı¶à",//27
+        "[]Ö»ÓÃÓÚ·ÃÎÊÊı×é",//28
+        "returnÓï¾äÓëº¯Êı¶¨Òå²»Ò»ÖÂ",//29
+        "È±ÉÙreturnÓï¾ä",//30
+        "º¯Êıµ÷ÓÃ²ÎÊı¸öÊı²»ÕıÈ·",//31
+        "º¯Êıµ÷ÓÃ²ÎÊıÀàĞÍ²»ÕıÈ·",//32
+        "²»ÄÜ¶ÔÊı×éÖ±½Ó¸³Öµ"//33
 };
 
 
@@ -71,19 +71,19 @@ void error(int n){
         case 6://redef iden
             printErr(n);
             break;
-        case 7://æœªçŸ¥çš„å¸¸é‡ç±»å‹æ ‡è¯† const defä¸­é‡åˆ°
+        case 7://Î´ÖªµÄ³£Á¿ÀàĞÍ±êÊ¶ const defÖĞÓöµ½
             printErr(n);
             while (symBuf[symBufIdx].id!=semicolon){
                 updateSymBuf();
             }
             break;
-        case 8://æœªçŸ¥çš„å‚æ•°ç±»å‹
+        case 8://Î´ÖªµÄ²ÎÊıÀàĞÍ
             printErr(n);
             while (symBuf[symBufIdx].id!=comma && symBuf[symBufIdx].id!=rparent){
                 updateSymBuf();
             }
             break;
-        case 9://åº”æ˜¯æ ‡è¯†ç¬¦
+        case 9://Ó¦ÊÇ±êÊ¶·û
             printErr(n);
             if(strcmp(errPlace,"condef")==0){
                 while (symBuf[symBufIdx].id!=semicolon){
@@ -108,68 +108,68 @@ void error(int n){
             }
             errPlace[0]=0;
             break;
-        case 10://åº”æ˜¯(
+        case 10://Ó¦ÊÇ(
             printErr(n);
             if(symBuf[symBufIdx].id==lbrace || symBuf[symBufIdx].id==lbrack)
                 updateSymBuf();
             break;
-        case 11://åº”æ˜¯)
+        case 11://Ó¦ÊÇ)
             printErr(n);
             if(symBuf[symBufIdx].id==rbrace || symBuf[symBufIdx].id==rbrack)
                 updateSymBuf();
             break;
-        case 12://åº”æ˜¯{
+        case 12://Ó¦ÊÇ{
             printErr(n);
             if(symBuf[symBufIdx].id==lparent || symBuf[symBufIdx].id==lbrack)
                 updateSymBuf();
             break;
-        case 13://åº”æ˜¯}
+        case 13://Ó¦ÊÇ}
             printErr(n);
             if(symBuf[symBufIdx].id==rparent || symBuf[symBufIdx].id==rbrack)
                 updateSymBuf();
             break;
-        case 14://åº”æ˜¯]
+        case 14://Ó¦ÊÇ]
             printErr(n);
             if(symBuf[symBufIdx].id==rbrace || symBuf[symBufIdx].id==rparent)
                 updateSymBuf();
             break;
-        case 15://åº”æ˜¯:
+        case 15://Ó¦ÊÇ:
             printErr(n);
             while(symBuf[symBufIdx].id!=ifsy     &&  symBuf[symBufIdx].id!=whilesy    &&  symBuf[symBufIdx].id!=lbrace &&
                   symBuf[symBufIdx].id!=scanfsy  &&  symBuf[symBufIdx].id!=printfsy   &&  symBuf[symBufIdx].id!=returnsy &&
-                  symBuf[symBufIdx].id!=switchsy &&  symBuf[symBufIdx].id!=ident      &&  symBuf[symBufIdx].id!=semicolon){//!firsté›†åˆ
+                  symBuf[symBufIdx].id!=switchsy &&  symBuf[symBufIdx].id!=ident      &&  symBuf[symBufIdx].id!=semicolon){//!first¼¯ºÏ
                 updateSymBuf();
             }
             break;
-        case 16://å‡½æ•°æœªå®šä¹‰,call()ä¸­å‡ºç°,å› å­å’Œè¯­å¥åˆ†åˆ«è°ƒç”¨
-            printErr(n);//åˆ°è¯­å¥çš„ç»“æŸä½ç½®
-            if(strcmp(errPlace,"0")==0){//è¯­å¥ä¸­è°ƒç”¨
+        case 16://º¯ÊıÎ´¶¨Òå,call()ÖĞ³öÏÖ,Òò×ÓºÍÓï¾ä·Ö±ğµ÷ÓÃ
+            printErr(n);//µ½Óï¾äµÄ½áÊøÎ»ÖÃ
+            if(strcmp(errPlace,"0")==0){//Óï¾äÖĞµ÷ÓÃ
                 while(symBuf[symBufIdx].id!=rbrace && symBuf[symBufIdx].id!=semicolon)
                     updateSymBuf();
-            }//else//å› å­ä¸­è°ƒç”¨//do nothing
+            }//else//Òò×ÓÖĞµ÷ÓÃ//do nothing
             errPlace[0]=0;
             break;
-        case 17://æ ‡è¯†ç¬¦æœªå®šä¹‰ èµ‹å€¼è¯­å¥ readè¯­å¥ å› å­
-            printErr(n);//èµ‹å€¼è¯­å¥çš„ç»“æŸä½ç½®
-            if(strcmp(errPlace,"assign")==0){//èµ‹å€¼è¯­å¥ä¸­è°ƒç”¨
+        case 17://±êÊ¶·ûÎ´¶¨Òå ¸³ÖµÓï¾ä readÓï¾ä Òò×Ó
+            printErr(n);//¸³ÖµÓï¾äµÄ½áÊøÎ»ÖÃ
+            if(strcmp(errPlace,"assign")==0){//¸³ÖµÓï¾äÖĞµ÷ÓÃ
                 while(symBuf[symBufIdx].id!=semicolon)
                     updateSymBuf();
-            }//else//å› å­ä¸­è°ƒç”¨//do nothing
+            }//else//Òò×ÓÖĞµ÷ÓÃ//do nothing
             errPlace[0]=0;
             break;
-        case 18://å¸¸é‡å¿…é¡»æœ‰åˆå§‹å€¼
-        case 19://intå¸¸é‡çš„åˆå§‹å€¼åº”ä¸ºæ•´æ•°ï¼Œcharå¸¸é‡çš„åˆå§‹å€¼åº”ä¸ºå­—ç¬¦
+        case 18://³£Á¿±ØĞëÓĞ³õÊ¼Öµ
+        case 19://int³£Á¿µÄ³õÊ¼ÖµÓ¦ÎªÕûÊı£¬char³£Á¿µÄ³õÊ¼ÖµÓ¦Îª×Ö·û
             printErr(n);//
             while(symBuf[symBufIdx].id!=semicolon)
                 updateSymBuf();
             break;
-        case 20://æ•°ç»„çš„å¤§å°åº”ä¸ºé0æ— ç¬¦å·æ•´æ•°
+        case 20://Êı×éµÄ´óĞ¡Ó¦Îª·Ç0ÎŞ·ûºÅÕûÊı
             printErr(n);//
             while(symBuf[symBufIdx].id!=rbrack)
                 updateSymBuf();
             break;
-        case 21://éæ³•çš„æ•´æ•° numdefä¸­é‡åˆ°, constdef 0, factor 1, onecase 2
-            printErr(n);//åˆ°è¡¨è¾¾å¼æˆ–è€…è¯­å¥çš„ç»“æŸä½ç½®
+        case 21://·Ç·¨µÄÕûÊı numdefÖĞÓöµ½, constdef 0, factor 1, onecase 2
+            printErr(n);//µ½±í´ïÊ½»òÕßÓï¾äµÄ½áÊøÎ»ÖÃ
             if(strcmp(errPlace,"0")==0){
                 while(symBuf[symBufIdx].id!=semicolon)
                     updateSymBuf();
@@ -181,32 +181,32 @@ void error(int n){
                     updateSymBuf();
             }
             break;
-        case 22://mainå‡½æ•°è¿”å›ç±»å‹åº”ä¸ºvoid
+        case 22://mainº¯Êı·µ»ØÀàĞÍÓ¦Îªvoid
             printErr(n);//do nothing
             break;
-        case 23://å¿…é¡»æœ‰mainå‡½æ•°
+        case 23://±ØĞëÓĞmainº¯Êı
             printErr(n);//do nothing
             break;
-        case 24://éæ³•å› å­
+        case 24://·Ç·¨Òò×Ó
             printErr(n);
             while(symBuf[symBufIdx].id!=semicolon && symBuf[symBufIdx].id!=rbrack && symBuf[symBufIdx].id!=rparent)
                 updateSymBuf();
             break;
-        case 25://éæ³•è¯­å¥
+        case 25://·Ç·¨Óï¾ä
             printErr(n);
             while(symBuf[symBufIdx].id!=semicolon && symBuf[symBufIdx].id!=rbrace)
                 updateSymBuf();
             break;
-        case 26://switchè‡³å°‘æœ‰ä¸€ä¸ªcase
-        case 27://caseæ ‡ç­¾è¿‡å¤š
+        case 26://switchÖÁÉÙÓĞÒ»¸öcase
+        case 27://case±êÇ©¹ı¶à
             printErr(n);//do nothing
             break;
-        case 28://[]åªç”¨äºè®¿é—®æ•°ç»„
-        case 29://returnè¯­å¥ä¸å‡½æ•°å®šä¹‰ä¸ä¸€è‡´
-        case 30://ç¼ºå°‘returnè¯­å¥
-        case 31://å‡½æ•°è°ƒç”¨å‚æ•°ä¸ªæ•°ä¸æ­£ç¡®
-        case 32://å‡½æ•°è°ƒç”¨å‚æ•°ç±»å‹ä¸æ­£ç¡®
-        case 33://ä¸èƒ½å¯¹æ•°ç»„ç›´æ¥èµ‹å€¼
+        case 28://[]Ö»ÓÃÓÚ·ÃÎÊÊı×é
+        case 29://returnÓï¾äÓëº¯Êı¶¨Òå²»Ò»ÖÂ
+        case 30://È±ÉÙreturnÓï¾ä
+        case 31://º¯Êıµ÷ÓÃ²ÎÊı¸öÊı²»ÕıÈ·
+        case 32://º¯Êıµ÷ÓÃ²ÎÊıÀàĞÍ²»ÕıÈ·
+        case 33://²»ÄÜ¶ÔÊı×éÖ±½Ó¸³Öµ
             printErr(n);//do nothing
             break;
         case 99:

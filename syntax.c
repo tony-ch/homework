@@ -458,7 +458,7 @@ void mainDef(){//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
     enum KINDS kind;
     enum TYPES type;
     kind=funkind;
-    int tidCur=tidx;
+    //int tidCur=tidx;
     int btidCur=btidx;
     if(symBuf[symBufIdx].id!=voidsy){
         error(22);//!
@@ -762,7 +762,7 @@ int factor(){//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞|
 }
 
 void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
-    int resTid=-1,ti1=-1,ti2=-1;
+    int resTid,ti1,ti2=-1;
     //todo 类型不一致
     int isArr=0;
 //    if(symBuf[symBufIdx].id!=ident){
@@ -832,7 +832,7 @@ void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
 
 //if开头
 void ifStat(){//＜条件语句＞::=if ‘(’＜条件＞‘)’＜语句＞［else＜语句＞］
-    int midxElse=0,midxNext=0,brTi=-1;
+    int midxElse=0,midxNext=0,brTi;
     if(symBuf[symBufIdx].id!=ifsy){
         error(-1);//!should't happen , run time err
         return;
@@ -902,7 +902,7 @@ int condition(){//＜条件＞::=＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
     return resTi;
 }
 /*
- * /*
+ *
  * labLoop:
  * while cond
  * (true)->
@@ -915,7 +915,7 @@ int condition(){//＜条件＞::=＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
  */
 //while开头
 void  whileStat(){//＜循环语句＞::=while ‘(’＜条件＞‘)’＜语句＞
-    int loopLabIdx=0,endLabIdx=0,brTi=-1,loopMidx=-1;
+    int loopLabIdx=0,endLabIdx=0,brTi,loopMidx;
     if(symBuf[symBufIdx].id!=whilesy){
         error(-1);//! should't happen , run time err
         return;
@@ -1044,8 +1044,8 @@ void readStat(){//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
 //default:   gen labDefault;     goto labNext;
 //switch开头
 void switchStat(){//＜情况语句＞  ::=  switch ‘(’＜表达式＞‘)’ ‘{’＜情况表＞［＜缺省＞］‘}’
-    int eva=-1;
-    int swtMidx=-1;
+    int eva;
+    int swtMidx;
     int hasDefault=0;
     int nextLabIdx=0;int i,brTi;
     /*case record
