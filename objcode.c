@@ -388,6 +388,7 @@ void storeGlobal(){
     for(i=0;i<strCnt;i++){
         fprintf(codefile,"str_%d: .asciiz %s\n",i,strtab[i]);
     }
+    fprintf(codefile,"str_newline: .asciiz \"\\n\"\n");
     mIdxCur=btab[0].tidx;
     fprintf(codefile,".text:\n");
     fprintf(codefile,"j func_main\n");
@@ -431,6 +432,9 @@ void wrToObj(){
             fprintf(codefile,"syscall\n");
         }
     }//todo check avaliable
+    fprintf(codefile,"la $a0,str_newline\n");
+    fprintf(codefile,"addi $v0,$0,4\n");
+    fprintf(codefile,"syscall\n");
 }
 
 void getArrToObj(){//=[],arr,idx,des
