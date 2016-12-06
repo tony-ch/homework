@@ -35,10 +35,10 @@ void program(){
 }
 //const 开头
 void decConst(){
-    if(symBuf[symBufIdx].id!=constsy){//!可稍改写文法
-        error(-1);//!should't happen run time err
-        return;
-    }
+//    if(symBuf[symBufIdx].id!=constsy){//!可稍改写文法
+//        error(-1);//!should't happen run time err
+//        return;
+//    }
     updateSymBuf();
     constDef();
     if(symBuf[symBufIdx].id!=semicolon){
@@ -713,7 +713,7 @@ int factor(){//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞|
         if(nextSym==lparent){
             return call(1);
         }else{
-            resTi=lookup(symBuf[symBufIdx].token,0);//标识符
+            resTi=lookup(symBuf[symBufIdx].token,0);//标识符, 0 not func
             if(resTi==-1){
                 strcpy(errPlace,"fac");
                 error(17);//!标识符未定义
@@ -769,7 +769,7 @@ void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
 //        error(-1);//! should't happen , run time err
 //        return;
 //    }
-    resTid=lookup(symBuf[symBufIdx].token,0);
+    resTid=lookup(symBuf[symBufIdx].token,0);//0 not func
     if(resTid==-1){
         strcpy(errPlace,"assign");
         error(17);//!标识符未定义
@@ -806,9 +806,9 @@ void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
         return;
     }
     if(resTid>=0 && ti1>=0 && tab[resTid].typ!=tab[ti1].typ){
-        fprintf(fout,"error: line:%d col:%d 赋值语句两端类型不一致\n",
+        fprintf(fout,"warn: line:%d col:%d 赋值语句两端类型不一致\n",
                 symBuf[symBufIdx].lin,symBuf[symBufIdx].col);
-        printf("error: line:%d col:%d 赋值语句两端类型不一致\n",
+        printf("warn: line:%d col:%d 赋值语句两端类型不一致\n",
                 symBuf[symBufIdx].lin,symBuf[symBufIdx].col);
     }
     emitMid(isArr?setArrOp:becomeOp,ti1,ti2,resTid,tiarg,isArr?tiarg:earg,tiarg);
@@ -832,7 +832,6 @@ void assignment(){//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
 
 //if开头
 void ifStat(){//＜条件语句＞::=if ‘(’＜条件＞‘)’＜语句＞［else＜语句＞］
-    int midxElse=0,midxNext=0,brTi;
     if(symBuf[symBufIdx].id!=ifsy){
         error(-1);//!should't happen , run time err
         return;
@@ -843,15 +842,15 @@ void ifStat(){//＜条件语句＞::=if ‘(’＜条件＞‘)’＜语句＞［else＜语句＞］
     } else{
         updateSymBuf();
     }
-    brTi=condition();//!直接调用
-    midxElse=midx;
-    emitMid(brfOp,brTi,0,0,tiarg,earg,liarg);
+    int brTi=condition();//!直接调用
+    int midxElse=midx;
+    emitMid(brfOp,brTi,-1,0,tiarg,earg,liarg);
     if(symBuf[symBufIdx].id!=rparent)
         error(11);//!应是)
     else
         updateSymBuf();//!read one more sym
     stat();//!直接调用
-    midxNext=midx;
+    int midxNext=midx;
     emitMid(jOp,-1,-1,0,earg,earg,liarg);
     mCode[midxElse].res.labIdx=getLab();
     if(symBuf[symBufIdx].id==elsesy){//!可选项
@@ -915,20 +914,19 @@ int condition(){//＜条件＞::=＜表达式＞＜关系运算符＞＜表达式＞｜＜表达式＞
  */
 //while开头
 void  whileStat(){//＜循环语句＞::=while ‘(’＜条件＞‘)’＜语句＞
-    int loopLabIdx=0,endLabIdx=0,brTi,loopMidx;
     if(symBuf[symBufIdx].id!=whilesy){
         error(-1);//! should't happen , run time err
         return;
     }
-    loopLabIdx=getLab();
+    int loopLabIdx=getLab();
     updateSymBuf();
     if(symBuf[symBufIdx].id!=lparent){
         error(10);//!应是(
     } else{
         updateSymBuf();
     }
-    brTi=condition();//!直接调用
-    loopMidx=midx;
+    int brTi=condition();//!直接调用
+    int loopMidx=midx;
     emitMid(brfOp,brTi,-1,0,tiarg,earg,liarg);
     if(symBuf[symBufIdx].id!=rparent)
         error(11);//!应是)
@@ -936,7 +934,7 @@ void  whileStat(){//＜循环语句＞::=while ‘(’＜条件＞‘)’＜语句＞
         updateSymBuf();
     stat();//!直接调用
     emitMid(jOp,-1,-1,loopLabIdx,earg,earg,liarg);
-    endLabIdx=getLab();
+    int endLabIdx=getLab();
     mCode[loopMidx].res.labIdx=endLabIdx;
     fprintf(fout,"\t\tthis is a while stat.\n");
 }
@@ -994,7 +992,7 @@ void readStat(){//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
         strcpy(errPlace,"read");
         error(9);//!应是标识符
     }else{
-        ti=lookup(symBuf[symBufIdx].token,0);
+        ti=lookup(symBuf[symBufIdx].token,0);//0 not func
         if(ti==-1){
             strcpy(errPlace,"read");
             error(17);//!标识符未定义
@@ -1009,7 +1007,7 @@ void readStat(){//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
             error(9);//!应是标识符
             continue;
         }
-        ti=lookup(symBuf[symBufIdx].token,0);
+        ti=lookup(symBuf[symBufIdx].token,0);//0 not func
         if(ti==-1){
             strcpy(errPlace,"read");
             error(17);//!标识符未定义
@@ -1044,10 +1042,6 @@ void readStat(){//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
 //default:   gen labDefault;     goto labNext;
 //switch开头
 void switchStat(){//＜情况语句＞  ::=  switch ‘(’＜表达式＞‘)’ ‘{’＜情况表＞［＜缺省＞］‘}’
-    int eva;
-    int swtMidx;
-    int hasDefault=0;
-    int nextLabIdx=0;int i,brTi;
     /*case record
     int caseCntCur;
     caseCnt++;
@@ -1062,8 +1056,8 @@ void switchStat(){//＜情况语句＞  ::=  switch ‘(’＜表达式＞‘)’ ‘{’＜情况表
     } else{
         updateSymBuf();
     }
-    eva=expr();//!直接调用
-    swtMidx=midx;//FOR BACK PATCH goto TEST
+    int eva=expr();//!直接调用
+    int swtMidx=midx;//FOR BACK PATCH goto TEST
     emitMid(jOp,-1,-1,0,earg,earg,liarg);
     if(symBuf[symBufIdx].id!=rparent){
         error(11);//!应是)
@@ -1075,13 +1069,15 @@ void switchStat(){//＜情况语句＞  ::=  switch ‘(’＜表达式＞‘)’ ‘{’＜情况表
     else
         updateSymBuf();
     caseStat(&casetb);//!直接调用
+    int hasDefault=0;
     if(symBuf[symBufIdx].id==defaultsy){//!first集合为{default}
         hasDefault=1;
         defaultCase(&casetb);//!可选项
     }
     mCode[swtMidx].res.labIdx=getLab();//gen labTest
+    int i;
     for(i=0;i<casetb.caseCnt-hasDefault;i++){
-        brTi=getTemVar();
+        int brTi=getTemVar();
         emitMid(sneOp,casetb.cValue[i],eva,brTi,varg,tiarg,tiarg);
         emitMid(brfOp,brTi,-1,casetb.labIdx[i],tiarg,earg,liarg);
     }
@@ -1089,7 +1085,7 @@ void switchStat(){//＜情况语句＞  ::=  switch ‘(’＜表达式＞‘)’ ‘{’＜情况表
         emitMid(jOp,-1,-1,casetb.labIdx[casetb.caseCnt-1],earg,earg,liarg);
     }
     //gen nextLab
-    nextLabIdx=getLab();
+    int nextLabIdx=getLab();
     for(i=0;i<casetb.caseCnt;i++){
         mCode[casetb.midx[i]].res.labIdx=nextLabIdx;
     }
@@ -1175,9 +1171,9 @@ void retStat(){//＜返回语句＞::=return[‘(’＜表达式＞‘)’]
     btab[btidx-1].reted=1;//标记有返回语句
     updateSymBuf();
     if(symBuf[symBufIdx].id==lparent){//!可选项
-        if(tab[btab[btidx-1].tidx].typ==voidtyp && hasRet==1){
+        if(tab[btab[btidx-1].tidx].typ==voidtyp){
             error(29);//!应为无返回值ret
-            return;
+            //return;
         }
         updateSymBuf();
         expTid=expr();//!直接调用

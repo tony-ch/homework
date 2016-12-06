@@ -109,7 +109,7 @@ void getsym(){
     }else if(ch=='\''){
         char con;
         getch();
-        if(!isalpha(ch) && !isdigit(ch) && ch!='+' && ch!='*'){
+        if(!isalpha(ch) && !isdigit(ch) && ch!='+' && ch!='*' && ch!='-' && ch!='/' && ch!='_'){
             error(1);//! invalid character(F)
             //symBuf[symBufIdx].id=nul;
             //symBuf[symBufIdx].token[0]='\'';symBuf[symBufIdx].token[1]=0;
@@ -136,7 +136,7 @@ void getsym(){
         int i=0;
         symBuf[symBufIdx].id=strcon;
         do{
-            if(ch>=32 && ch<=126 && ch!=33){
+            if(ch>=32 && ch<=126){// && ch!=34
                 if(i<=STRMAX-3){
                     symBuf[symBufIdx].token[i]=ch;
                     i++;

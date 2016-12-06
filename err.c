@@ -147,7 +147,11 @@ void error(int n){
             if(strcmp(errPlace,"0")==0){//语句中调用
                 while(symBuf[symBufIdx].id!=rbrace && symBuf[symBufIdx].id!=semicolon)
                     updateSymBuf();
-            }//else//因子中调用//do nothing
+            }else{
+                while(symBuf[symBufIdx].id!=rbrace)
+                    updateSymBuf();
+                updateSymBuf();
+            }
             errPlace[0]=0;
             break;
         case 17://标识符未定义 赋值语句 read语句 因子
