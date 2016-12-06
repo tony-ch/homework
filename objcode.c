@@ -163,7 +163,7 @@ void freeTemReg(int i){
     int tid=tReg.tidx[i];
     if(tab[tid].kind!=varkind && tab[tid].kind!=parakind && tReg.dif[i]!=0){
         printf("run time err. arr fun or const in dirty reg\n");
-        exit(1);
+        endProc(-1);
     }
     if(tReg.tidx[i]==-1 || tReg.dif[i]==0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数
@@ -458,11 +458,11 @@ void getArrToObj(){//=[],arr,idx,des
     if(code.arg2Typ==varg){
         if(tReg.tidx[regArr]!=arrTid){
             printf("run time err, get arr err 1, arr not in reg.\n");
-            exit(1);
+            endProc(-1);
         }
         if(tReg.tidx[regDes]!=code.res.tidx){
             printf("run time err, get arr err 1, des not in reg.\n");
-            exit(1);
+            endProc(-1);
         }
         fprintf(codefile,"lw $t%d,%d($t%d)\n",regDes,code.arg2.value*4,regArr);
     } else{
@@ -473,11 +473,11 @@ void getArrToObj(){//=[],arr,idx,des
         }
         if(tReg.tidx[regArr]!=arrTid){
             printf("run time err, get arr err 2, arr not in reg.\n");
-            exit(1);
+            endProc(-1);
         }
         if(tReg.tidx[regDes]!=code.res.tidx){
             printf("run time err, get arr err 2, des not in reg.\n");
-            exit(1);
+            endProc(-1);
         }
         fprintf(codefile,"sll $at,$t%d,2\n",regIdx);
         fprintf(codefile,"add $at,$at,$t%d\n",regArr);
@@ -643,7 +643,7 @@ void calPaToObj(){//todo calpa can be value
     if(paraQue.cnt==PAMAX){
         fprintf(codefile,"#fatal error: para quene is full\n");
         printf("#fatal err: para quene is full\n");
-        exit(1);
+        endProc(-1);
     }
     paraQue.para[paraQue.cnt].tidx=mCode[mIdxCur].res.tidx;
     paraQue.cnt++;

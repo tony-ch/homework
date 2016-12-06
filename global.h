@@ -109,7 +109,7 @@ extern int labCnt;
 //objcode
 extern FILE* codefile;//结果文件
 
-
+void endProc(int n);//end program
 
 //lex
 void getch();

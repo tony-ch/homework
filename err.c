@@ -49,9 +49,7 @@ void error(int n){
         case 0://"incomplete source file",
             fprintf(fout,"errno:%d %s\n",n,emsg[n]);
             printf("errno:%d %s\n",n,emsg[n]);
-            fclose(fin);
-            fclose(fout);
-            exit(1);
+            endProc(1);
         case 1://"invalid character"
             fprintf(fout,"line:%d col:%d errno:%d %s: %c\n",lcnt,ccnt,n,emsg[n],ch);
             printf("line:%d col:%d errno:%d %s: %c\n",lcnt,ccnt,n,emsg[n],ch);
@@ -217,11 +215,11 @@ void error(int n){
         case 99:
             fprintf(fout,"fatal error: sym tab is full.\n");
             printf("fatal error: sym tab is full.\n");
-            exit(1);
+            endProc(99);
         default:
             fprintf(fout,"run time error\n");
             printf("run time error\n");
-            exit(1);
+            endProc(-1);
         }
 }
 

@@ -40,9 +40,7 @@ int main()
         }
         generate();
     }
-    fclose(fin);
-    fclose(fout);
-    fclose(codefile);
+    endProc(0);
     return 0;
 }
 
@@ -66,3 +64,13 @@ int getPath(char* path){//读取控制台输入的路径
     return 0;
 }
 
+void endProc(int n){
+    if(fin!=NULL)
+        fclose(fin);
+    if(fout!=NULL)
+        fclose(fout);
+    if(codefile!=NULL)
+        fclose(codefile);
+    system("pause");
+    exit(n);
+}
