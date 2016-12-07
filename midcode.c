@@ -61,6 +61,8 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tab[tidx].typ = t;
     tab[tidx].value = value;
     tab[tidx].adr = adrOffset;
+    tab[tidx].inMem = 0;
+    tab[tidx].regIdx = -1;
     fprintf(fout, "\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d, adr:%d\n",
             tidx, tab[tidx].name, kindstr[tab[tidx].kind], typestr[tab[tidx].typ], tab[tidx].value, tab[tidx].adr);
     if (k == funkind) {
@@ -68,6 +70,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
         btab[btidx].tidx = tidx;
         btab[btidx].paraN = value;
         btab[btidx].reted = 0;
+        btab[btidx].callParaN = 0;
         fprintf(fout, "\t\tenter btab index: %d, name: %s, tidx: %d, spacesz:%d, paraN:%d\n",
                 btidx, btab[btidx].name, btab[btidx].tidx, btab[btidx].spacesz, btab[btidx].paraN);
         btidx = btidx + 1;

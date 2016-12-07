@@ -88,15 +88,15 @@ struct {
     enum TYPES typ;
     int value;//value for const; para num for funkind; arr element num for arr
     int adr;// for not para adr relative to b base$fp
-    int inMem;//todo
-    int regIdx;//todo
+    int inMem;
+    int regIdx;
 } tab[TMAX];
 extern int adrOffset;
 extern int tidx;//tab index
 struct {
     char name[ALENMAX];
     int tidx;//index in tab
-    int callParaN;//todo
+    int callParaN;
     int spacesz;
     int paraN;
     int reted;
@@ -183,7 +183,7 @@ void voidFuncDef();
 int paraList();     //return para cnt
 void mainDef();
 
-int call(int hasRet);
+int call(int needRet);
 
 int valueParaList(int funcid);
 

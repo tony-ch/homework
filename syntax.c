@@ -506,22 +506,22 @@ void mainDef() {//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
     fprintf(fout, "\t\tthis is main func dec.\n");
 }
 
-int call(int hasRet) {
-    int funcId, resTid = 0, paraCnt, funcBtid = 0;
+int call(int needRet) {
     if (symBuf[symBufIdx].id != ident) {
         error(-1);//! should't happen , run time err
         return -1;
     }
-    funcId = lookup(symBuf[symBufIdx].token, 1);
+    int funcId = lookup(symBuf[symBufIdx].token, 1);
+    int funcBtid = 0;
     while (funcBtid < btidx && strcmp(btab[funcBtid].name, tab[funcId].name) != 0) {
         funcBtid++;
     }
     if (funcId == -1) {
         error(16);//!函数未定义
-        sprintf(errPlace, "%d", hasRet);
+        sprintf(errPlace, "%d", needRet);
         return -1;
     }
-    if (tab[funcId].typ == voidtyp && hasRet == 1) {
+    if (tab[funcId].typ == voidtyp && needRet == 1) {
         error(25);//!应是有返回值函数 非法语句
         return -1;
     }
@@ -531,13 +531,16 @@ int call(int hasRet) {
     } else {
         updateSymBuf();
     }
-    if (hasRet) {
+    int resTid = 0;
+    if (needRet) {
         resTid = getTemVar();
         tab[resTid].typ = tab[funcId].typ;
     }
     //＜有返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
-    paraCnt = valueParaList(funcId);//＜无返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
-    emitMid(callOp, resTid, paraCnt, funcBtid, hasRet == 1 ? tiarg : earg, varg, btiarg);
+    int paraCnt = valueParaList(funcId);//＜无返回值函数调用语句＞ ::= ＜标识符＞‘(’＜值参数表＞‘)’
+    emitMid(callOp, resTid, paraCnt, funcBtid, needRet == 1 ? tiarg : earg, varg, btiarg);
+    if (btab[btidx - 1].callParaN < paraCnt)//调整当前函数的值参数个数
+        btab[btidx - 1].callParaN = paraCnt;
     if (symBuf[symBufIdx].id != rparent)
         error(11);//!应是)
     else
@@ -549,12 +552,8 @@ int call(int hasRet) {
 
 int valueParaList(int funcId) {//＜值参数表＞   ::= ＜表达式＞{,＜表达式＞}｜＜空＞
     int paraCnt = 0;
-    int resTid;
-    if (symBuf[symBufIdx].id == rparent) {//!空
-        //getsym();//!
-    } else {
-        //todo calpa can be value
-        resTid = expr();//!至少一个
+    if (symBuf[symBufIdx].id != rparent) {//!不为空
+        int resTid = expr();//!至少一个
         emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
         paraCnt++;
         if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
@@ -639,7 +638,7 @@ stat() {//＜语句＞::= ＜条件语句＞｜＜循环语句＞| ‘{’＜语句列＞‘}’｜＜有返回
         if (nextSym == become || nextSym == lbrack) {
             assignment();
         } else if (nextSym == lparent) {
-            call(0);//todo 可能是有返回值的
+            call(0);
         } else {
             error(25);//!非法语句
             return;
@@ -796,7 +795,7 @@ void assignment() {//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
         else
             updateSymBuf();
         if (symBuf[symBufIdx].id != become) {
-            error(25);//!非法语句 todo
+            error(25);//!非法语句
             return;
         }
         updateSymBuf();
@@ -982,7 +981,6 @@ void readStat() {//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
     } else {
         updateSymBuf();
     }
-    //todo read 内标识符的检验
     int ti;
     if (symBuf[symBufIdx].id != ident) {
         strcpy(errPlace, "read");
