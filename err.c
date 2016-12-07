@@ -34,13 +34,25 @@ char *emsg[ERRMAX] = {
         "switch至少有一个case",//26
         "case标签过多",//27
         "[]只用于访问数组",//28
-        "return语句与函数定义不一致",//29
+        "应为无返回值return",//29
         "缺少return语句",//30
         "函数调用参数个数不正确",//31
-        "函数调用参数类型不正确",//32
-        "不能对数组直接赋值"//33
-        //todo 赋值语句类型不一致
+        "不能对数组、常量或函数赋值"//32
 };
+
+char *wmsg[ERRMAX] = {
+        "赋值语句两端类型不一致",//0
+        "返回值类型应为int",//1
+        "返回值类型应为char",//2
+        "参数类型不匹配"//3
+};
+
+void warn(int n) {
+    fprintf(fout, "warn: line:%d col:%d %s\n",
+            symBuf[symBufIdx].lin, symBuf[symBufIdx].col, wmsg[n]);
+    printf("warn: line:%d col:%d %s\n",
+           symBuf[symBufIdx].lin, symBuf[symBufIdx].col, wmsg[n]);
+}
 
 
 void error(int n) {
@@ -209,11 +221,10 @@ void error(int n) {
             printErr(n);//do nothing
             break;
         case 28://[]只用于访问数组
-        case 29://return语句与函数定义不一致
+        case 29://应为无返回值return
         case 30://缺少return语句
         case 31://函数调用参数个数不正确
-        case 32://函数调用参数类型不正确
-        case 33://不能对数组直接赋值
+        case 32://不能对数组函数和常量赋值
             printErr(n);//do nothing
             break;
         case 99:

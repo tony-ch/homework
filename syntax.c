@@ -553,13 +553,12 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
     if (symBuf[symBufIdx].id == rparent) {//!¿Õ
         //getsym();//!
     } else {
-        //todo ¼ì²é²ÎÊý¸öÊýºÍÀàÐÍ
         //todo calpa can be value
         resTid = expr();//!ÖÁÉÙÒ»¸ö
         emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
         paraCnt++;
         if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
-            error(32);//²ÎÊýÀàÐÍ²»ÕýÈ·
+            warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
         }
         while (symBuf[symBufIdx].id == comma) {
             updateSymBuf();
@@ -567,7 +566,7 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
             emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
             paraCnt++;
             if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
-                error(32);//²ÎÊýÀàÐÍ²»ÕýÈ·
+                warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
             }
         }
     }
@@ -774,12 +773,7 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
 
 void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
     int resTid, ti1, ti2 = -1;
-    //todo ÀàÐÍ²»Ò»ÖÂ
     int isArr = 0;
-//    if(symBuf[symBufIdx].id!=ident){
-//        error(-1);//! should't happen , run time err
-//        return;
-//    }
     resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func
     if (resTid == -1) {
         strcpy(errPlace, "assign");
@@ -787,7 +781,7 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
         return;
     }
     if (tab[resTid].kind == conkind && tab[resTid].kind == funkind) {
-        error(33);//!²»ÄÜ¶Ô³£Á¿ºÍº¯ÊýÃû¸³Öµ
+        error(32);//!²»ÄÜ¶Ô³£Á¿ºÍº¯ÊýÃû¸³Öµ
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id == lbrack) {
@@ -809,7 +803,7 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
         ti1 = expr();
     } else if (symBuf[symBufIdx].id == become) {//±äÁ¿¸³Öµ£¼¸³ÖµÓï¾ä£¾   ::=  £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾
         if (tab[resTid].kind == arrkind) {
-            error(33);//!²»ÄÜ¶ÔÊý×éÖ±½Ó¸³Öµ
+            error(32);//!²»ÄÜ¶ÔÊý×éÖ±½Ó¸³Öµ
         }
         updateSymBuf();
         ti1 = expr();//!Ö±½Óµ÷ÓÃ
@@ -817,12 +811,8 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
         error(25);//!·Ç·¨Óï¾ä
         return;
     }
-    if (resTid >= 0 && ti1 >= 0 && tab[resTid].typ != tab[ti1].typ) {
-        fprintf(fout, "warn: line:%d col:%d ¸³ÖµÓï¾äÁ½¶ËÀàÐÍ²»Ò»ÖÂ\n",
-                symBuf[symBufIdx].lin, symBuf[symBufIdx].col);
-        printf("warn: line:%d col:%d ¸³ÖµÓï¾äÁ½¶ËÀàÐÍ²»Ò»ÖÂ\n",
-               symBuf[symBufIdx].lin, symBuf[symBufIdx].col);
-    }
+    if (resTid >= 0 && ti1 >= 0 && tab[resTid].typ != tab[ti1].typ)
+        warn(0);
     emitMid(isArr ? setArrOp : becomeOp, ti1, ti2, resTid, tiarg, isArr ? tiarg : earg, tiarg);
     fprintf(fout, "\t\tthis is a assignment.\n");
 }
@@ -844,10 +834,6 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
 
 //if¿ªÍ·
 void ifStat() {//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
-    if (symBuf[symBufIdx].id != ifsy) {
-        error(-1);//!should't happen , run time err
-        return;
-    }
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
         error(10);//!Ó¦ÊÇ(
@@ -932,10 +918,6 @@ int condition() {//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
  */
 //while¿ªÍ·
 void whileStat() {//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
-    if (symBuf[symBufIdx].id != whilesy) {
-        error(-1);//! should't happen , run time err
-        return;
-    }
     int loopLabIdx = getLab();
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
@@ -962,10 +944,6 @@ void writeStat() {//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf 
     char str[STRMAX] = "";
     int expTid = -1, strTid = -1;
     int hasStr = 0, hasExp = 0;
-    if (symBuf[symBufIdx].id != printfsy) {
-        error(-1);//! should't happen run time err
-        return;
-    }
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
         error(10);//!Ó¦ÊÇ(
@@ -998,10 +976,6 @@ void writeStat() {//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf 
 
 //scanf¿ªÍ·
 void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
-    if (symBuf[symBufIdx].id != scanfsy) {
-        error(-1);//! should't happen run time err
-        return;
-    }
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
         error(10);//!Ó¦ÊÇ(
@@ -1071,10 +1045,6 @@ void switchStat() {//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±
      */
     struct CASTAB casetb;
     casetb.caseCnt = 0;
-    if (symBuf[symBufIdx].id != switchsy) {
-        error(-1);
-        return;
-    }//! should't happen run time err
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
         error(10);//!Ó¦ÊÇ(
@@ -1137,54 +1107,38 @@ void caseStat(struct CASTAB *casetb) {//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×
 void oneCase(struct CASTAB *casetb) {//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
     if (casetb->caseCnt == CASEMAX) {
         error(27);//!case±êÇ©¹ý¶à
-        casetb->caseCnt = casetb->caseCnt - 1;
-    }
-    if (symBuf[symBufIdx].id != casesy) {
-        error(-1);//! should't happen , run time err
-        return;
+        casetb->caseCnt = casetb->caseCnt - 1;//!ÉÏÒ»¸öcase²»±£´æ
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id == charcon) {
         casetb->cValue[casetb->caseCnt] = symBuf[symBufIdx].token[1];
-        //caseTab[caseCnt].cValue=symBuf[symBufIdx].token[1];
         updateSymBuf();
     } else {
         casetb->cValue[casetb->caseCnt] = numDef(2);
-        //caseTab[caseCnt].cValue=numDef();//!Ö±½Óµ÷ÓÃ
     }
     if (symBuf[symBufIdx].id != colon)
         error(15);//!Ó¦ÊÇ:
     else
         updateSymBuf();
     casetb->labIdx[casetb->caseCnt] = getLab();
-    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
     casetb->midx[casetb->caseCnt] = midx;
-    //caseTab[caseCnt].midx=midx;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     casetb->caseCnt = casetb->caseCnt + 1;
-    //caseCnt++;
     fprintf(fout, "\t\tthis is a one case.\n");
 }
 
 //default¿ªÍ·
 void defaultCase(struct CASTAB *casetb) {//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
-    if (symBuf[symBufIdx].id != defaultsy) {
-        error(-1);//!should't happen , run time err
-        return;
-    }
     updateSymBuf();
     if (symBuf[symBufIdx].id != colon)
         error(15);//!Ó¦ÊÇ:
     else
         updateSymBuf();
     casetb->labIdx[casetb->caseCnt] = getLab();
-    //caseTab[caseCnt].labIdx=getLab();
     stat();//!Ö±½Óµ÷ÓÃ
     casetb->midx[casetb->caseCnt] = midx;
-    //caseTab[caseCnt].midx=midx;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
-    //caseCnt++;
     casetb->caseCnt = casetb->caseCnt + 1;
     fprintf(fout, "\t\tthis is a default case.\n");
 }
@@ -1193,17 +1147,11 @@ void defaultCase(struct CASTAB *casetb) {//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
 void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
     int hasRet = 0;
     int expTid = -1;
-    if (symBuf[symBufIdx].id != returnsy) {
-        error(-1);//!should't happen , run time err
-        return;
-    }
     btab[btidx - 1].reted = 1;//±ê¼ÇÓÐ·µ»ØÓï¾ä
     updateSymBuf();
     if (symBuf[symBufIdx].id == lparent) {//!¿ÉÑ¡Ïî
-        if (tab[btab[btidx - 1].tidx].typ == voidtyp) {
+        if (tab[btab[btidx - 1].tidx].typ == voidtyp)
             error(29);//!Ó¦ÎªÎÞ·µ»ØÖµret
-            //return;
-        }
         updateSymBuf();
         expTid = expr();//!Ö±½Óµ÷ÓÃ
         hasRet = 1;
@@ -1212,12 +1160,10 @@ void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
         else
             error(11);//!Ó¦ÊÇ)
     }
-    if (tab[btab[btidx - 1].tidx].typ == inttyp && (hasRet == 0 || tab[expTid].typ != inttyp)) {
-        error(29);//!Ó¦Îªint·µ»ØÖµ
-    }
-    if (tab[btab[btidx - 1].tidx].typ == chtyp && (hasRet == 0 || tab[expTid].typ != chtyp)) {
-        error(29);//!Ó¦Îªchar·µ»ØÖµ
-    }
+    if (tab[btab[btidx - 1].tidx].typ == inttyp && (hasRet == 0 || tab[expTid].typ != inttyp))
+        warn(1);//!Ó¦Îªint·µ»ØÖµ
+    if (tab[btab[btidx - 1].tidx].typ == chtyp && (hasRet == 0 || tab[expTid].typ != chtyp))
+        warn(2);//!Ó¦Îªchar·µ»ØÖµ
     emitMid(retOp, -1, -1, expTid, earg, earg, hasRet ? tiarg : earg);
     fprintf(fout, "\t\tthis is a return stat.\n");
 }
