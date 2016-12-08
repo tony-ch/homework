@@ -49,12 +49,7 @@ Temporary Items
 .apdisk
 .idea/
 CMakeLists.txt
-bin/CMakeCache.txt
-bin/CMakeFiles/
-bin/Makefile
-bin/cmake_install.cmake
-bin/compile.cbp
-bin/compile.exe
-bin/xons.out
-obj/Debug/midcode.o
-obj/Debug/objcode.o
+bin/
+obj/
+*.out
+*.asm
