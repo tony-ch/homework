@@ -51,7 +51,7 @@ void getch() {//读取下一个字符，存放到ch中
             line[lleng] = ch;
             lleng = lleng + 1;
         }
-        line[lleng] = ' ';
+        line[lleng] = '\n';
         lleng = lleng + 1;
     }
     ch = line[ccnt];
@@ -155,8 +155,11 @@ void getsym() {
                 error(1);//! invalid character (T)
             }
             getch();
-        } while (ch != '\"');
+        } while (ch != '\"' && ch != EOF && ch != '\n');
         symBuf[symBufIdx].token[i] = '\"';
+        if (ch != '\"') {
+            error(35);
+        }
         getch();//！需要再读一个字符
         i++;
         symBuf[symBufIdx].token[i] = 0;
