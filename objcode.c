@@ -9,12 +9,12 @@
 #define PAMAX 300
 int mIdxCur = 0;
 int btidCur = -1;
-struct {//todo change $tx to $x
+struct {
+    int used;
     int lastUsed;
     int tidx[TREGNUM];
     int dif[TREGNUM];
     int busy[TREGNUM];
-    int regId[TREGNUM];
 } tReg;
 char calopStr[][4] = {"slt", "sle", "sgt", "sge", "seq", "sne", "add", "sub", "mul", "div"};
 
@@ -29,6 +29,7 @@ struct {
 
 void generate() {
     int i;
+    tReg.used = 0;
     tReg.lastUsed = TREGNUM - 1;
     paraQue.cnt = 0;
     for (i = 0; i < TREGNUM; i++) {
@@ -162,11 +163,7 @@ int isGlobal(int tidx) {
 
 void freeTemReg(int i) {
     int tid = tReg.tidx[i];
-    if (tab[tid].kind != varkind && tab[tid].kind != parakind && tReg.dif[i] != 0) {
-        printf("run time err. arr fun or const in dirty reg\n");
-        endProc(-1);
-    }
-    if (tReg.tidx[i] == -1 || tReg.dif[i] == 0) {
+    if (tReg.tidx[i] == -1 || tReg.dif[i] == 0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数
     } else if (isGlobal(tid) && tab[tid].kind == varkind) {
         fprintf(codefile, "sw $t%d,glb_%s\n", i, tab[tid].name);
@@ -179,6 +176,7 @@ void freeTemReg(int i) {
     tReg.dif[i] = 0;
     tReg.tidx[i] = -1;
     tReg.busy[i] = 0;
+    tReg.used = tReg.used - 1;
 }
 
 void clearTemReg() {
@@ -187,11 +185,11 @@ void clearTemReg() {
     for (i = 0; i < TREGNUM; i++) {
         freeTemReg(i);
     }
+    tReg.used = 0;
     fprintf(fout, "\t\t\tclear reg\n");
 }
 
 void loadToReg(int tid, int reg) {
-    //int i;
     if (isGlobal(tid)) {
         fprintf(codefile, "lw $t%d,glb_%s\n", reg, tab[tid].name);
         fprintf(fout, "lw $t%d,glb_%s\n", reg, tab[tid].name);
@@ -202,34 +200,38 @@ void loadToReg(int tid, int reg) {
     fprintf(fout, "\t\t\tlw $t%d,%d($fp) # load %s\n", reg, (tab[tid].adr) * 4, tab[tid].name);
 }
 
-int findInTemReg(int tid) {
+int findInTemReg(int tid) {//todo  tidx of reg to free should't be -1, this should be checked later.
     int i;
-    if (tid == -1)
-        return -1;
-    for (i = 0; i < TREGNUM && tReg.tidx[i] != tid; i++);
-    if (i == TREGNUM)
-        i = -1;
+    for (i = TREGNUM - 1; i >= 0 && tReg.tidx[i] != tid; i--);
     fprintf(fout, "\t\tfind %s, res:%d\n", tab[tid].name, i);
     return i;
 }
 
 int getEmpTemReg(int tid, int regToUse1, int regToUse2) {
     int res;
-    for (res = 0; res < TREGNUM && tReg.busy[res] != 0; res++);
-    if (res == TREGNUM) {
+    if (tReg.used < TREGNUM) {
+        for (res = 0; res < TREGNUM; res++) {
+            if (tReg.busy[res] == 0) {
+                break;
+            }
+        }
+        tReg.used = tReg.used + 1;
+    } else {
         res = tReg.lastUsed;
         do {
             res = (res + 1) % TREGNUM;
         } while (res == regToUse1 || res == regToUse2);
-        if (tReg.dif[res] == 1)
+        if (tReg.dif[res] == 1) {
             freeTemReg(res);
+            tReg.used = tReg.used + 1;
+        }
     }
     tReg.busy[res] = 1;
     tReg.dif[res] = 0;
     tReg.tidx[res] = tid;
     tReg.lastUsed = res;
     fprintf(fout, "\t\t\tget reg %d for %s\n", res, tab[tid].name);
-    fprintf(fout, "\t\t\t**************************\n");
+    fprintf(fout, "\t\t\t*********used %d**************\n", tReg.used);
     int i;
     for (i = 0; i < 8; i++) {
         fprintf(fout, "\t\t\treg %d: busy:%d,tidx:%d,dirty:%d", i, tReg.busy[i], tReg.tidx[i], tReg.dif[i]);
@@ -654,7 +656,6 @@ void retToObj() {
 void callToObj() {//call,ret,paraN,func
     int funcBtid = mCode[mIdxCur].res.btid;
     int hasRet = mCode[mIdxCur].arg1Typ != earg ? 1 : 0;
-    int retTid = hasRet == 1 ? mCode[mIdxCur].arg1.tidx : -1;
     int calparaN = mCode[mIdxCur].arg2.value;
     int paraN = btab[funcBtid].paraN;
     int i, j;
@@ -702,8 +703,8 @@ void callToObj() {//call,ret,paraN,func
     fprintf(fout, "jal func_%s\n", btab[funcBtid].name);
     fprintf(fout, "nop\n");
     if (hasRet == 1) {
-        int retReg;
-        retReg = findInTemReg(retTid);
+        int retTid = mCode[mIdxCur].arg1.tidx;
+        int retReg = findInTemReg(retTid);
         if (retReg == -1) {
             retReg = getEmpTemReg(retTid, -1, -1);
         }
