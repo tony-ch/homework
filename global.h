@@ -175,7 +175,7 @@ void constDef();
 //void decVar();
 void varDef();
 
-int numDef(int);       //return num value
+int numDef(char);       //return num value ; param:pos
 void retFuncDef();
 
 void voidFuncDef();
@@ -189,7 +189,7 @@ int valueParaList(int funcid);
 
 void complexStat();
 
-void stat();
+void stat(char pos);
 
 void statList();
 

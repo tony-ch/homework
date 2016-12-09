@@ -27,11 +27,12 @@ void program() {
         } else {
             retFuncDef();
         }
+        if (symBuf[symBufIdx].id != voidsy && symBuf[symBufIdx].id != charsy && symBuf[symBufIdx].id != intsy) {
+            error(34);
+        }
     }
     mainDef();
-    fprintf(fout, "\t\tthis is a program.\n");
-
-    fprintf(fout, "\n");
+    fprintf(fout, "\t\tthis is a program.\n\n");
     printCode();
 
 }
@@ -70,7 +71,7 @@ void constDef() {
         type = inttyp;
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {
-            strcpy(errPlace, "condef");
+            errPlace = 'c';
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             return;
         }
@@ -88,14 +89,14 @@ void constDef() {
             enter(name, kind, type, 0);
             return;
         }
-        value = numDef(0);
+        value = numDef('c');//'c'->pos
         emitMid(conOp, type, value, tidx, targ, varg, tiarg);
         enter(name, kind, type, value);
         adrOffset++;
         while (symBuf[symBufIdx].id == comma) {//¿ÉÑ¡Ïî
             updateSymBuf();
             if (symBuf[symBufIdx].id != ident) {
-                strcpy(errPlace, "condef");
+                errPlace = 'c';
                 error(9);//!Ó¦ÊÇ±êÊ¶·û
                 return;
             }
@@ -113,7 +114,7 @@ void constDef() {
                 enter(name, kind, type, 0);
                 return;
             }
-            value = numDef(0);
+            value = numDef('c');//'c'->pos
             emitMid(conOp, type, value, tidx, targ, varg, tiarg);
             enter(name, kind, type, value);
             adrOffset++;
@@ -122,7 +123,7 @@ void constDef() {
         type = chtyp;
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {
-            strcpy(errPlace, "condef");
+            errPlace = 'c';
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             return;
         }
@@ -147,7 +148,7 @@ void constDef() {
         while (symBuf[symBufIdx].id == comma) {//¿ÉÑ¡Ïî
             updateSymBuf();
             if (symBuf[symBufIdx].id != ident) {
-                strcpy(errPlace, "condef");
+                errPlace = 'c';
                 error(9);//!Ó¦ÊÇ±êÊ¶·û
                 return;
             }
@@ -196,7 +197,7 @@ void varDef() {//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id != ident) {
-        strcpy(errPlace, "vardef");
+        errPlace = 'v';
         error(9);//!Ó¦ÊÇ±êÊ¶·û
     } else {
         strcpy(name, symBuf[symBufIdx].token);
@@ -228,7 +229,7 @@ void varDef() {//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ
     while (symBuf[symBufIdx].id == comma) {
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {//!²»Ó¦ÓÐÀàÐÍ±êÊ¶·û
-            strcpy(errPlace, "vardef");
+            errPlace = 'v';
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             continue;
         }
@@ -259,7 +260,8 @@ void varDef() {//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ
     fprintf(fout, "\t\tthis is var def.\n");
 }
 
-int numDef(int useTo) {//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
+int numDef(char pos) {//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
+    //pos 'c': constDef 'f': factor 'o': onecase
     int flag = 0;
     int num = 0;
     if (symBuf[symBufIdx].id == zero) {
@@ -280,7 +282,7 @@ int numDef(int useTo) {//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
             updateSymBuf();
         } else {
             error(21);//!·Ç·¨µÄÕûÊý
-            sprintf(errPlace, "%d", useTo);
+            errPlace = pos;
             return 0;
         }
     }
@@ -308,7 +310,7 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id != ident) {
-        strcpy(errPlace, "fundef");
+        errPlace = 'f';
         error(9);//!Ó¦ÊÇ±êÊ¶·û
         sprintf(name, "#fun_%d", btidx);
     } else {
@@ -368,7 +370,7 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
     type = voidtyp;
     updateSymBuf();
     if (symBuf[symBufIdx].id != ident) {
-        strcpy(errPlace, "fundef");
+        errPlace = 'f';
         error(9);//!Ó¦ÊÇ±êÊ¶·û
         sprintf(name, "#func_%d", btidx);
     } else {
@@ -422,7 +424,7 @@ int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
         }
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {
-            strcpy(errPlace, "paralist");
+            errPlace = 'p';
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             sprintf(name, "#p_%d_%d", btidx, paraCnt);
         } else {
@@ -446,7 +448,7 @@ int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
             }
             updateSymBuf();
             if (symBuf[symBufIdx].id != ident) {
-                strcpy(errPlace, "paralist");
+                errPlace = 'p';
                 error(9);//!Ó¦ÊÇ±êÊ¶·û
                 sprintf(name, "#p_%d_%d", btidx, paraCnt);
             } else {
@@ -509,7 +511,7 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     fprintf(fout, "\t\tthis is main func dec.\n");
 }
 
-int call(int needRet) {
+int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
     if (symBuf[symBufIdx].id != ident) {
         error(-1);//! should't happen , run time err
         return -1;
@@ -521,7 +523,10 @@ int call(int needRet) {
     }
     if (funcId == -1) {
         error(16);//!º¯ÊýÎ´¶¨Òå
-        sprintf(errPlace, "%d", needRet);
+        if (needRet)
+            errPlace = 'f';//factor
+        else
+            errPlace = 's';//stat
         return -1;
     }
     if (tab[funcId].typ == voidtyp && needRet == 1) {
@@ -601,7 +606,7 @@ void complexStat() {//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾ä
 }
 
 void
-stat() {//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾; | £¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾;£ü£¼¸³ÖµÓï¾ä£¾;£ü£¼¶ÁÓï¾ä£¾;£ü£¼Ð´Óï¾ä£¾;£ü£¼¿Õ£¾;|£¼Çé¿öÓï¾ä£¾£ü£¼·µ»ØÓï¾ä£¾;
+stat(char pos) {//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾; | £¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾;£ü£¼¸³ÖµÓï¾ä£¾;£ü£¼¶ÁÓï¾ä£¾;£ü£¼Ð´Óï¾ä£¾;£ü£¼¿Õ£¾;|£¼Çé¿öÓï¾ä£¾£ü£¼·µ»ØÓï¾ä£¾;
     if (symBuf[symBufIdx].id == ifsy) {//!Í··ûºÅ¼¯ºÏ
         ifStat();
     } else if (symBuf[symBufIdx].id == whilesy) {
@@ -658,6 +663,7 @@ stat() {//£¼Óï¾ä£¾::= £¼Ìõ¼þÓï¾ä£¾£ü£¼Ñ­»·Óï¾ä£¾| ¡®{¡¯£¼Óï¾äÁÐ£¾¡®}¡¯£ü£¼ÓÐ·µ»Ø
             updateSymBuf();
         }
     }//!¿Õ
+    testAfterStat(pos);
     fprintf(fout, "\t\tthis is a stat.\n");
 }
 
@@ -667,7 +673,7 @@ void statList() {
            symBuf[symBufIdx].id == scanfsy || symBuf[symBufIdx].id == printfsy || symBuf[symBufIdx].id == returnsy ||
            symBuf[symBufIdx].id == switchsy || symBuf[symBufIdx].id == ident ||
            symBuf[symBufIdx].id == semicolon) {//!first¼¯ºÏ
-        stat();
+        stat('s');//pos is statlist
     }
     fprintf(fout, "\t\tthis is a stat list.\n");
 }
@@ -726,7 +732,7 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
         } else {
             resTi = lookup(symBuf[symBufIdx].token, 0);//±êÊ¶·û, 0 not func
             if (resTi == -1) {
-                strcpy(errPlace, "fac");
+                errPlace = 'f';
                 error(17);//!±êÊ¶·ûÎ´¶¨Òå
                 //return -1; ! ²»Ó¦return
             }
@@ -757,7 +763,7 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
     } else if (symBuf[symBufIdx].id == plus || symBuf[symBufIdx].id == minus || symBuf[symBufIdx].id == zero ||
                symBuf[symBufIdx].id == unsignum) {//!ÕûÊý first ¼¯ºÏ
         resTi = getTemVar();
-        emitMid(liop, numDef(1), -1, resTi, varg, earg, tiarg);
+        emitMid(liop, numDef('f'), -1, resTi, varg, earg, tiarg);//'f'->pos
     } else if (symBuf[symBufIdx].id == lparent) {//¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
         updateSymBuf();
         resTi = expr();
@@ -778,7 +784,7 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
     int isArr = 0;
     resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func
     if (resTid == -1) {
-        strcpy(errPlace, "assign");
+        errPlace = 'a';
         error(17);//!±êÊ¶·ûÎ´¶¨Òå
         return;
     }
@@ -849,13 +855,13 @@ void ifStat() {//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
         error(11);//!Ó¦ÊÇ)
     else
         updateSymBuf();//!read one more sym
-    stat();//!Ö±½Óµ÷ÓÃ
+    stat('i');//!Ö±½Óµ÷ÓÃ pos if
     int midxNext = midx;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     mCode[midxElse].res.labIdx = getLab();
     if (symBuf[symBufIdx].id == elsesy) {//!¿ÉÑ¡Ïî
         updateSymBuf();//!one more sym
-        stat();
+        stat('e');//pos else
     }
     mCode[midxNext].res.labIdx = getLab();
     fprintf(fout, "\t\tthis is an if stat.\n");
@@ -934,7 +940,7 @@ void whileStat() {//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
         error(11);//!Ó¦ÊÇ)
     else
         updateSymBuf();
-    stat();//!Ö±½Óµ÷ÓÃ
+    stat('w');//!Ö±½Óµ÷ÓÃ pos while
     emitMid(jOp, -1, -1, loopLabIdx, earg, earg, liarg);
     int endLabIdx = getLab();
     mCode[loopMidx].res.labIdx = endLabIdx;
@@ -986,12 +992,12 @@ void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     }
     int ti;
     if (symBuf[symBufIdx].id != ident) {
-        strcpy(errPlace, "read");
+        errPlace = 'r';
         error(9);//!Ó¦ÊÇ±êÊ¶·û
     } else {
         ti = lookup(symBuf[symBufIdx].token, 0);//0 not func
         if (ti == -1) {
-            strcpy(errPlace, "read");
+            errPlace = 'r';
             error(17);//!±êÊ¶·ûÎ´¶¨Òå
         }
         emitMid(readOp, -1, -1, ti, earg, earg, tiarg);
@@ -1000,13 +1006,13 @@ void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     while (symBuf[symBufIdx].id == comma) {//!Ñ­»·ÒÔ,·Ö¸ô
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {
-            strcpy(errPlace, "read");
+            errPlace = 'r';
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             continue;
         }
         ti = lookup(symBuf[symBufIdx].token, 0);//0 not func
         if (ti == -1) {
-            strcpy(errPlace, "read");
+            errPlace = 'r';
             error(17);//!±êÊ¶·ûÎ´¶¨Òå
         }
         emitMid(readOp, -1, -1, ti, earg, earg, tiarg);
@@ -1115,14 +1121,14 @@ void oneCase(struct CASTAB *casetb) {//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
         casetb->cValue[casetb->caseCnt] = symBuf[symBufIdx].token[1];
         updateSymBuf();
     } else {
-        casetb->cValue[casetb->caseCnt] = numDef(2);
+        casetb->cValue[casetb->caseCnt] = numDef('o');//'o'->pos
     }
     if (symBuf[symBufIdx].id != colon)
         error(15);//!Ó¦ÊÇ:
     else
         updateSymBuf();
     casetb->labIdx[casetb->caseCnt] = getLab();
-    stat();//!Ö±½Óµ÷ÓÃ
+    stat('c');//!Ö±½Óµ÷ÓÃ pos case
     casetb->midx[casetb->caseCnt] = midx;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     casetb->caseCnt = casetb->caseCnt + 1;
@@ -1137,7 +1143,7 @@ void defaultCase(struct CASTAB *casetb) {//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     else
         updateSymBuf();
     casetb->labIdx[casetb->caseCnt] = getLab();
-    stat();//!Ö±½Óµ÷ÓÃ
+    stat('d');//!Ö±½Óµ÷ÓÃ pos default
     casetb->midx[casetb->caseCnt] = midx;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     casetb->caseCnt = casetb->caseCnt + 1;
