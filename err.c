@@ -37,7 +37,8 @@ char *emsg[ERRMAX] = {
         "应为无返回值return",//29
         "缺少return语句",//30
         "函数调用参数个数不正确",//31
-        "不能对数组、常量或函数赋值"//32
+        "不能对数组、常量或函数赋值",//32
+        "不合法的变量定义"//33
 };
 
 char *wmsg[ERRMAX] = {
@@ -226,6 +227,11 @@ void error(int n) {
         case 31://函数调用参数个数不正确
         case 32://不能对数组函数和常量赋值
             printErr(n);//do nothing
+            break;
+        case 33://不合法的变量定义
+            printErr(n);
+            while (symBuf[symBufIdx].id != comma && symBuf[symBufIdx].id != semicolon)
+                updateSymBuf();
             break;
         case 99:
             fprintf(fout, "fatal error: sym tab is full.\n");

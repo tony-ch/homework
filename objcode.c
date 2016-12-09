@@ -14,6 +14,7 @@ struct {//todo change $tx to $x
     int tidx[TREGNUM];
     int dif[TREGNUM];
     int busy[TREGNUM];
+    int regId[TREGNUM];
 } tReg;
 char calopStr[][4] = {"slt", "sle", "sgt", "sge", "seq", "sne", "add", "sub", "mul", "div"};
 

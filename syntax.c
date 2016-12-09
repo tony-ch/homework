@@ -222,6 +222,9 @@ void varDef() {//＜变量定义＞  ::= ＜类型标识符＞(＜标识符＞|＜标识符＞‘[’＜无
         enter(name, kind, type, value);
         adrOffset = adrOffset + value;
     }
+    if (symBuf[symBufIdx].id != comma && symBuf[symBufIdx].id != semicolon) {
+        error(33);//非法的变量定义
+    }
     while (symBuf[symBufIdx].id == comma) {
         updateSymBuf();
         if (symBuf[symBufIdx].id != ident) {//!不应有类型标识符
