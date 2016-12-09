@@ -41,14 +41,17 @@ char *emsg[ERRMAX] = {
         "不合法的变量定义",//33
         "函数应以void, int, 或char开始",//34
         "字符串非正常结束",//35
-        "语句后的内容不合法"//36
+        "语句后的内容不合法",//36
+        "位置不合法的常量定义",//37
+        "位置不合法的变量定义"//38
 };
 
 char *wmsg[ERRMAX] = {
         "赋值语句两端类型不一致",//0
         "返回值类型应为int",//1
         "返回值类型应为char",//2
-        "参数类型不匹配"//3
+        "参数类型不匹配",//3
+        "常量定义应该在变量定义之前"//4
 };
 
 void warn(int n) {
@@ -280,6 +283,10 @@ void error(int n) {
             }
             errPlace = 0;
             showPos();
+            break;
+        case 37:
+        case 38:
+            printErr(n);
             break;
         case 99:
             fprintf(fout, "fatal error: sym tab is full.\n");

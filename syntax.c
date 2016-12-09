@@ -16,6 +16,10 @@ void program() {
         } else {
             updateSymBuf();//!read one more sym
         }
+        if (symBuf[symBufIdx].id == constsy) {
+            warn(4);//可以正确的分配存储，只定为warn
+            decConst();
+        }
     }
     if (hasVarDef) {
         fprintf(fout, "\t\tthis is dec of var.\n");
@@ -26,6 +30,24 @@ void program() {
             voidFuncDef();
         } else {
             retFuncDef();
+        }
+        if (symBuf[symBufIdx].id == constsy) {
+            error(37);//不能正确分配存储，定为error
+            decConst();
+        }
+        while ((symBuf[symBufIdx].id == intsy || symBuf[symBufIdx].id == charsy) &&
+               symBuf[(symBufIdx + 2) % 3].id != lparent) {
+            error(38);
+            varDef();
+            if (symBuf[symBufIdx].id != semicolon) {
+                error(4);//!应是分号(F)
+            } else {
+                updateSymBuf();//!read one more sym
+            }
+            if (symBuf[symBufIdx].id == constsy) {
+                error(37);
+                decConst();
+            }
         }
         if (symBuf[symBufIdx].id != voidsy && symBuf[symBufIdx].id != charsy && symBuf[symBufIdx].id != intsy) {
             error(34);
@@ -597,6 +619,10 @@ void complexStat() {//＜复合语句＞   ::=  ［＜常量说明＞］［＜变量说明＞］＜语句
         } else {
             updateSymBuf();
         }
+        if (symBuf[symBufIdx].id == constsy) {
+            warn(4);
+            decConst();
+        }
     }
     if (hasVarDef) {
         fprintf(fout, "\t\tthis is dec of var.\n");
@@ -605,8 +631,8 @@ void complexStat() {//＜复合语句＞   ::=  ［＜常量说明＞］［＜变量说明＞］＜语句
     fprintf(fout, "\t\tthis is complex stat.\n");
 }
 
-void
-stat(char pos) {//＜语句＞::= ＜条件语句＞｜＜循环语句＞| ‘{’＜语句列＞‘}’｜＜有返回值函数调用语句＞; | ＜无返回值函数调用语句＞;｜＜赋值语句＞;｜＜读语句＞;｜＜写语句＞;｜＜空＞;|＜情况语句＞｜＜返回语句＞;
+void stat(char pos) {
+//＜语句＞::= ＜条件语句＞｜＜循环语句＞| ‘{’＜语句列＞‘}’｜＜有返回值函数调用语句＞; | ＜无返回值函数调用语句＞;｜＜赋值语句＞;｜＜读语句＞;｜＜写语句＞;｜＜空＞;|＜情况语句＞｜＜返回语句＞;
     if (symBuf[symBufIdx].id == ifsy) {//!头符号集合
         ifStat();
     } else if (symBuf[symBufIdx].id == whilesy) {
