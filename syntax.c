@@ -61,10 +61,6 @@ void program() {
 
 //const ¿ªÍ·
 void decConst() {
-//    if(symBuf[symBufIdx].id!=constsy){//!¿ÉÉÔ¸ÄÐ´ÎÄ·¨
-//        error(-1);//!should't happen run time err
-//        return;
-//    }
     updateSymBuf();
     constDef();
     if (symBuf[symBufIdx].id != semicolon) {
@@ -385,10 +381,6 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
     kind = funkind;
     tIdxCur = tidx;
     btIdxCur = btidx;
-    if (symBuf[symBufIdx].id != voidsy) {
-        error(-1);//!should't happen , run time err
-        return;
-    }
     type = voidtyp;
     updateSymBuf();
     if (symBuf[symBufIdx].id != ident) {
@@ -534,18 +526,14 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
 }
 
 int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
-    if (symBuf[symBufIdx].id != ident) {
-        error(-1);//! should't happen , run time err
-        return -1;
-    }
-    int funcId = lookup(symBuf[symBufIdx].token, 1);
+    int funcId = lookup(symBuf[symBufIdx].token, 1);//¿ÉÄÜÊÇ-1 checked
     if (funcId == -1) {
         error(16);//!º¯ÊýÎ´¶¨Òå
         if (needRet)
             errPlace = 'f';//factor
         else
             errPlace = 's';//stat
-        return -1;
+        return -1;//checked£ºstat()µ÷ÓÃ£¬µ«²»ÐèÒª·µ»ØÖµ; factor() µ÷ÓÃ£¬Ðè¼ì²é
     }
     int funcBtid = 0;
     while (funcBtid < btidx && strcmp(btab[funcBtid].name, tab[funcId].name) != 0) {
@@ -553,7 +541,7 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
     }
     if (tab[funcId].typ == voidtyp && needRet == 1) {
         error(25);//!Ó¦ÊÇÓÐ·µ»ØÖµº¯Êý ·Ç·¨Óï¾ä
-        return -1;
+        return -1;//checked
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id != lparent) {
@@ -581,20 +569,21 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
 
 
 int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿Õ£¾
+    //funcId Ò»¶¨´óÓÚµÈÓÚ0
     int paraCnt = 0;
     if (symBuf[symBufIdx].id != rparent) {//!²»Îª¿Õ
-        int resTid = expr();//!ÖÁÉÙÒ»¸ö
+        int resTid = expr();//!ÖÁÉÙÒ»¸ö //¿ÉÄÜÊÇ-1 checked check3
         emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
         paraCnt++;
-        if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
-            warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ· todo tab[-1] may happen
+        if (resTid != -1 && tab[resTid].typ != tab[funcId + paraCnt].typ) {//!check3
+            warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
         }
         while (symBuf[symBufIdx].id == comma) {
             updateSymBuf();
-            resTid = expr();
+            resTid = expr();//¿ÉÄÜÊÇ-1 checked check4
             emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
             paraCnt++;
-            if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
+            if (resTid != -1 && tab[resTid].typ != tab[funcId + paraCnt].typ) {//check4
                 warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
             }
         }
@@ -713,7 +702,7 @@ int expr() {//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
         updateSymBuf();
         negflag = 1;
     }
-    ti1 = term();
+    ti1 = term();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit»ò·µ»Ø£¬¼ì²éµ÷ÓÃÕß(checked)
     if (negflag) {
         resTi = getTemVar();
         emitMid(subOp, 0, ti1, resTi, varg, tiarg, tiarg);
@@ -724,7 +713,7 @@ int expr() {//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
         enum MOP op = symBuf[symBufIdx].id == plus ? addOp : subOp;
         updateSymBuf();
         ti1 = resTi;
-        ti2 = term();
+        ti2 = term();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit»ò·µ»Ø£¬¼ì²éµ÷ÓÃÕß(checked)
         resTi = getTemVar();
         emitMid(op, ti1, ti2, resTi, tiarg, tiarg, tiarg);
     }
@@ -734,13 +723,13 @@ int expr() {//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
 
 int term() {//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
     int ti1, ti2, resTi;
-    ti1 = factor();
+    ti1 = factor();//·µ»ØÖµ¿ÉÄÜÊÇ-1, checked Á÷Ïòemit»ò·µ»Ø£¬¼ì²éµ÷ÓÃÕßexpr()
     resTi = ti1;
     while (symBuf[symBufIdx].id == mul || symBuf[symBufIdx].id == divd) {
         enum MOP op = symBuf[symBufIdx].id == mul ? mulOp : divOp;
         updateSymBuf();
         ti1 = resTi;
-        ti2 = factor();
+        ti2 = factor();//·µ»ØÖµ¿ÉÄÜÊÇ-1 checked Á÷Ïòemit»ò·µ»Ø£¬¼ì²éµ÷ÓÃÕßexpr()
         resTi = getTemVar();
         emitMid(op, ti1, ti2, resTi, tiarg, tiarg, tiarg);
 
@@ -754,9 +743,9 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
     if (symBuf[symBufIdx].id == ident) {
         enum SYMBOL nextSym = symBuf[(symBufIdx + 1) % 3].id;
         if (nextSym == lparent) {
-            return call(1);
+            return call(1);//checked: ´Ë´¦Î´Ê¹ÓÃ£¬¼ì²éµ÷ÓÃfactorµÄº¯Êýterm()
         } else {
-            resTi = lookup(symBuf[symBufIdx].token, 0);//±êÊ¶·û, 0 not func
+            resTi = lookup(symBuf[symBufIdx].token, 0);//±êÊ¶·û, 0 not func ¿ÉÄÜÊÇ-1 checked
             if (resTi == -1) {
                 errPlace = 'f';
                 error(17);//!±êÊ¶·ûÎ´¶¨Òå
@@ -771,9 +760,11 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
                 }
                 ti1 = resTi;
                 updateSymBuf();
-                ti2 = expr();
+                ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
                 resTi = getTemVar();
-                tab[resTi].typ = ti1 == -1 ? inttyp : tab[ti1].typ;//!ÀàÐÍÉèÎªÊý×éÔªËØµÄÀàÐÍ
+                if (ti1 != -1) {//!ÀàÐÍÉèÎªÊý×éÔªËØµÄÀàÐÍ
+                    tab[resTi].typ = tab[ti1].typ;
+                }
                 emitMid(getArrOp, ti1, ti2, resTi, tiarg, tiarg, tiarg);
                 if (symBuf[symBufIdx].id != rbrack)
                     error(14);//!Ó¦ÊÇ]
@@ -792,14 +783,14 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
         emitMid(liop, numDef('f'), -1, resTi, varg, earg, tiarg);//'f'->pos
     } else if (symBuf[symBufIdx].id == lparent) {//¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯
         updateSymBuf();
-        resTi = expr();
+        resTi = expr();//¿ÉÄÜÊÇ-1 checked ¼ì²éµ÷ÓÃÕßterm()
         if (symBuf[symBufIdx].id != rparent)
             error(11);//!Ó¦ÊÇ)
         else
             updateSymBuf();
     } else {
         error(24);//!·Ç·¨Òò×Ó
-        resTi = -1;
+        resTi = -1;//checked: ´Ë´¦Î´Ê¹ÓÃ£¬¼ì²éµ÷ÓÃfactor()µÄº¯Êýterm()
     }
     fprintf(fout, "\t\tthis is a factor.\n");
     return resTi;
@@ -808,7 +799,7 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
 void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
     int resTid, ti1, ti2 = -1;
     int isArr = 0;
-    resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func
+    resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func ¿ÉÄÜÊÇ-1,checked
     if (resTid == -1) {
         errPlace = 'a';
         error(17);//!±êÊ¶·ûÎ´¶¨Òå
@@ -823,7 +814,7 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             error(28);//!²»ÊÇÊý×é
         }
         updateSymBuf();//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
         isArr = 1;
         if (symBuf[symBufIdx].id != rbrack)
             error(14);//!Ó¦ÊÇ]
@@ -834,18 +825,18 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
             return;
         }
         updateSymBuf();
-        ti1 = expr();
+        ti1 = expr();//¿ÉÄÜÊÇ-1 checked ÏÂÎÄcheck1
     } else if (symBuf[symBufIdx].id == become) {//±äÁ¿¸³Öµ£¼¸³ÖµÓï¾ä£¾   ::=  £¼±êÊ¶·û£¾£½£¼±í´ïÊ½£¾
         if (tab[resTid].kind == arrkind) {
             error(32);//!²»ÄÜ¶ÔÊý×éÖ±½Ó¸³Öµ
         }
         updateSymBuf();
-        ti1 = expr();//!Ö±½Óµ÷ÓÃ
+        ti1 = expr();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked ÏÂÎÄcheck1
     } else {
         error(25);//!·Ç·¨Óï¾ä
         return;
     }
-    if (resTid >= 0 && ti1 >= 0 && tab[resTid].typ != tab[ti1].typ)
+    if (resTid != -1 && ti1 != -1 && tab[resTid].typ != tab[ti1].typ)//check1
         warn(0);
     emitMid(isArr ? setArrOp : becomeOp, ti1, ti2, resTid, tiarg, isArr ? tiarg : earg, tiarg);
     fprintf(fout, "\t\tthis is a assignment.\n");
@@ -874,7 +865,7 @@ void ifStat() {//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
     } else {
         updateSymBuf();
     }
-    int brTi = condition();//!Ö±½Óµ÷ÓÃ
+    int brTi = condition();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked emit
     int midxElse = midx;
     emitMid(brfOp, brTi, -1, 0, tiarg, earg, liarg);
     if (symBuf[symBufIdx].id != rparent)
@@ -897,43 +888,43 @@ int condition() {//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
     int ti1, ti2 = -1, resTi;
     int hasOp = 0;
     enum MOP op = sltOp;
-    ti1 = expr();//!Ö±½Óµ÷ÓÃ
+    ti1 = expr();//!Ö±½Óµ÷ÓÃ ¿ÉÄÜÊÇ-1 checked, Á÷Ïòemit»ò·µ»Ø
     if (symBuf[symBufIdx].id == les) {//!¿ÉÑ¡Ïî
         hasOp = 1;
         op = sltOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     } else if (symBuf[symBufIdx].id == leq) {
         hasOp = 1;
         op = sleOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     } else if (symBuf[symBufIdx].id == gtr) {
         hasOp = 1;
         op = sgtOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     } else if (symBuf[symBufIdx].id == geq) {
         hasOp = 1;
         op = sgeOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     } else if (symBuf[symBufIdx].id == eql) {
         hasOp = 1;
         op = seqOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     } else if (symBuf[symBufIdx].id == neq) {//!Â©Ð´
         hasOp = 1;
         op = sneOp;
         updateSymBuf();
-        ti2 = expr();
+        ti2 = expr();//¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     }
     if (hasOp == 1) {
         resTi = getTemVar();
         emitMid(op, ti1, ti2, resTi, tiarg, tiarg, tiarg);
     } else {
-        resTi = ti1;
+        resTi = ti1;//¿ÉÄÜÊÇ-1 checked ·µ»ØÖµ£¬¼ì²éµ÷ÓÃÕß ifºÍwhile
     }
     fprintf(fout, "\t\tthis is a condition.\n");
     return resTi;
@@ -959,7 +950,7 @@ void whileStat() {//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
     } else {
         updateSymBuf();
     }
-    int brTi = condition();//!Ö±½Óµ÷ÓÃ
+    int brTi = condition();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked emit
     int loopMidx = midx;
     emitMid(brfOp, brTi, -1, 0, tiarg, earg, liarg);
     if (symBuf[symBufIdx].id != rparent)
@@ -990,11 +981,11 @@ void writeStat() {//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf 
         updateSymBuf();
         if (symBuf[symBufIdx].id == comma) {//!¿ÉÑ¡Ïî
             updateSymBuf();
-            expTid = expr();
+            expTid = expr();//¿ÉÄÜÊÇ-1 checked emit
             hasExp = 1;
         }
     } else {
-        expTid = expr();//!Ö±½Óµ÷ÓÃ
+        expTid = expr();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked emit
         hasExp = 1;
     }
     if (hasStr) {
@@ -1021,7 +1012,7 @@ void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
         errPlace = 'r';
         error(9);//!Ó¦ÊÇ±êÊ¶·û
     } else {
-        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func
+        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func ¿ÉÄÜÊÇ-1, checked
         if (ti == -1) {
             errPlace = 'r';
             error(17);//!±êÊ¶·ûÎ´¶¨Òå
@@ -1036,7 +1027,7 @@ void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
             error(9);//!Ó¦ÊÇ±êÊ¶·û
             continue;
         }
-        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func
+        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func ¿ÉÄÜÊÇ-1, checked
         if (ti == -1) {
             errPlace = 'r';
             error(17);//!±êÊ¶·ûÎ´¶¨Òå
@@ -1084,7 +1075,7 @@ void switchStat() {//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±
     } else {
         updateSymBuf();
     }
-    int eva = expr();//!Ö±½Óµ÷ÓÃ
+    int eva = expr();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked Á÷Ïòemit
     int swtMidx = midx;//FOR BACK PATCH goto TEST
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     if (symBuf[symBufIdx].id != rparent) {
@@ -1186,16 +1177,16 @@ void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
         if (tab[btab[btidx - 1].tidx].typ == voidtyp)
             error(29);//!Ó¦ÎªÎÞ·µ»ØÖµret
         updateSymBuf();
-        expTid = expr();//!Ö±½Óµ÷ÓÃ
+        expTid = expr();//!Ö±½Óµ÷ÓÃ //¿ÉÄÜÊÇ-1 checked ÏÂÎÄcheck2
         hasRet = 1;
         if (symBuf[symBufIdx].id == rparent)
             updateSymBuf();
         else
             error(11);//!Ó¦ÊÇ)
     }
-    if (tab[btab[btidx - 1].tidx].typ == inttyp && (hasRet == 0 || tab[expTid].typ != inttyp))
+    if (tab[btab[btidx - 1].tidx].typ == inttyp && (hasRet == 0 || (expTid != -1 && tab[expTid].typ != inttyp)))//check2
         warn(1);//!Ó¦Îªint·µ»ØÖµ
-    if (tab[btab[btidx - 1].tidx].typ == chtyp && (hasRet == 0 || tab[expTid].typ != chtyp))
+    if (tab[btab[btidx - 1].tidx].typ == chtyp && (hasRet == 0 || (expTid != -1 && tab[expTid].typ != chtyp)))//check2
         warn(2);//!Ó¦Îªchar·µ»ØÖµ
     emitMid(retOp, -1, -1, expTid, earg, earg, hasRet ? tiarg : earg);
     fprintf(fout, "\t\tthis is a return stat.\n");

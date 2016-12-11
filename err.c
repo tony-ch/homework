@@ -8,7 +8,7 @@ char *emsg[ERRMAX] = {
         "源文件不完整",//0 updatesymBuf
         "非法字符, 将之跳过",//1 getsym
         "数有前导0或整数太长",//2 getsym
-        "应是 \' ",//3 getsym todo 跳读太多
+        "应是 \' ",//3 getsym
         "应是 ; ",//4
         "函数重定义",//5 enter
         "标识符重定义",//6 enter
@@ -295,7 +295,7 @@ void error(int n) {
         default:
             fprintf(fout, "run time error\n");
             printf("run time error\n");
-            endProc(-1);
+            endProc(-1);//checked
     }
 }
 

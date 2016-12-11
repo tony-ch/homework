@@ -26,8 +26,8 @@ extern int lcnt;//line num
 //extern int lleng;
 extern int ccnt;
 enum SYMBOL {
-    eofs = -1,
-    constsy = 0,
+    eofs,
+    constsy,
     intsy,
     charsy,
     voidsy,

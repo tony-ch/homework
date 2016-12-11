@@ -24,7 +24,7 @@ enum SYMBOL ksym[KEYNO] =//±£Áô×Ö
                 printfsy, returnsy
         };
 char *symbolstr[] = {
-        "CONSTSY", "INTSY", "CHARSY", "VOIDSY",
+        "EOFSY", "CONSTSY", "INTSY", "CHARSY", "VOIDSY",
         "MAINSY", "IFSY", "ELSESY", "WHILESY",
         "SWITCHSY", "CASESY", "DEFAULTSY", "SCANFSY",
         "PRINTFSY", "RETURNSY",
@@ -312,11 +312,12 @@ void updateSymBuf() {
         getsym();
     } while (symBuf[symBufIdx].id == nul);
     symBufIdx += 1;
-    if (symBuf[symBufIdx].id == eofs) {
-        error(0);//!incomplete source file, exit (T)
-    }
     if (symBufIdx == 3) {
         symBufIdx = 0;
+    }
+    if (symBuf[symBufIdx].id == eofs) {
+        printf("%d,%d", eofs, symBuf[symBufIdx].id);
+        error(0);//!incomplete source file, exit (T)
     }
 }
 

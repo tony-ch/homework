@@ -62,7 +62,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tab[tidx].value = value;
     tab[tidx].adr = adrOffset;
     tab[tidx].inMem = 0;
-    tab[tidx].regIdx = -1;
+    tab[tidx].regIdx = -1;//todo check
     fprintf(fout, "\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d, adr:%d\n",
             tidx, tab[tidx].name, kindstr[tab[tidx].kind], typestr[tab[tidx].typ], tab[tidx].value, tab[tidx].adr);
     if (k == funkind) {
@@ -79,7 +79,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
 }
 
 int lookup(char *name, int isfunc) {
-    int result = -1;
+    int result = -1;//checked 此处未使用 检查调用者(all chceked)
     int i;
     if (isfunc == 1) {
         for (i = 0; i < btidx; i++)
@@ -122,7 +122,7 @@ int getLab() {
     return (labCnt++);
 }
 
-void emitMid(enum MOP op, int a1, int a2, int r, enum ARGTYP a1t, enum ARGTYP a2t, enum ARGTYP rt) {
+void emitMid(enum MOP op, int a1, int a2, int r, enum ARGTYP a1t, enum ARGTYP a2t, enum ARGTYP rt) {//todo check -1
     mCode[midx].op = op;
     mCode[midx].arg1.value = a1;
     mCode[midx].arg1Typ = a1t;
@@ -148,6 +148,9 @@ void printCode() {
     }
     for (i = 0; i < labCnt; i++) {
         fprintf(fout, "\t\tlab index: %d,\tmidx: %d\n", i, lab[i]);
+    }
+    if (ecnt > 0) {
+        return;//确保不会访问下标-1的元素
     }
     for (i = 0; i < midx; i++) {
         fprintf(fout, "%5d%20s", i, mopStr[mCode[i].op]);

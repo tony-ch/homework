@@ -58,7 +58,7 @@ int getPath(char *path) {//读取控制台输入的路径
     }
     if (flag) {//大于长度限制,报错
         printf("path is too long\n");
-        return -1;
+        return -1;//checked
     }
     path[i] = '\0';
     return 0;
