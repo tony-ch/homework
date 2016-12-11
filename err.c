@@ -174,10 +174,10 @@ void error(int n) {
         case 16://函数未定义,call()中出现,因子和语句分别调用
             printErr(n);//到语句的结束位置
             if (errPlace == 's') {//语句中调用
-                while (symBuf[symBufIdx].id != rbrace && symBuf[symBufIdx].id != semicolon)
+                while (symBuf[symBufIdx].id != semicolon)
                     updateSymBuf();
             } else {//factor f
-                while (symBuf[symBufIdx].id != rbrace)
+                while (symBuf[symBufIdx].id != rparent)
                     updateSymBuf();
                 updateSymBuf();
             }

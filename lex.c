@@ -285,6 +285,7 @@ void getsym() {
     } else {
         if (ch == EOF) {
             symBuf[symBufIdx].id = eofs;
+            symBuf[symBufIdx].token[0] = 0;
         } else {
             error(1);//! invalid character (T)
             symBuf[symBufIdx].id = nul;

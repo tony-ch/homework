@@ -539,10 +539,6 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
         return -1;
     }
     int funcId = lookup(symBuf[symBufIdx].token, 1);
-    int funcBtid = 0;
-    while (funcBtid < btidx && strcmp(btab[funcBtid].name, tab[funcId].name) != 0) {
-        funcBtid++;
-    }
     if (funcId == -1) {
         error(16);//!º¯ÊýÎ´¶¨Òå
         if (needRet)
@@ -550,6 +546,10 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
         else
             errPlace = 's';//stat
         return -1;
+    }
+    int funcBtid = 0;
+    while (funcBtid < btidx && strcmp(btab[funcBtid].name, tab[funcId].name) != 0) {
+        funcBtid++;
     }
     if (tab[funcId].typ == voidtyp && needRet == 1) {
         error(25);//!Ó¦ÊÇÓÐ·µ»ØÖµº¯Êý ·Ç·¨Óï¾ä
@@ -587,7 +587,7 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
         emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
         paraCnt++;
         if (tab[resTid].typ != tab[funcId + paraCnt].typ) {
-            warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
+            warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ· todo tab[-1] may happen
         }
         while (symBuf[symBufIdx].id == comma) {
             updateSymBuf();
