@@ -401,9 +401,9 @@ void storeGlobal() {
                     fprintf(fout, "glb_%s: .word \'%c\'\n", tab[i].name, tab[i].value);
                 }
                 break;
-            case varkind:
-                fprintf(codefile, "glb_%s: .word\n", tab[i].name);
-                fprintf(fout, "glb_%s: .word\n", tab[i].name);
+            case varkind://!!注意 不赋值的话不分配地址
+                fprintf(codefile, "glb_%s: .word 0\n", tab[i].name);
+                fprintf(fout, "glb_%s: .word 0\n", tab[i].name);
                 break;
             case arrkind:
                 fprintf(codefile, "glb_%s: .space %d\n", tab[i].name, tab[i].value * 4);
