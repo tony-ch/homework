@@ -23,6 +23,8 @@ void endFunToObj();
 
 void retToObj();
 
+void paraToObj();
+
 void brfToObj();
 
 void callToObj();
