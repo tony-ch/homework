@@ -61,7 +61,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tab[tidx].typ = t;
     tab[tidx].value = value;
     tab[tidx].adr = adrOffset;
-    tab[tidx].inMem = 0;
+    tab[tidx].inMem = 1;//todo check
     tab[tidx].regIdx = -1;//todo check
     fprintf(fout, "\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d, adr:%d\n",
             tidx, tab[tidx].name, kindstr[tab[tidx].kind], typestr[tab[tidx].typ], tab[tidx].value, tab[tidx].adr);
@@ -140,8 +140,9 @@ void printCode() {
                 i, tab[i].name, kindstr[tab[i].kind], typestr[tab[i].typ], tab[i].value, tab[i].adr);
     }
     for (i = 0; i < btidx; i++) {
-        fprintf(fout, "\t\tbtab index: %d,\tname: %20s,\t\tspacesz: %d,\t\tparaN: %d,\t\treted: %d,\t\ttidx: %d\n",
-                i, btab[i].name, btab[i].spacesz, btab[i].paraN, btab[i].reted, btab[i].tidx);
+        fprintf(fout,
+                "\t\tbtab index: %d,\tname: %20s,\t\tspacesz: %d,\t\tparaN: %d,\t\treted: %d,\t\ttidx: %d,\t\tcallParaN:%d\n",
+                i, btab[i].name, btab[i].spacesz, btab[i].paraN, btab[i].reted, btab[i].tidx, btab[i].callParaN);
     }
     for (i = 0; i < strCnt; i++) {
         fprintf(fout, "\t\tstr index: %d,\tstr: %s\n", i, strtab[i]);
