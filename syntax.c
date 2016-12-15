@@ -553,7 +553,7 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
     } else {
         updateSymBuf();
     }
-    int resTid = 0;
+    int resTid = -1;//checked term中使用 stat中不使用
     if (needRet) {
         resTid = getTemVar();
         tab[resTid].typ = tab[funcId].typ;
