@@ -78,7 +78,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tidx = tidx + 1;
 }
 
-int lookup(char *name, int isfunc) {
+int lookup(char *name, int isfunc) {//todo func and ident 分开
     int result = -1;//checked 此处未使用 检查调用者(all chceked)
     int i;
     if (isfunc == 1) {

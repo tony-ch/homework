@@ -532,7 +532,7 @@ void mainDef() {//＜主函数＞    ::= void main‘(’‘)’ ‘{’＜复合语句＞‘}’
 int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
     int funcId = lookup(symBuf[symBufIdx].token, 1);//可能是-1 checked
     if (funcId == -1) {
-        error(16);//!函数未定义
+        error(16);//!函数未定义 标识符对应多种情况 checked 排除变量 常量 数组和参数
         if (needRet)
             errPlace = 'f';//factor
         else
@@ -661,6 +661,7 @@ void stat(char pos) {
     } else if (symBuf[symBufIdx].id == switchsy) {
         switchStat();
     } else if (symBuf[symBufIdx].id == ident) {//!first集合相交
+        //标识符对应多种情况，checked 转移到调用的函数
         enum SYMBOL nextSym = symBuf[(symBufIdx + 1) % 3].id;
         if (nextSym == become || nextSym == lbrack) {
             assignment();
@@ -747,12 +748,12 @@ int factor() {//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞
     if (symBuf[symBufIdx].id == ident) {
         enum SYMBOL nextSym = symBuf[(symBufIdx + 1) % 3].id;
         if (nextSym == lparent) {
-            return call(1);//checked: 此处未使用，检查调用factor的函数term()
+            return call(1);//checked: 此处未使用，检查调用factor的函数term() 必须是函数，checked call内判断
         } else {
             resTi = lookup(symBuf[symBufIdx].token, 0);//标识符, 0 not func 可能是-1 checked
             if (resTi == -1) {
                 errPlace = 'f';
-                error(17);//!标识符未定义
+                error(17);//!标识符未定义 排除函数
                 //return -1; ! 不应return
             }
             updateSymBuf();
@@ -774,6 +775,10 @@ int factor() {//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞
                     error(14);//!应是]
                 else
                     updateSymBuf();
+            } else {//标识符对应多种情况 checked 已经排除函数，需要排除数组
+                if (resTi != -1 && tab[resTi].kind == arrkind) {
+                    error(17);//!不应为数组 标识符种类不正确
+                }
             }
         }
     } else if (symBuf[symBufIdx].id == charcon) {
@@ -803,14 +808,15 @@ int factor() {//＜因子＞::= ＜标识符＞｜＜标识符＞‘[’＜表达式＞‘]’｜＜整数＞
 void assignment() {//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
     int resTid, ti1, ti2 = -1;
     int isArr = 0;
-    resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1,checked
+    resTid = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1,checked (排除函数)
+    //标识符对应多种情况 checked 排除常量 数组和函数
     if (resTid == -1) {
         errPlace = 'a';
         error(17);//!标识符未定义
         return;
     }
     if (tab[resTid].kind == conkind && tab[resTid].kind == funkind) {
-        error(32);//!不能对常量和函数名赋值
+        error(32);//!不能对常量和函数名赋值 (排除常量)
     }
     updateSymBuf();
     if (symBuf[symBufIdx].id == lbrack) {
@@ -832,7 +838,7 @@ void assignment() {//＜赋值语句＞::=＜标识符＞‘[’＜表达式＞‘]’=＜表达式＞
         ti1 = expr();//可能是-1 checked 下文check1
     } else if (symBuf[symBufIdx].id == become) {//变量赋值＜赋值语句＞   ::=  ＜标识符＞＝＜表达式＞
         if (tab[resTid].kind == arrkind) {
-            error(32);//!不能对数组直接赋值
+            error(32);//!不能对数组直接赋值 (排除数组)
         }
         updateSymBuf();
         ti1 = expr();//!直接调用 //可能是-1 checked 下文check1
@@ -1012,14 +1018,17 @@ void readStat() {//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
         updateSymBuf();
     }
     int ti;
-    if (symBuf[symBufIdx].id != ident) {
+    if (symBuf[symBufIdx].id != ident) {//标识符对应多种情况,此处排除函数，需要排除常量和数组
         errPlace = 'r';
         error(9);//!应是标识符
     } else {
-        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1, checked
+        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1, checked 排除函数
         if (ti == -1) {
             errPlace = 'r';
             error(17);//!标识符未定义
+        }
+        if (ti != -1 && (tab[ti].kind == arrkind || tab[ti].kind == conkind)) {//排除常量和数组
+            error(17);//!标识符种类不正确
         }
         emitMid(readOp, -1, -1, ti, earg, earg, tiarg);
         updateSymBuf();
@@ -1031,10 +1040,13 @@ void readStat() {//＜读语句＞::=scanf ‘(’＜标识符＞{,＜标识符＞}‘)’
             error(9);//!应是标识符
             continue;
         }
-        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1, checked
+        ti = lookup(symBuf[symBufIdx].token, 0);//0 not func 可能是-1, checeked //标识符对应多种情况,此处排除函数，需要排除常量和数组
         if (ti == -1) {
             errPlace = 'r';
             error(17);//!标识符未定义
+        }
+        if (ti != -1 && (tab[ti].kind == arrkind || tab[ti].kind == conkind)) {//排除函数和数组
+            error(17);//!标识符种类不正确
         }
         emitMid(readOp, -1, -1, ti, earg, earg, tiarg);
         updateSymBuf();

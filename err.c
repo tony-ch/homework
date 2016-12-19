@@ -22,7 +22,7 @@ char *emsg[ERRMAX] = {
         "应是]",//14
         "应是:",//15
         "函数未定义",//16
-        "标识符未定义",//17
+        "标识符未定义或标识符种类不正确",//17
         "常量必须有初始值",//18
         "int常量的初始值应为整数，char常量的初始值应为字符",//19
         "数组的大小应为非0无符号整数",//20
@@ -184,7 +184,7 @@ void error(int n) {
             showPos();
             errPlace = 0;
             break;
-        case 17://标识符未定义 赋值语句 read语句 因子
+        case 17://标识符未定义或标识符种类不正确 赋值语句 read语句 因子
             printErr(n);//赋值语句的结束位置
             if (errPlace == 'a') {//赋值语句中调用 assign
                 while (symBuf[symBufIdx].id != semicolon)
