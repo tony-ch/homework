@@ -182,7 +182,8 @@ void freeTemReg(int i) {
         fprintf(codefile, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
         fprintf(fout, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
     }
-    fprintf(fout, "\t\t\tfree reg %d for %s\n", i, tab[tid].name);
+    if (tReg.tidx[i] > 0)
+        fprintf(fout, "\t\t\tfree reg %d for %s\n", i, tab[tid].name);
     tReg.dif[i] = 0;
     tReg.tidx[i] = -1;
     tReg.busy[i] = 0;
@@ -236,11 +237,13 @@ int getEmpTemReg(int tid, int regToUse1, int regToUse2) {
     fprintf(fout, "\t\t\t**************************\n");
     int i;
     for (i = 0; i < 8; i++) {
-        fprintf(fout, "\t\t\treg %d: busy:%d,tidx:%d,dirty:%d", i, tReg.busy[i], tReg.tidx[i], tReg.dif[i]);
-        if (tReg.tidx[i] > 0) {
-            fprintf(fout, ",name:%s", tab[tReg.tidx[i]].name);
+        if (tReg.busy[i]) {
+            fprintf(fout, "\t\t\treg %d: busy:%d,tidx:%d,dirty:%d", i, tReg.busy[i], tReg.tidx[i], tReg.dif[i]);
+            if (tReg.tidx[i] > 0) {
+                fprintf(fout, ",name:%s", tab[tReg.tidx[i]].name);
+            }
+            fprintf(fout, "\n");
         }
-        fprintf(fout, "\n");
     }
     return res;
 }
@@ -370,8 +373,7 @@ void mathToObj(int op) {
 }
 
 void conToObj() {//con,type,value,name
-    int tid = mCode[mIdxCur].res.tidx;//todo check 是否可以用$at
-//    int reg= getEmpTemReg(tid,-1, -1);
+    int tid = mCode[mIdxCur].res.tidx;
     fprintf(codefile, "addi $at,$0,%d  #code %d\n", mCode[mIdxCur].arg2.value, mIdxCur);
     fprintf(fout, "addi $at,$0,%d  #code %d\n", mCode[mIdxCur].arg2.value, mIdxCur);
     fprintf(codefile, "sw $at,%d($fp) #const %s code %d\n", tab[tid].adr * 4, tab[tid].name, mIdxCur);
@@ -726,7 +728,6 @@ void callToObj() {//call,ret,paraN,func
 
 void calPaToObj() {//todo calpa can be value
     if (paraQue.cnt == PAMAX) {
-        fprintf(codefile, "#fatal error: para quene is full\n");
         printf("#fatal err: para quene is full\n");
         endProc(-1);
     }

@@ -55,6 +55,10 @@ void program() {
     }
     mainDef();
     fprintf(fout, "\t\tthis is a program.\n\n");
+    if (!reachEof()) {
+        fprintf(fout, "there should be nothing after main func.\n");
+        printf("there should be nothing after main func.\n");
+    }
     printCode();
 
 }
