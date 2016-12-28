@@ -7,7 +7,8 @@
 char mopStr[][10] = {"conOp", "varOp", "funOp", "arrOp", "paraOp", "retOp", "endFunOp", "callOp", "calPaOp", "readOp",
                      "writeOp",
                      "jOp", "brfOp", "sltOp", "sleOp", "sgtOp", "sgeOp", "seqOp", "sneOp",
-                     "liop", "addOp", "subOp", "mulOp", "divOp", "setArrOp", "getArrOp", "becomeOp", "genOp"};
+                     "liop", "addOp", "subOp", "mulOp", "divOp", "setArrOp", "getArrOp", "becomeOp", "genOp",
+                     "optedOp"};
 char kindstr[5][10] = {"var", "const", "func", "arr", "para"};
 char typestr[3][10] = {"void", "int", "char"};
 
@@ -192,6 +193,9 @@ void printCode() {
                 break;
             case btiarg:
                 fprintf(fout, "%20s", btab[mCode[i].res.btid].name);
+                break;
+            case varg:
+                fprintf(fout, "%20d", mCode[i].res.value);
                 break;
             default:
                 fprintf(fout, "%20s", "");

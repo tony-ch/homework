@@ -3,11 +3,12 @@
 
 #define DEBUG
 
+#define OPT 1
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <unistd.h>
 
 #define PATHLEN 100//
 #define KEYNO 14//number of key words
@@ -109,7 +110,8 @@ extern int btidx;//block tab index
 enum MOP {
     conOp, varOp, funOp, arrOp, paraOp, retOp, endFunOp, callOp, calPaOp, readOp, writeOp,
     jOp, brfOp, sltOp, sleOp, sgtOp, sgeOp, seqOp, sneOp,
-    liop, addOp, subOp, mulOp, divOp, setArrOp, getArrOp, becomeOp, genOp
+    liop, addOp, subOp, mulOp, divOp, setArrOp, getArrOp, becomeOp, genOp,
+    optedOp
 };
 enum ARGTYP {
     earg, targ, varg, tiarg, liarg, siarg, btiarg//empty type value idx str btidx
@@ -130,7 +132,7 @@ struct MIDCODE {
         int tidx;
         int btid;
         int labIdx;
-        //int value;
+        int value;
     } res;
     enum ARGTYP arg1Typ;
     enum ARGTYP arg2Typ;
@@ -238,6 +240,9 @@ int getLab();
 void emitMid(enum MOP op, int a1, int a2, int r, enum ARGTYP a1t, enum ARGTYP a2t, enum ARGTYP rt);
 
 void printCode();
+
+//opt
+void opt();
 
 //objcode
 void generate();

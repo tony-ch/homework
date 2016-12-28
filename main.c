@@ -59,6 +59,8 @@ int main() {
             endProc(-1);
         }
 #endif
+        opt();
+        printCode();
         generate();
     }
     endProc(0);

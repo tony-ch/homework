@@ -59,7 +59,7 @@ void program() {
         fprintf(fout, "there should be nothing after main func.\n");
         printf("there should be nothing after main func.\n");
     }
-    printCode();
+    //printCode();
 
 }
 

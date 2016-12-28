@@ -9,6 +9,6 @@ set(SOURCE_FILES
         global.h
         lex.c
         main.c
-        syntax.c midcode.c objcode.c objcode.h)
+        syntax.c midcode.c objcode.c objcode.h opt.c opt.h)
 
 add_executable(compile ${SOURCE_FILES})
