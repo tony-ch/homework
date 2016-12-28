@@ -1,6 +1,6 @@
 #include "global.h"
-#include "err.h"
 
+#define PATHLEN 100//
 int getPath(char *path);//读取控制台输入的路径
 FILE *fin = NULL;//源文件
 FILE *fout = NULL;//结果文件

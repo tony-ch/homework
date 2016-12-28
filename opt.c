@@ -1,9 +1,8 @@
 //
 // Created by tony on 2016/12/27.
 //
-
-#include "opt.h"
 #include "global.h"
+#include "opt.h"
 
 //t1 opt jmp
 //t2 opt lab
@@ -22,7 +21,7 @@ void opt() {
 }
 
 void optLab() {
-    for (int i = 0; i < midx - 1; i++) {//0-midx-2 第二条到倒数第二条
+    for (int i = 0; i < mcodeCnt - 1; i++) {//0-midx-2 第二条到倒数第二条
         if (mCode[i].op == genOp) {
             int labId = mCode[i].res.labIdx;
             int j = i + 1;
@@ -36,7 +35,7 @@ void optLab() {
 }
 
 void delLab(int toDel, int replaceLabIdx) {
-    for (int i = 0; i < midx; i++) {
+    for (int i = 0; i < mcodeCnt; i++) {
         if (mCode[i].rTyp == liarg && mCode[i].res.labIdx == toDel) {
             mCode[i].res.labIdx = replaceLabIdx;
         }
@@ -44,7 +43,7 @@ void delLab(int toDel, int replaceLabIdx) {
 }
 
 void optJmp() {
-    for (int i = 1; i < midx - 1; i++) {//0-midx-2 第一条到倒数第二条
+    for (int i = 1; i < mcodeCnt - 1; i++) {//0-midx-2 第一条到倒数第二条
         if (mCode[i].op != jOp && mCode[i].op != brfOp)
             continue;
         if (mCode[i + 1].op != genOp && mCode[i - 1].op != genOp)
@@ -57,7 +56,7 @@ void optJmp() {
 }
 
 void optConst() {
-    for (int i = 0; i < midx; i++) {//li,v,_,des
+    for (int i = 0; i < mcodeCnt; i++) {//li,v,_,des
         if (mCode[i].op == liop) {
             mCode[i].op = optedOp;
             delConst(mCode[i].res.tidx, mCode[i].arg1.value);
@@ -70,7 +69,7 @@ void optConst() {
 }
 
 void delConst(int tid, int value) {
-    for (int i = 0; i < midx; i++) {
+    for (int i = 0; i < mcodeCnt; i++) {
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             mCode[i].arg1Typ = varg;
             mCode[i].arg1.value = value;
@@ -89,11 +88,11 @@ void delConst(int tid, int value) {
         }
     }
     //更改tab中的地址偏移
-    for (int i = tid + 1; i < tidx && tab[i].kind != funkind; i++) {
+    for (int i = tid + 1; i < tabCnt && tab[i].kind != funkind; i++) {
         tab[i].adr -= 1;
     }
     if (tid >= btab[0].tidx) {//不是全局变量
-        for (int i = 0; i < btidx; i++) {
+        for (int i = 0; i < btabCnt; i++) {
             if (tid < btab[i].tidx) {
                 btab[i - 1].spacesz -= 1;
                 break;
@@ -103,7 +102,7 @@ void delConst(int tid, int value) {
 }
 
 void optExp() {
-    for (int i = 0; i < midx; i++) {
+    for (int i = 0; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
         if (mCode[i].arg1Typ != varg || mCode[i].arg2Typ != varg)
             continue;
