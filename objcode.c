@@ -385,34 +385,34 @@ void arrToObj() {//arr,type,size,name;
 }
 
 void storeGlobal() {
-    int i, limit = btab[0].tidx;
     fprintf(codefile, ".data:\n");
     fprintf(fout, ".data:\n");
-    for (i = 0; i < limit; i++) {//const var arr (func para)
-        switch (tab[i].kind) {
-            case conkind:
-                if (tab[i].typ == inttyp) {
-                    fprintf(codefile, "#glb_%s: .word %d\n", tab[i].name, tab[i].value);
-                    fprintf(fout, "#glb_%s: .word %d\n", tab[i].name, tab[i].value);
+    int i;
+    for (i = 0; i < mcodeCnt && mCode[i].op != funOp; i++) {//const var arr (func para)
+        int tid = mCode[i].res.tidx;
+        switch (mCode[i].op) {
+            case conOp:
+                if (mCode[i].arg1.typ == inttyp) {
+                    fprintf(codefile, "glb_%s: .word %d\n", tab[tid].name, tab[tid].value);
+                    fprintf(fout, "glb_%s: .word %d\n", tab[tid].name, tab[tid].value);
                 } else {
-                    fprintf(codefile, "#glb_%s: .word \'%c\'\n", tab[i].name, tab[i].value);
-                    fprintf(fout, "#glb_%s: .word \'%c\'\n", tab[i].name, tab[i].value);
+                    fprintf(codefile, "glb_%s: .word \'%c\'\n", tab[tid].name, tab[tid].value);
+                    fprintf(fout, "glb_%s: .word \'%c\'\n", tab[tid].name, tab[tid].value);
                 }
-                //tab[i].inMem = 1;
                 break;
-            case varkind://!!注意 不赋值的话不分配地址
-                fprintf(codefile, "glb_%s: .word 0\n", tab[i].name);
-                fprintf(fout, "glb_%s: .word 0\n", tab[i].name);
-                //tab[i].inMem = 1;
+            case varOp://!!注意 不赋值的话不分配地址
+                fprintf(codefile, "glb_%s: .word 0\n", tab[tid].name);
+                fprintf(fout, "glb_%s: .word 0\n", tab[tid].name);
                 break;
-            case arrkind:
-                fprintf(codefile, "glb_%s: .space %d\n", tab[i].name, tab[i].value * 4);
-                fprintf(fout, "glb_%s: .space %d\n", tab[i].name, tab[i].value * 4);
+            case arrOp:
+                fprintf(codefile, "glb_%s: .space %d\n", tab[tid].name, tab[tid].value * 4);
+                fprintf(fout, "glb_%s: .space %d\n", tab[tid].name, tab[tid].value * 4);
                 break;
             default:
                 break;
         }
     }
+    mIdxCur = i;
     fprintf(codefile, "#str\n");
     fprintf(fout, "#str\n");
     for (i = 0; i < strCnt; i++) {
@@ -421,7 +421,6 @@ void storeGlobal() {
     }
     fprintf(codefile, "str_newline: .asciiz \"\\n\"\n");
     fprintf(fout, "str_newline: .asciiz \"\\n\"\n");
-    mIdxCur = btab[0].tidx;//todo check
     fprintf(codefile, ".text:\n");
     fprintf(fout, ".text:\n");
     fprintf(codefile, "j func_main\n");
