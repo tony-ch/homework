@@ -341,7 +341,7 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
         updateSymBuf();
     }
     mIdxCur = mcodeCnt;
-    emitMid(funOp, type, 0, btabCnt, targ, varg, btiarg);
+    emitMid(funOp, btabCnt, 0, type, btiarg, varg, targ);
     enter(name, kind, type, 0);
     adrOffset = 0;
     if (symBuf[symBufIdx].id != lparentsy) {
@@ -370,7 +370,7 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
     if (btab[btidCur].reted == 0) {
         error(30);
     }
-    emitMid(endFunOp, -1, -1, btidCur, earg, earg, btiarg);
+    emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
     btab[btidCur].spacesz = adrOffset;
     btab[btidCur].paraN = value;
     fprintf(fout, "\t\tthis is a ret func dec.\n");
@@ -397,7 +397,7 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
         updateSymBuf();
     }
     mIdxCur = mcodeCnt;
-    emitMid(funOp, type, 0, btabCnt, targ, varg, btiarg);
+    emitMid(funOp, btabCnt, 0, type, btiarg, varg, targ);
     enter(name, kind, type, 0);
     adrOffset = 0;
     if (symBuf[symBufIdx].id != lparentsy) {
@@ -423,7 +423,7 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
         error(13);//!Ó¦ÊÇ}
     else
         updateSymBuf();
-    emitMid(endFunOp, -1, -1, btIdxCur, earg, earg, btiarg);
+    emitMid(endFunOp, btIdxCur, -1, -1, btiarg, earg, earg);
     btab[btIdxCur].spacesz = adrOffset;
     btab[btIdxCur].paraN = value;
     fprintf(fout, "\t\tthis is a void func dec.\n");
@@ -450,7 +450,7 @@ int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
             strcpy(name, symBuf[symBufIdx].token);
             updateSymBuf();
         }
-        emitMid(paraOp, type, -1, tabCnt, targ, earg, tiarg);
+        emitMid(paraOp, tabCnt, -1, type, tiarg, earg, targ);
         enter(name, kind, type, 0);
         paraCnt = paraCnt + 1;
         adrOffset++;
@@ -474,7 +474,7 @@ int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
                 strcpy(name, symBuf[symBufIdx].token);
                 updateSymBuf();
             }
-            emitMid(paraOp, type, -1, tabCnt, targ, earg, tiarg);
+            emitMid(paraOp, tabCnt, -1, type, tiarg, earg, targ);
             enter(name, kind, type, 0);
             adrOffset++;
             paraCnt = paraCnt + 1;
@@ -502,7 +502,7 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
         error(23);//!
     }
     strcpy(name, symBuf[symBufIdx].token);
-    emitMid(funOp, type, 0, btabCnt, targ, varg, btiarg);
+    emitMid(funOp, btabCnt, 0, type, btiarg, varg, targ);
     enter(name, kind, type, 0);
     adrOffset = 0;
     adrOffset++;//for fp;
@@ -525,7 +525,7 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     if (symBuf[symBufIdx].id != rbracesy) {
         error(13);//!Ó¦ÊÇ}
     }
-    emitMid(endFunOp, -1, -1, btidCur, earg, earg, btiarg);
+    emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
     btab[btidCur].spacesz = adrOffset;
     fprintf(fout, "\t\tthis is main func dec.\n");
 }
@@ -561,7 +561,7 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
     }
     //£¼ÓÐ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
     int paraCnt = valueParaList(funcId);//£¼ÎÞ·µ»ØÖµº¯Êýµ÷ÓÃÓï¾ä£¾ ::= £¼±êÊ¶·û£¾¡®(¡¯£¼Öµ²ÎÊý±í£¾¡®)¡¯
-    emitMid(callOp, resTid, paraCnt, funcBtid, needRet == 1 ? tiarg : earg, varg, btiarg);
+    emitMid(callOp, funcBtid, paraCnt, resTid, btiarg, varg, needRet == 1 ? tiarg : earg);
     if (btab[btabCnt - 1].callParaN < paraCnt)//µ÷Õûµ±Ç°º¯ÊýµÄÖµ²ÎÊý¸öÊý
         btab[btabCnt - 1].callParaN = paraCnt;
     if (symBuf[symBufIdx].id != rparentsy)
@@ -578,7 +578,7 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
     int paraCnt = 0;
     if (symBuf[symBufIdx].id != rparentsy) {//!²»Îª¿Õ
         int resTid = expr();//!ÖÁÉÙÒ»¸ö //¿ÉÄÜÊÇ-1 checked check3
-        emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
+        emitMid(calPaOp, resTid, -1, -1, tiarg, earg, earg);
         paraCnt++;
         if (resTid != -1 && tab[resTid].typ != tab[funcId + paraCnt].typ) {//!check3
             warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
@@ -586,7 +586,7 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
         while (symBuf[symBufIdx].id == commasy) {
             updateSymBuf();
             resTid = expr();//¿ÉÄÜÊÇ-1 checked check4
-            emitMid(calPaOp, -1, -1, resTid, earg, earg, tiarg);
+            emitMid(calPaOp, resTid, -1, -1, tiarg, earg, earg);
             paraCnt++;
             if (resTid != -1 && tab[resTid].typ != tab[funcId + paraCnt].typ) {//check4
                 warn(3);//²ÎÊýÀàÐÍ²»ÕýÈ·
@@ -1002,7 +1002,7 @@ void writeStat() {//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf 
     if (hasStr) {
         strTid = enterStr(str);
     }
-    emitMid(writeOp, -1, strTid, expTid, earg, hasStr ? siarg : earg, hasExp ? tiarg : earg);
+    emitMid(writeOp, expTid, strTid, -1, hasExp ? tiarg : earg, hasStr ? siarg : earg, earg);
     if (symBuf[symBufIdx].id != rparentsy)
         error(11);//!Ó¦ÊÇ)
     else
@@ -1206,6 +1206,6 @@ void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
         warn(1);//!Ó¦Îªint·µ»ØÖµ
     if (tab[btab[btabCnt - 1].tidx].typ == chtyp && (hasRet == 0 || (expTid != -1 && tab[expTid].typ != chtyp)))//check2
         warn(2);//!Ó¦Îªchar·µ»ØÖµ
-    emitMid(retOp, -1, -1, expTid, earg, earg, hasRet ? tiarg : earg);
+    emitMid(retOp, expTid, -1, -1, hasRet ? tiarg : earg, earg, earg);
     fprintf(fout, "\t\tthis is a return stat.\n");
 }

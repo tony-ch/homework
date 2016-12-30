@@ -138,6 +138,9 @@ void printCode() {
             case tiarg:
                 fprintf(fout, "%20s", tab[mCode[i].arg1.tidx].name);
                 break;
+            case btiarg:
+                fprintf(fout, "%20s", btab[mCode[i].arg1.btid].name);
+                break;
             default:
                 fprintf(fout, "%20s", "");
                 break;
@@ -157,6 +160,9 @@ void printCode() {
                 break;
         }
         switch (mCode[i].rTyp) {
+            case targ:
+                fprintf(fout, "%20s", typestr[mCode[i].res.typ]);
+                break;
             case tiarg:
                 fprintf(fout, "%20s", tab[mCode[i].res.tidx].name);
                 break;
@@ -165,9 +171,6 @@ void printCode() {
                 break;
             case btiarg:
                 fprintf(fout, "%20s", btab[mCode[i].res.btid].name);
-                break;
-            case varg:
-                fprintf(fout, "%20d", mCode[i].res.value);
                 break;
             default:
                 fprintf(fout, "%20s", "");

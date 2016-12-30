@@ -10,6 +10,32 @@
 //t3.1 li
 //t3.2 con
 //t3.3 exp
+//t3.4 调整头文件和global
+//t3.3.1 calPa
+//t3.3.2 call
+//t3.3.3 ret
+//t3.3.4 fun endfun para
+
+//con       type    value   tid                                 cvar type,_,tid     arr type,sz,tid
+
+//jmp       _       _       labidx
+//gen       _       _       labidx
+//brf       con     _       labidx  (con:v,ti)
+
+//fun       btid    paCnt   type                                para tid,_,type        endFun btid,_,_
+//ret       ret     _       _       (ret:v,ti)
+//cal       btid    paCnt   des
+//calPa     pa      _       _       (pa:v,ti)
+
+//become    src     _       des     (src:v,ti)
+//li        val     _       des
+//math      arg1    arg2    des     (arg1:v,ti arg2:v,ti)       slt,sle,seq,sne,sgt,sge,add,sub,mul,div
+//=[]       arr     idx     des     (idx:v,ti)
+//[]=       src     idx     arr     (src:v,ti idx:v,ti)
+
+//rd        _       _       tid
+//wr        [exp]   [sidx]  [tid]   (exp:v,ti)
+
 void opt() {
     if (!OPT) {
         return;
@@ -73,18 +99,14 @@ void delConst(int tid, int value) {
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             mCode[i].arg1Typ = varg;
             mCode[i].arg1.value = value;
+            if (mCode[i].op == writeOp) {
+                mCode[i].rTyp = targ;
+                mCode[i].res.typ = tab[tid].typ;
+            }
         }
         if (mCode[i].arg2Typ == tiarg && mCode[i].arg2.tidx == tid) {
             mCode[i].arg2Typ = varg;
             mCode[i].arg2.value = value;
-        }
-        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid) {
-            mCode[i].rTyp = varg;
-            mCode[i].res.value = value;
-            if (mCode[i].op == writeOp) {
-                mCode[i].arg1Typ = targ;
-                mCode[i].arg1.typ = tab[tid].typ;
-            }
         }
     }
     //更改tab中的地址偏移
@@ -104,15 +126,39 @@ void delConst(int tid, int value) {
 void optExp() {
     for (int i = 0; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
-        if (mCode[i].arg1Typ != varg || mCode[i].arg2Typ != varg)
-            continue;
-        if (op == addOp || op == subOp || op == mulOp || op == divOp
-            || op == sltOp || op == sleOp || op == seqOp || op == sneOp || op == sgtOp || op == sgeOp) {
-            mCode[i].arg1.value = calExp(i);
-            mCode[i].op = becomeOp;
-            mCode[i].arg1Typ = varg;
-            mCode[i].arg2Typ = earg;
+        if (mCode[i].arg1Typ == varg && mCode[i].arg2Typ == varg) {
+            if (op == addOp || op == subOp || op == mulOp || op == divOp
+                || op == sltOp || op == sleOp || op == seqOp || op == sneOp || op == sgtOp || op == sgeOp) {
+                mCode[i].arg1.value = calExp(i);
+                mCode[i].op = becomeOp;
+                mCode[i].arg1Typ = varg;
+                mCode[i].arg2Typ = earg;
+            }
         }
+        if (mCode[i].op == becomeOp && mCode[i].arg1Typ == varg) {
+//            mCode[i].op=optedOp;可能跨越基本块，不能直接删掉
+            passConst(i);
+        }
+    }
+}
+
+void passConst(int codeIdx) {//没有数据流图，不能跨越基本块
+    int value = mCode[codeIdx].arg1.value;
+    int tid = mCode[codeIdx].res.tidx;
+    for (int i = codeIdx + 1; i < mcodeCnt; i++) {
+        if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
+            mCode[i].arg1Typ = varg;
+            mCode[i].arg1.value = value;
+        }
+        if (mCode[i].arg2Typ == tiarg && mCode[i].arg2.tidx == tid) {
+            mCode[i].arg2Typ = varg;
+            mCode[i].arg2.value = value;
+        }
+        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid)//到达下一个定义点，不能再进行值传递
+            break;
+        enum MOP op = mCode[i].op;
+        if (op == brfOp || op == jOp || op == genOp || op == endFunOp || op == retOp || op == callOp)
+            break;
     }
 }
 

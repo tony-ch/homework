@@ -445,9 +445,9 @@ void rdToObj() {
     fprintf(fout, "add $%d,$0,$v0\n", tReg.regId[reg]);
 }
 
-void wrToObj() {
+void wrToObj() {//wr,exp,str,type
     int hasStr = mCode[mIdxCur].arg2Typ != earg ? 1 : 0;
-    int hasExp = mCode[mIdxCur].rTyp != earg ? 1 : 0;
+    int hasExp = mCode[mIdxCur].arg1Typ != earg ? 1 : 0;
     if (hasStr) {
         fprintf(codefile, "la $a0,str_%d\n", mCode[mIdxCur].arg2.stridx);
         fprintf(codefile, "addi $v0,$0,4\n");
@@ -457,10 +457,10 @@ void wrToObj() {
         fprintf(fout, "syscall\n");
     }
     if (hasExp) {//!mCode[mIdxCur].rTyp==tiarg todo check
-        if (mCode[mIdxCur].rTyp == varg) {
-            fprintf(codefile, "add $a0,$0,%d\n", mCode[mIdxCur].res.value);
-            fprintf(fout, "add $a0,$0,%d\n", mCode[mIdxCur].res.value);
-            if (mCode[mIdxCur].arg1.typ == chtyp) {
+        if (mCode[mIdxCur].arg1Typ == varg) {
+            fprintf(codefile, "add $a0,$0,%d\n", mCode[mIdxCur].arg1.value);
+            fprintf(fout, "add $a0,$0,%d\n", mCode[mIdxCur].arg1.value);
+            if (mCode[mIdxCur].res.typ == chtyp) {
                 fprintf(codefile, "addi $v0,$0,11\n");
                 fprintf(codefile, "syscall\n");
                 fprintf(fout, "addi $v0,$0,11\n");
@@ -472,7 +472,7 @@ void wrToObj() {
                 fprintf(fout, "syscall\n");
             }
         } else {
-            int tid = mCode[mIdxCur].res.tidx;
+            int tid = mCode[mIdxCur].arg1.tidx;
             int reg = findInTemReg(tid);
             if (reg == -1) {
                 reg = getEmpTemReg(tid, -1, -1);
@@ -599,9 +599,9 @@ void setArrToObj() {//[]=,src,idx,arr
     }
 }
 
-void funToObj() {
+void funToObj() {//todo res(type)没有用到
     int paraN = mCode[mIdxCur].arg2.value;
-    btidCur = mCode[mIdxCur].res.btid;
+    btidCur = mCode[mIdxCur].arg1.btid;
     fprintf(codefile, "func_%s:\n", btab[btidCur].name);
     fprintf(fout, "func_%s:\n", btab[btidCur].name);
     if (strcmp(btab[btidCur].name, "main") == 0) {
@@ -621,11 +621,11 @@ void funToObj() {
 }
 
 void paraToObj() {
-    int tid = mCode[mIdxCur].res.tidx;
+    int tid = mCode[mIdxCur].arg1.tidx;
     //tab[tid].inMem = 1;//todo use $ax
 }
 
-void endFunToObj() {
+void endFunToObj() {//todo arg1(btidx) 没有用到
     int paraN = btab[btidCur].paraN;
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "addi,$sp,$sp,%d\n", (btab[btidCur].spacesz) * 4);
@@ -655,19 +655,19 @@ void endFunToObj() {
     fprintf(codefile, "nop\n");
 }
 
-void retToObj() {
+void retToObj() {//ret,[ret],_,_
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "j end\n");
         fprintf(fout, "j end\n");
         return;
     }
-    if (mCode[mIdxCur].rTyp == earg) {
+    if (mCode[mIdxCur].arg1Typ == earg) {
         clearTemReg();
         fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
         fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
         fprintf(codefile, "nop\n");
-    } else if (mCode[mIdxCur].rTyp == tiarg) {
-        int tid = mCode[mIdxCur].res.tidx;
+    } else if (mCode[mIdxCur].arg1Typ == tiarg) {
+        int tid = mCode[mIdxCur].arg1.tidx;
         int resReg = findInTemReg(tid);
         if (resReg == -1) {
             resReg = getEmpTemReg(tid, -1, -1);
@@ -679,9 +679,9 @@ void retToObj() {
         fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
         fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
         fprintf(codefile, "nop\n");
-    } else if (mCode[mIdxCur].rTyp == varg) {//todo check
-        fprintf(codefile, "add $v0,$0,%d\n", mCode[mIdxCur].res.value);
-        fprintf(fout, "add $v0,$0,%d\n", mCode[mIdxCur].res.value);
+    } else if (mCode[mIdxCur].arg1Typ == varg) {//todo check
+        fprintf(codefile, "add $v0,$0,%d\n", mCode[mIdxCur].arg1.value);
+        fprintf(fout, "add $v0,$0,%d\n", mCode[mIdxCur].arg1.value);
         clearTemReg();
         fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
         fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
@@ -690,9 +690,9 @@ void retToObj() {
 }
 
 
-void callToObj() {//call,ret,paraN,func
-    int funcBtid = mCode[mIdxCur].res.btid;
-    int hasRet = mCode[mIdxCur].arg1Typ != earg ? 1 : 0;
+void callToObj() {//call,func,paraN,ret
+    int funcBtid = mCode[mIdxCur].arg1.btid;
+    int hasRet = mCode[mIdxCur].rTyp != earg ? 1 : 0;
     int calparaN = mCode[mIdxCur].arg2.value;
     int paraN = btab[funcBtid].paraN;
     int i, j;
@@ -749,7 +749,7 @@ void callToObj() {//call,ret,paraN,func
     fprintf(fout, "jal func_%s\n", btab[funcBtid].name);
     fprintf(fout, "nop\n");
     if (hasRet == 1) {
-        int retTid = mCode[mIdxCur].arg1.tidx;
+        int retTid = mCode[mIdxCur].res.tidx;
         int retReg = findInTemReg(retTid);
         if (retReg == -1) {
             retReg = getEmpTemReg(retTid, -1, -1);
@@ -769,11 +769,11 @@ void calPaToObj() {//todo calpa can be value
         printf("#fatal err: para quene is full\n");
         endProc(-1);
     }
-    if (mCode[mIdxCur].rTyp == varg) {
-        paraQue.para[paraQue.cnt].value = mCode[mIdxCur].res.value;
+    if (mCode[mIdxCur].arg1Typ == varg) {
+        paraQue.para[paraQue.cnt].value = mCode[mIdxCur].arg1.value;
         paraQue.isTid[paraQue.cnt] = 0;
     } else {
-        paraQue.para[paraQue.cnt].tidx = mCode[mIdxCur].res.tidx;
+        paraQue.para[paraQue.cnt].tidx = mCode[mIdxCur].arg1.tidx;
         paraQue.isTid[paraQue.cnt] = 1;
     }
     paraQue.cnt++;

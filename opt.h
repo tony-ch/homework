@@ -19,6 +19,8 @@ void optExp();
 
 int calExp(int codeIdx);
 
+void passConst(int codeIdx);
+
 void dag();
 
 #endif //COMPILE_OPT_H

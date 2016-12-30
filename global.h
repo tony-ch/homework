@@ -79,6 +79,7 @@ struct MIDCODE {
         enum TYPES typ;
         int value;
         int tidx;
+        int btid;
     } arg1;
     union {
         int value;
@@ -89,7 +90,8 @@ struct MIDCODE {
         int tidx;
         int btid;
         int labIdx;
-        int value;
+        //int value;
+        enum TYPES typ;
     } res;
     enum ARGTYP arg1Typ;
     enum ARGTYP arg2Typ;
