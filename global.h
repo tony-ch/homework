@@ -29,12 +29,13 @@ enum SYMBOL {
     identsy, unsignumsy, zerosy, charconsy, strconsy,
     nulsy
 };
-struct {
+struct SYMBUF {
     enum SYMBOL id;
     char token[STRMAX];
     int lin;
     int col;
-} symBuf[3];
+};
+extern struct SYMBUF symBuf[3];
 extern int symBufIdx;
 //tab
 enum KINDS {
@@ -43,7 +44,7 @@ enum KINDS {
 enum TYPES {
     voidtyp, inttyp, chtyp
 };
-struct {
+struct TAB {
     char name[ALENMAX];
     enum KINDS kind;
     enum TYPES typ;
@@ -51,17 +52,18 @@ struct {
     int adr;// for not para adr relative to b base$fp
     int inMem;
     int regIdx;
-} tab[TMAX];
-
+};
+extern struct TAB tab[TMAX];
 extern int tabCnt;//tab index
-struct {
+struct BTAB {
     char name[ALENMAX];
     int tidx;//index in tab
     int callParaN;
     int spacesz;
     int paraN;
     int reted;
-} btab[TMAX];
+};
+extern struct BTAB btab[TMAX];
 extern int btabCnt;//block tab index
 //midcode
 enum MOP {

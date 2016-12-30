@@ -2,6 +2,11 @@
 #include "syntax.h"
 
 
+struct SYMBUF symBuf[3];
+struct TAB tab[TMAX];
+struct BTAB btab[TMAX];
+
+
 void program() {
     if (symBuf[symBufIdx].id == constsy) {//!Í··ûºÅÎªconst
         decConst();

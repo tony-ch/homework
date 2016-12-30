@@ -6,6 +6,25 @@
 //mCode[];
 //midx;
 
+int mIdxCur = 0;
+int btidCur = -1;
+struct {
+    int lastIn;//FIFO
+    int tidx[TREGNUM];
+    int dif[TREGNUM];
+    int busy[TREGNUM];
+    int regId[TREGNUM];
+} tReg;
+char calopStr[][4] = {"slt", "sle", "sgt", "sge", "seq", "sne", "add", "sub", "mul", "div"};
+
+struct {
+    int cnt;
+    union {
+        int tidx;
+        int value;
+    } para[PAMAX];
+    int isTid[PAMAX];
+} paraQue;
 
 void init() {
     tReg.lastIn = TREGNUM - 1;
@@ -621,7 +640,7 @@ void funToObj() {//todo res(type)没有用到
 }
 
 void paraToObj() {
-    int tid = mCode[mIdxCur].arg1.tidx;
+    //int tid = mCode[mIdxCur].arg1.tidx;
     //tab[tid].inMem = 1;//todo use $ax
 }
 

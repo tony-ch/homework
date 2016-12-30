@@ -192,7 +192,7 @@ int calExp(int codeIdx) {
         case sgeOp:
             return arg1 >= arg2;
         default:
-            break;
+            return 0;
     }
 
 }
