@@ -21,6 +21,12 @@ int calExp(int codeIdx);
 
 void passConst(int codeIdx);
 
+void divdBlk();
+
 void dag();
+
+void dataflow();
+
+int canDelTemVar(int codeIdx);
 
 #endif //COMPILE_OPT_H

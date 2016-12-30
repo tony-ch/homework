@@ -1,5 +1,5 @@
 #include "global.h"
-#include <unistd.h>
+//#include <unistd.h>
 #define PATHLEN 100//
 
 int getPath(char *path);//读取控制台输入的路径
@@ -7,9 +7,9 @@ FILE *fin = NULL;//源文件
 FILE *fout = NULL;//结果文件
 FILE *codefile = NULL;//目标代码文件
 int main() {
-    char cwd[100];
-    getcwd(cwd, 100);
-    printf("cwd:\"%s\"\n", cwd);
+//    char cwd[100];
+//    getcwd(cwd, 100);
+//    printf("cwd:\"%s\"\n", cwd);
     char finPath[PATHLEN];
     char foutPath[PATHLEN];
     while (fin == NULL) {//打开源文件

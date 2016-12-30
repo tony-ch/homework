@@ -176,7 +176,7 @@ int isGlobal(int tidx) {
 }
 
 void freeTemReg(int i) {
-    int tid = tReg.tidx[i];
+    int tid = tReg.tidx[i];//临时变量可能跨越函数调用
     if (tid == -1 || tab[tid].inMem == 1) {//tReg.dif[i]==0 // wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数
     } else if (isGlobal(tid) && tab[tid].kind == varkind) {
@@ -722,7 +722,7 @@ void callToObj() {//call,func,paraN,ret
         i = calparaN;
         j = 0;
         while (i > 0) {
-            if (paraQue.isTid[paraQue.cnt - 1] == 0) {//sw 不能存常数
+            if (paraQue.isTid[paraQue.cnt - i] == 0) {//sw 不能存常数
                 int value = paraQue.para[paraQue.cnt - i].value;
                 fprintf(codefile, "addi $1,$0,%d\n", value);
                 fprintf(fout, "addi $1,$0,%d\n", value);

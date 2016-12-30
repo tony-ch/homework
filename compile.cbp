@@ -31,27 +31,17 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="err.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="err.h" />
+		<Unit filename="err.cpp" />
 		<Unit filename="global.h" />
-		<Unit filename="lex.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="main.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="midcode.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="objcode.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="lex.cpp" />
+		<Unit filename="main.cpp" />
+		<Unit filename="midcode.cpp" />
+		<Unit filename="objcode.cpp" />
 		<Unit filename="objcode.h" />
-		<Unit filename="syntax.c">
-			<Option compilerVar="CC" />
-		</Unit>
+		<Unit filename="opt.cpp" />
+		<Unit filename="opt.h" />
+		<Unit filename="syntax.cpp" />
+		<Unit filename="syntax.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
