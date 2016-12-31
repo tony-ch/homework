@@ -23,7 +23,9 @@
 //opt opt.txt become &
 //dag1 dag
 //t3.7 x=y z=x
-
+//dag2 =dag1
+//dag3 dag.txt
+//dag4 dag.txt optdag
 //con[opt]  type    value   tid
 //cvar      type    _       tid
 //arr       type    sz      tid
@@ -50,15 +52,13 @@
 #define DAGMAX 512
 #define CODEMAX 4096
 int block[BLKMAX];
-struct MIDCODE newCode[CODEMAX];
-int newCodeCnt;
 void opt() {
     if (!OPT) {
         return;
     }
     optLab();
     optJmp();
-    optConst();//优化常量
+    optConst();//常量替换
 
     divdBlk();
     //dataflow();
@@ -179,17 +179,17 @@ void optExp() {
         }
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == varg) {
 //            mCode[i].op=optedOp;可能跨越基本块，不能直接删掉
+            passConst(i);
             if (tab[mCode[i].res.tidx].name[0] == '&' && canDelTemVar(i)) {//例子：return(1+2+x());
                 mCode[i].op = optedOp;//临时变量不能跨越基本块，可以在满足情况的条件下删掉
             }
-            passConst(i);
         }
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == mCode[i].res.tidx) {
             mCode[i].op = optedOp;
         }
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg &&
             mCode[i - 1].rTyp == tiarg && mCode[i - 1].res.tidx == mCode[i].arg1.tidx
-            && mCode[i].arg1.tidx > btab[0].tidx) {
+            && tab[mCode[i].arg1.tidx].name[0] == '&') {
             mCode[i].arg1Typ = earg;
             if (canDelTemVar(i - 1)) {
                 mCode[i].op = optedOp;
@@ -204,7 +204,7 @@ void optExp() {
 int canDelTemVar(int codeIdx) {//todo check
     int tid = mCode[codeIdx].res.tidx;
     int used = 0;
-    for (int i = codeIdx; i < mcodeCnt; i++) {
+    for (int i = codeIdx + 1; i < mcodeCnt; i++) {//应从下一条语开始
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             used = 1;
             break;
@@ -221,7 +221,7 @@ int canDelTemVar(int codeIdx) {//todo check
         if (op == genOp || op == jOp || op == brfOp || op == endFunOp || op == retOp) {//函数调用不用判定
             used = 0;//函数调用不会改变临时变量的值，除非返回值是这个临时变量，但是会被上面一个if检测到
             break;//!这种情况按理不会出现
-            //! 变量不能跨越基本块
+            //! 临时变量不能跨越基本块，局部变量可以
         }
     }
     return (!used);
@@ -355,23 +355,24 @@ void printDag() {
     dagCnt = 0;
 }
 
+int findFisrtNode(int dagIdx) {
+    for (int i = 0; i < nodeCnt; i++) {
+        if (nodeTab[i].dagIdx == dagIdx)
+            return i;
+    }
+    return -1;
+}
+
 void dag() {//math become
-    newCodeCnt = 0;
     for (int i = 0; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
-        if (op == optedOp)
-            continue;
         if (!isMathOp(op)) {
-            newCode[newCodeCnt] = mCode[i];
-            newCodeCnt++;
             continue;
         }
         if (i + 1 < mcodeCnt && !isMathOp(mCode[i + 1].op)) {
-            newCode[newCodeCnt] = mCode[i];
-            newCodeCnt++;
             continue;
         }
-        fprintf(fout, "begin code: %d\n", i);
+        int begin = i;
         for (int j = i; j < mcodeCnt; j++) {
             enum MOP mop = mCode[j].op;
             if (!isMathOp(mop)) {
@@ -413,11 +414,31 @@ void dag() {//math become
                 nodeTab[resNode].dagIdx = dagCnt;
                 dagTab[dagCnt] = {2, mop, nodeTab[arg1Node].dagIdx, nodeTab[arg2Node].dagIdx};
                 dagCnt++;
+                //没有找到公共表达式，尝试将操作数优化
+                int newArg1Node = findFisrtNode(nodeTab[arg1Node].dagIdx);//一定不为-1，至少可以找到arg1Node
+                int newArg2Node = findFisrtNode(nodeTab[arg2Node].dagIdx);
+                mCode[j].arg1Typ = nodeTab[newArg1Node].sel == 0 ? tiarg : varg;
+                mCode[j].arg1.value = nodeTab[newArg1Node].val;
+                mCode[j].arg2Typ = nodeTab[newArg2Node].sel == 0 ? tiarg : varg;
+                mCode[j].arg2.value = nodeTab[newArg2Node].val;
             } else {
                 nodeTab[resNode].dagIdx = resDag;
+                int newSrcNode = findFisrtNode(resDag);//找到了公共表达式，转换为赋值
+                if (newSrcNode != -1) {//todo 可能为-1吗？
+                    mCode[j].op = becomeOp;
+                    mCode[j].arg2Typ = earg;
+                    mCode[j].arg1.value = nodeTab[newSrcNode].val;
+                    mCode[j].arg1Typ = nodeTab[newSrcNode].sel == 0 ? tiarg : varg;
+                }
             }
         }
-        fprintf(fout, "end code %d\n", i);
+        int end = i;
+        fprintf(fout, "begin code: %d\n", begin);
+        fprintf(fout, "end code %d\n", end);
+        for (int k = begin; k < end; k++) {
+            if (tab[mCode[k].res.tidx].name[0] == '&' && canDelTemVar(k))
+                mCode[k].op = optedOp;
+        }
         printDag();
     }
 }
