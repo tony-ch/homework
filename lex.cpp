@@ -338,5 +338,7 @@ int reachEof() {
 }
 
 void printSym() {
+#ifdef LEXOUT
     fprintf(fout, "%-10s:\t\t%s\n", symbolstr[symBuf[symBufIdx].id], symBuf[symBufIdx].token);
+#endif
 }

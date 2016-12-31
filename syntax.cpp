@@ -27,7 +27,9 @@ void program() {
         }
     }
     if (hasVarDef) {
+#ifdef LEXOUT
         fprintf(fout, "\t\tthis is dec of var.\n");
+#endif
     }
     while ((symBuf[symBufIdx].id == intsy || symBuf[symBufIdx].id == charsy || symBuf[symBufIdx].id == voidsy) &&
            symBuf[(symBufIdx + 1) % 3].id != mainsy) {
@@ -59,9 +61,13 @@ void program() {
         }
     }
     mainDef();
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a program.\n\n");
+#endif
     if (!reachEof()) {
+#ifdef LEXOUT
         fprintf(fout, "there should be nothing after main func.\n");
+#endif
         printf("there should be nothing after main func.\n");
     }
     //printCode();
@@ -86,7 +92,9 @@ void decConst() {
             updateSymBuf();
         }
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is dec of const.\n");
+#endif
 }
 
 void constDef() {
@@ -202,7 +210,9 @@ void constDef() {
     } else {
         error(7);//! Ó¦Îªint»òchar Î´ÖªµÄ³£Á¿ÀàÐÍ±êÊ¶
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is const def.\n");
+#endif
 }
 
 /*
@@ -285,7 +295,9 @@ void varDef() {//£¼±äÁ¿¶¨Òå£¾  ::= £¼ÀàÐÍ±êÊ¶·û£¾(£¼±êÊ¶·û£¾|£¼±êÊ¶·û£¾¡®[¡¯£¼ÎÞ
         enter(name, kind, type, value);
         adrOffset = adrOffset + value;
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is var def.\n");
+#endif
 }
 
 int numDef(char pos) {//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
@@ -314,7 +326,9 @@ int numDef(char pos) {//£¼ÕûÊý£¾::= £Û£«£ü£­£Ý£¼ÎÞ·ûºÅÕûÊý£¾£ü£°
             return 0;
         }
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a num:%d.\n", num);
+#endif
     return num;
 }
 
@@ -358,7 +372,9 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
     tab[tIdxCur].value = value;
     mCode[mIdxCur].arg2.value = value;
     adrOffset = adrOffset + 10;//for $fp $ra and $s0-$s7
+#ifdef LEXOUT
     fprintf(fout, "\t\tenter para num for func %s, para num: %d\n", tab[tIdxCur].name, tab[tIdxCur].value);
+#endif
     if (symBuf[symBufIdx].id != rparentsy)
         error(11);//!Ó¦ÊÇ)
     else
@@ -378,7 +394,9 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
     emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
     btab[btidCur].spacesz = adrOffset;
     btab[btidCur].paraN = value;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a ret func dec.\n");
+#endif
 }
 
 void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
@@ -414,7 +432,9 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
     tab[tIdxCur].value = value;
     mCode[mIdxCur].arg2.value = value;
     adrOffset = adrOffset + 10;//!for $fp($sp+16) $ra($sp+20) and $s0-$s7
+#ifdef LEXOUT
     fprintf(fout, "\t\tenter para num for func %s, para num: %d\n", tab[tIdxCur].name, tab[tIdxCur].value);
+#endif
     if (symBuf[symBufIdx].id != rparentsy)
         error(11);//!Ó¦ÊÇ)
     else
@@ -431,7 +451,9 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
     emitMid(endFunOp, btIdxCur, -1, -1, btiarg, earg, earg);
     btab[btIdxCur].spacesz = adrOffset;
     btab[btIdxCur].paraN = value;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a void func dec.\n");
+#endif
 }
 
 int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
@@ -486,7 +508,9 @@ int paraList() {//£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾{,£¼ÀàÐÍ±êÊ¶·û£¾£¼±êÊ¶·û£¾}|£¼¿Õ£¾
         }
     }
     adrOffset += (4 - paraCnt);
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is para list.\n");
+#endif
     return paraCnt;
 }
 
@@ -532,7 +556,9 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     }
     emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
     btab[btidCur].spacesz = adrOffset;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is main func dec.\n");
+#endif
 }
 
 int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
@@ -573,7 +599,9 @@ int call(int needRet) {// needRet=0 : stat ; needRet=1 : factor
         error(11);//!Ó¦ÊÇ)
     else
         updateSymBuf();
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a call stat.\n");
+#endif
     return resTid;
 }
 
@@ -601,7 +629,9 @@ int valueParaList(int funcId) {//£¼Öµ²ÎÊý±í£¾   ::= £¼±í´ïÊ½£¾{,£¼±í´ïÊ½£¾}£ü£¼¿
     if (tab[funcId].value != paraCnt) {
         error(31);//!²ÎÊý¸öÊý²»ÕýÈ·
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is value para list.\n");
+#endif
     return paraCnt;
 }
 
@@ -624,10 +654,14 @@ void complexStat() {//£¼¸´ºÏÓï¾ä£¾   ::=  £Û£¼³£Á¿ËµÃ÷£¾£Ý£Û£¼±äÁ¿ËµÃ÷£¾£Ý£¼Óï¾ä
         }
     }
     if (hasVarDef) {
+#ifdef LEXOUT
         fprintf(fout, "\t\tthis is dec of var.\n");
+#endif
     }
     statList();
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is complex stat.\n");
+#endif
 }
 
 void stat(char pos) {
@@ -690,7 +724,9 @@ void stat(char pos) {
         }
     }//!¿Õ
     testAfterStat(pos);
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a stat.\n");
+#endif
 }
 
 void statList() {
@@ -701,7 +737,9 @@ void statList() {
            symBuf[symBufIdx].id == semicolonsy) {//!first¼¯ºÏ
         stat('s');//pos is statlist
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a stat list.\n");
+#endif
 }
 
 int expr() {//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
@@ -728,7 +766,9 @@ int expr() {//£¼±í´ïÊ½£¾::=£Û£«£ü£­£Ý£¼Ïî£¾{£¼¼Ó·¨ÔËËã·û£¾£¼Ïî£¾}
         resTi = getTemVar();
         emitMid(op, ti1, ti2, resTi, tiarg, tiarg, tiarg);
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is an expr.\n");
+#endif
     return resTi;
 }
 
@@ -745,7 +785,9 @@ int term() {//£¼Ïî£¾::=£¼Òò×Ó£¾{£¼³Ë·¨ÔËËã·û£¾£¼Òò×Ó£¾}
         emitMid(op, ti1, ti2, resTi, tiarg, tiarg, tiarg);
 
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a term.\n");
+#endif
     return resTi;
 }
 
@@ -807,7 +849,9 @@ int factor() {//£¼Òò×Ó£¾::= £¼±êÊ¶·û£¾£ü£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯£ü£¼ÕûÊý£¾
         error(24);//!·Ç·¨Òò×Ó
         resTi = -1;//checked: ´Ë´¦Î´Ê¹ÓÃ£¬¼ì²éµ÷ÓÃfactor()µÄº¯Êýterm()
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a factor.\n");
+#endif
     return resTi;
 }
 
@@ -855,7 +899,9 @@ void assignment() {//£¼¸³ÖµÓï¾ä£¾::=£¼±êÊ¶·û£¾¡®[¡¯£¼±í´ïÊ½£¾¡®]¡¯=£¼±í´ïÊ½£¾
     if (resTid != -1 && ti1 != -1 && tab[resTid].typ != tab[ti1].typ)//check1
         warn(0);
     emitMid(isArr ? setArrOp : becomeOp, ti1, ti2, resTid, tiarg, isArr ? tiarg : earg, tiarg);
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a assignment.\n");
+#endif
 }
 /*
  * if cond
@@ -897,7 +943,9 @@ void ifStat() {//£¼Ìõ¼þÓï¾ä£¾::=if ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾£Ûelse£¼Óï¾ä£¾£Ý
         stat('e');//pos else
     }
     mCode[midxNext].res.labIdx = getLab();
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is an if stat.\n");
+#endif
 }
 
 int condition() {//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
@@ -942,7 +990,9 @@ int condition() {//£¼Ìõ¼þ£¾::=£¼±í´ïÊ½£¾£¼¹ØÏµÔËËã·û£¾£¼±í´ïÊ½£¾£ü£¼±í´ïÊ½£¾
     } else {
         resTi = ti1;//¿ÉÄÜÊÇ-1 checked ·µ»ØÖµ£¬¼ì²éµ÷ÓÃÕß ifºÍwhile
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a condition.\n");
+#endif
     return resTi;
 }
 /*
@@ -977,7 +1027,9 @@ void whileStat() {//£¼Ñ­»·Óï¾ä£¾::=while ¡®(¡¯£¼Ìõ¼þ£¾¡®)¡¯£¼Óï¾ä£¾
     emitMid(jOp, -1, -1, loopLabIdx, earg, earg, liarg);
     int endLabIdx = getLab();
     mCode[loopMidx].res.labIdx = endLabIdx;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a while stat.\n");
+#endif
 }
 
 //printf¿ªÍ·
@@ -1012,7 +1064,9 @@ void writeStat() {//£¼Ð´Óï¾ä£¾::=printf¡®(¡¯ £¼×Ö·û´®£¾,£¼±í´ïÊ½£¾ ¡®)¡¯|printf 
         error(11);//!Ó¦ÊÇ)
     else
         updateSymBuf();//!one more sym
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a write stat.\n");
+#endif
 }
 
 //scanf¿ªÍ·
@@ -1062,7 +1116,9 @@ void readStat() {//£¼¶ÁÓï¾ä£¾::=scanf ¡®(¡¯£¼±êÊ¶·û£¾{,£¼±êÊ¶·û£¾}¡®)¡¯
     else
         updateSymBuf();
 
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a read stat.\n");
+#endif
 }
 /*
  * swtich E
@@ -1134,7 +1190,9 @@ void switchStat() {//£¼Çé¿öÓï¾ä£¾  ::=  switch ¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯ ¡®{¡¯£¼Çé¿ö±
         error(13);//!Ó¦ÊÇ}
     else
         updateSymBuf();
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a switch stat.\n");
+#endif
 }
 
 //case¿ªÍ·
@@ -1146,7 +1204,9 @@ void caseStat(struct CASTAB *casetb) {//£¼Çé¿ö±í£¾   ::=  £¼Çé¿ö×ÓÓï¾ä£¾{£¼Çé¿ö×
     while (symBuf[symBufIdx].id == casesy) {//! first¼¯ºÏÎª{case}
         oneCase(casetb);
     }
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a case table.\n");
+#endif
 }
 
 //case¿ªÍ·
@@ -1171,7 +1231,9 @@ void oneCase(struct CASTAB *casetb) {//£¼Çé¿ö×ÓÓï¾ä£¾::=case£¼³£Á¿£¾£º£¼Óï¾ä£¾
     casetb->midx[casetb->caseCnt] = mcodeCnt;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     casetb->caseCnt = casetb->caseCnt + 1;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a one case.\n");
+#endif
 }
 
 //default¿ªÍ·
@@ -1186,7 +1248,9 @@ void defaultCase(struct CASTAB *casetb) {//£¼È±Ê¡£¾::=default : £¼Óï¾ä£¾
     casetb->midx[casetb->caseCnt] = mcodeCnt;
     emitMid(jOp, -1, -1, 0, earg, earg, liarg);
     casetb->caseCnt = casetb->caseCnt + 1;
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a default case.\n");
+#endif
 }
 
 //return¿ªÍ·
@@ -1212,5 +1276,7 @@ void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
     if (tab[btab[btabCnt - 1].tidx].typ == chtyp && (hasRet == 0 || (expTid != -1 && tab[expTid].typ != chtyp)))//check2
         warn(2);//!Ó¦Îªchar·µ»ØÖµ
     emitMid(retOp, expTid, -1, -1, hasRet ? tiarg : earg, earg, earg);
+#ifdef LEXOUT
     fprintf(fout, "\t\tthis is a return stat.\n");
+#endif
 }

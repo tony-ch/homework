@@ -4,6 +4,8 @@
 #define DEBUG
 
 #define OPT 1
+//#define LEXOUT
+//#define TABOUT
 
 #include <stdio.h>
 #include <stdlib.h>

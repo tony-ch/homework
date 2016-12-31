@@ -67,17 +67,21 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tab[tabCnt].adr = adrOffset;
     tab[tabCnt].inMem = 1;//todo check
     tab[tabCnt].regIdx = -1;//todo check
+#ifdef LEXOUT
     fprintf(fout, "\t\tenter tab index: %d, name: %s, kind: %s, type: %s, value: %d, adr:%d\n",
             tabCnt, tab[tabCnt].name, kindstr[tab[tabCnt].kind], typestr[tab[tabCnt].typ], tab[tabCnt].value,
             tab[tabCnt].adr);
+#endif
     if (k == funkind) {
         strcpy(btab[btabCnt].name, name);
         btab[btabCnt].tidx = tabCnt;
         btab[btabCnt].paraN = value;
         btab[btabCnt].reted = 0;
         btab[btabCnt].callParaN = 0;
+#ifdef LEXOUT
         fprintf(fout, "\t\tenter btab index: %d, name: %s, tidx: %d, spacesz:%d, paraN:%d\n",
                 btabCnt, btab[btabCnt].name, btab[btabCnt].tidx, btab[btabCnt].spacesz, btab[btabCnt].paraN);
+#endif
         btabCnt = btabCnt + 1;
     }
     tabCnt = tabCnt + 1;
@@ -140,6 +144,7 @@ void emitMid(enum MOP op, int a1, int a2, int r, enum ARGTYP a1t, enum ARGTYP a2
 
 void printCode() {
     int i;
+#ifdef TABOUT
     for (i = 0; i < tabCnt; i++) {
         fprintf(fout, "\t\ttab index: %d,\tname: %s,\tkind: %s,\ttype: %s,\tvalue: %d,\tadr: %d\n",
                 i, tab[i].name, kindstr[tab[i].kind], typestr[tab[i].typ], tab[i].value, tab[i].adr);
@@ -155,6 +160,7 @@ void printCode() {
     for (i = 0; i < labCnt; i++) {
         fprintf(fout, "\t\tlab index: %d,\tmidx: %d\n", i, lab[i]);
     }
+#endif
     if (ecnt > 0) {
         return;//确保不会访问下标-1的元素
     }

@@ -25,7 +25,10 @@
 //t3.7 x=y z=x
 //dag2 =dag1
 //dag3 dag.txt
-//dag4 dag.txt optdag
+//dag4 dag.txt
+//dag5 changecode
+//dag6 dag.txt opt
+//dag7 changcode
 //con[opt]  type    value   tid
 //cvar      type    _       tid
 //arr       type    sz      tid
@@ -48,10 +51,19 @@
 //rd        _       _       tid
 //wr        [exp]   [sidx]  [typ]   (exp:v,ti)
 
-#define BLKMAX 512
+#define BLKMAX 1024
 #define DAGMAX 512
-#define CODEMAX 4096
-int block[BLKMAX];
+#define SETMAX 128
+struct {
+    int begin;
+    int end;
+    int next1;
+    int next2;
+    int in[SETMAX];
+    int out[SETMAX];
+    int use[SETMAX];
+    int def[SETMAX];
+} block[BLKMAX];
 void opt() {
     if (!OPT) {
         return;
@@ -61,7 +73,7 @@ void opt() {
     optConst();//常量替换
 
     divdBlk();
-    //dataflow();
+    dataflow();
 
     optExp();//优化表达式，合并常数 todo check
     dag();
@@ -72,20 +84,24 @@ void divdBlk() {
     int i = 0;
     while (i < mcodeCnt && mCode[i].op != funOp)
         i++;
-    block[cnt] = i;
+    block[cnt].begin = i;
     cnt++;
     i++;
     for (; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
         if (i + 1 < mcodeCnt &&
             (op == genOp || op == jOp || op == brfOp || op == retOp || op == endFunOp || op == callOp)) {
-            block[cnt] = i + 1;
+            block[cnt].begin = i + 1;
             cnt++;
         }
     }
     for (int j = 0; j < cnt; j++) {
-        fprintf(fout, "blk %d: code %d\n", j, block[j]);
+        fprintf(fout, "blk %d: code %d\n", j, block[j].begin);
     }
+}
+
+void dataflow() {
+
 }
 
 void optLab() {
