@@ -3,32 +3,10 @@
 //
 #include "global.h"
 #include "opt.h"
+#include <algorithm>
+#include <map>
+#include <vector>
 
-//t1 opt jmp
-//t2 opt lab
-//t3 opt const
-//t3.1 li
-//t3.2 con
-//t3.3 exp
-//t3.4 调整头文件和global
-//t3.3.1 calPa
-//t3.3.2 call
-//t3.3.3 ret
-//t3.3.4 fun endfun para
-//t3.3.5 wr
-//t3.3.6 输出调整
-//t3.5 passconst
-//t3.6 become &
-//cpp cpp
-//opt opt.txt become &
-//dag1 dag
-//t3.7 x=y z=x
-//dag2 =dag1
-//dag3 dag.txt
-//dag4 dag.txt
-//dag5 changecode
-//dag6 dag.txt opt
-//dag7 changcode
 //con[opt]  type    value   tid
 //cvar      type    _       tid
 //arr       type    sz      tid
@@ -37,8 +15,8 @@
 //gen       _       _       labidx
 //brf       con     _       labidx  (con:v,ti)
 
-//fun       btid    paCnt   type                                para tid,_,type        endFun btid,_,_
-//ret       ret     _       _       (ret:v,ti)
+//fun       btid    paCnt   type                                para tid,_,type        endFun _,_,btid
+//ret       ret     _       btid    (ret:v,ti)
 //cal       btid    paCnt   des
 //calPa     pa      _       _       (pa:v,ti)
 
@@ -54,63 +32,163 @@
 #define BLKMAX 1024
 #define DAGMAX 512
 #define SETMAX 128
-struct {
-    int begin;
-    int end;
-    int next1;
-    int next2;
-    int in[SETMAX];
-    int out[SETMAX];
-    int use[SETMAX];
-    int def[SETMAX];
-} block[BLKMAX];
-void opt() {
-    if (!OPT) {
-        return;
-    }
-    optLab();
-    optJmp();
-    optConst();//常量替换
+#define TREGNUM 8
+#define SREGNUM 8
+extern char mopStr[][10];
 
-    divdBlk();
-    dataflow();
+void opt() {
+#ifndef OPT
+        return;
+#endif
+    optLab();//删除多余标签
+    optJmp();//删除多余跳转
+
+    divdBlk();//划分基本块
+    dataflow();//建立数据流图
 
     optExp();//优化表达式，合并常数 todo check
-    dag();
+    dag();//删除公共子表达式
+    delDeadCode();//删除死代码
+    globalReg();
 }
 
+BLOCK block[BLKMAX];
+int blkCnt = 0;
+
+void optCode(int codeIdx) {
+    mCode[codeIdx].op = optedOp;
+    mCode[codeIdx].rTyp = earg;
+    mCode[codeIdx].arg1Typ = earg;
+    mCode[codeIdx].arg2Typ = earg;
+}
+
+int findInBlk(int codeIdx) {
+    int i;
+    for (i = 0; i < blkCnt; i++) {
+        if (block[i].end > codeIdx)
+            break;
+    }
+    return i;
+}
 void divdBlk() {
-    int cnt = 0;
     int i = 0;
     while (i < mcodeCnt && mCode[i].op != funOp)
         i++;
-    block[cnt].begin = i;
-    cnt++;
+    block[blkCnt].begin = i;
+    blkCnt++;
     i++;
     for (; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
         if (i + 1 < mcodeCnt &&
-            (op == genOp || op == jOp || op == brfOp || op == retOp || op == endFunOp || op == callOp)) {
-            block[cnt].begin = i + 1;
-            cnt++;
+            (op == genOp || op == jOp || op == brfOp || op == retOp || op == endFunOp)) {
+            block[blkCnt].begin = i + 1;
+            block[blkCnt - 1].end = i + 1;
+            if (op == retOp || op == endFunOp) {
+                block[blkCnt - 1].next1 = -1;
+                block[blkCnt - 1].next2 = -1;
+            } else if (op == brfOp) {
+                block[blkCnt - 1].next1 = blkCnt;
+                //block[blkCnt-1].next2=findInBlk(lab[mCode[i].res.labIdx]);
+            } else if (op == jOp) {
+                //block[blkCnt-1].next1=findInBlk(lab[mCode[i].res.labIdx]);
+                block[blkCnt - 1].next2 = -1;
+            } else {
+                block[blkCnt - 1].next1 = blkCnt;
+                block[blkCnt - 1].next2 = -1;
+            }
+            blkCnt++;
         }
     }
-    for (int j = 0; j < cnt; j++) {
-        fprintf(fout, "blk %d: code %d\n", j, block[j].begin);
+    block[blkCnt - 1].end = mcodeCnt;
+    for (int j = 0; j < blkCnt; j++) {
+        int codeIdx = block[j].end - 1;
+        if (mCode[codeIdx].op == brfOp) {
+            block[j].next2 = findInBlk(lab[mCode[codeIdx].res.labIdx]);
+        } else if (mCode[codeIdx].op == jOp) {
+            block[j].next1 = findInBlk(lab[mCode[codeIdx].res.labIdx]);
+        }
     }
 }
-
 void dataflow() {
-
+    for (int i = 0; i < blkCnt; i++) {
+        //初始化use和def
+        for (int j = block[i].begin; j < block[i].end; j++) {
+            if (mCode[j].op == optedOp)
+                continue;
+            int arg1 = mCode[j].arg1Typ == tiarg ? mCode[j].arg1.tidx : -1;
+            int arg2 = mCode[j].arg2Typ == tiarg ? mCode[j].arg2.tidx : -1;
+            int res = mCode[j].rTyp == tiarg ? mCode[j].res.tidx : -1;
+            arg1 = arg1 < btab[0].tidx ? -1 : arg1;
+            arg2 = arg2 < btab[0].tidx ? -1 : arg2;
+            res = res < btab[0].tidx ? -1 : res;
+            if (arg1 != -1 && block[i].use.find(arg1) == block[i].use.end() &&
+                block[i].def.find(arg1) == block[i].def.end()) {
+                block[i].use.insert(arg1);
+            }
+            if (arg2 != -1 && block[i].use.find(arg2) == block[i].use.end() &&
+                block[i].def.find(arg2) == block[i].def.end()) {
+                block[i].use.insert(arg2);
+            }
+            if (res != -1 && block[i].use.find(res) == block[i].use.end() &&
+                block[i].def.find(res) == block[i].def.end()) {
+                block[i].def.insert(res);
+            }
+        }
+    }
+    int flag;
+    do {
+        flag = 0;
+        for (int i = blkCnt - 1; i >= 0; i--) {
+            int next1 = block[i].next1;
+            int next2 = block[i].next2;
+            unsigned long long oldOutSize = block[i].out.size();
+            if (next1 != -1) {
+                block[i].out.insert(block[next1].in.begin(), block[next1].in.end());
+            }
+            if (next2 != -1) {
+                block[i].out.insert(block[next2].in.begin(), block[next2].in.end());
+            }
+            if (oldOutSize != block[i].out.size())
+                flag = 1;
+            //in=use V (out-def)
+            block[i].in.clear();
+            block[i].in.insert(block[i].use.begin(), block[i].use.end());
+            set<int> dif;
+            set_difference(block[i].out.begin(), block[i].out.end(), block[i].def.begin(), block[i].def.end(),
+                           inserter(dif, dif.begin()));
+            block[i].in.insert(dif.begin(), dif.end());
+        }
+    } while (flag);
+    for (int i = 0; i < blkCnt; i++) {
+        fprintf(fout, "blk %d,begin %d,end %d,next1 %d,next2 %d\n",
+                i, block[i].begin, block[i].end, block[i].next1, block[i].next2);
+        fprintf(fout, "in: \n");
+        for (set<int>::iterator si = block[i].in.begin(); si != block[i].in.end(); si++) {
+            fprintf(fout, "%s ", tab[*si].name);
+        }
+        fprintf(fout, "\nout:\n");
+        for (set<int>::iterator si = block[i].out.begin(); si != block[i].out.end(); si++) {
+            fprintf(fout, "%s ", tab[*si].name);
+        }
+        fprintf(fout, "\nuse:\n");
+        for (set<int>::iterator si = block[i].use.begin(); si != block[i].use.end(); si++) {
+            fprintf(fout, "%s ", tab[*si].name);
+        }
+        fprintf(fout, "\ndef:\n");
+        for (set<int>::iterator si = block[i].def.begin(); si != block[i].def.end(); si++) {
+            fprintf(fout, "%s ", tab[*si].name);
+        }
+        fprintf(fout, "\n");
+    }
 }
 
 void optLab() {
     for (int i = 0; i < mcodeCnt - 1; i++) {//0-midx-2 第二条到倒数第二条
-        if (mCode[i].op == genOp) {
+        if (mCode[i].op == genOp) {//总是保留第一条gen语句
             int labId = mCode[i].res.labIdx;
             int j = i + 1;
             while (mCode[j].op == genOp) {
-                mCode[j].op = optedOp;
+                optCode(j);
                 delLab(mCode[j].res.labIdx, labId);
                 j++;
             }
@@ -134,26 +212,16 @@ void optJmp() {
             continue;
         int labIdx = mCode[i].res.labIdx;
         if (labIdx == mCode[i + 1].res.labIdx || labIdx == mCode[i - 1].res.labIdx) {
-            mCode[i].op = optedOp;
+            optCode(i);
         }
     }
 }
 
-void optConst() {
-    for (int i = 0; i < mcodeCnt; i++) {//li,v,_,des
-        if (mCode[i].op == liop) {
-            mCode[i].op = optedOp;
-            delConst(mCode[i].res.tidx, mCode[i].arg1.value);
-        }
-        if (mCode[i].op == conOp) {//const,_,v,tid
-            mCode[i].op = optedOp;
-            delConst(mCode[i].res.tidx, mCode[i].arg2.value);
-        }
-    }
-}
 
 void delConst(int tid, int value) {
     for (int i = 0; i < mcodeCnt; i++) {
+        if (mCode[i].op == optedOp)
+            continue;
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             mCode[i].arg1Typ = varg;
             mCode[i].arg1.value = value;
@@ -184,6 +252,18 @@ void delConst(int tid, int value) {
 void optExp() {
     for (int i = 0; i < mcodeCnt; i++) {
         enum MOP op = mCode[i].op;
+        if (op == optedOp)
+            continue;
+        if (mCode[i].op == liop) {
+            optCode(i);
+            delConst(mCode[i].res.tidx, mCode[i].arg1.value);
+            continue;
+        }
+        if (mCode[i].op == conOp) {//const,_,v,tid
+            optCode(i);
+            delConst(mCode[i].res.tidx, mCode[i].arg2.value);
+            continue;
+        }
         if (mCode[i].arg1Typ == varg && mCode[i].arg2Typ == varg) {
             if (op == addOp || op == subOp || op == mulOp || op == divOp
                 || op == sltOp || op == sleOp || op == seqOp || op == sneOp || op == sgtOp || op == sgeOp) {
@@ -193,25 +273,30 @@ void optExp() {
                 mCode[i].arg2Typ = earg;
             }
         }
+        //优化x=常数
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == varg) {
 //            mCode[i].op=optedOp;可能跨越基本块，不能直接删掉
             passConst(i);
-            if (tab[mCode[i].res.tidx].name[0] == '&' && canDelTemVar(i)) {//例子：return(1+2+x());
-                mCode[i].op = optedOp;//临时变量不能跨越基本块，可以在满足情况的条件下删掉
+            if (mCode[i].res.tidx >= btab[0].tidx && canDelTemVar(i)) {//例子：return(1+2+x());
+                //mCode[i].op = optedOp;//临时变量不能跨越基本块，可以在满足情况的条件下删掉
+                optCode(i);
             }
         }
+        //优化x=x
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == mCode[i].res.tidx) {
-            mCode[i].op = optedOp;
+            optCode(i);
         }
+        //优化tx=x y=tx
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg &&
             mCode[i - 1].rTyp == tiarg && mCode[i - 1].res.tidx == mCode[i].arg1.tidx
-            && tab[mCode[i].arg1.tidx].name[0] == '&') {
+            && mCode[i].arg1.tidx >= btab[0].tidx) {//全局变量就作改变
             mCode[i].arg1Typ = earg;
             if (canDelTemVar(i - 1)) {
-                mCode[i].op = optedOp;
+                optCode(i);
                 mCode[i - 1].res.tidx = mCode[i].res.tidx;
+            } else {
+                mCode[i].arg1Typ = tiarg;
             }
-            mCode[i].arg1Typ = tiarg;
         }
     }
 }
@@ -220,7 +305,10 @@ void optExp() {
 int canDelTemVar(int codeIdx) {//todo check
     int tid = mCode[codeIdx].res.tidx;
     int used = 0;
+//    int isTem=tab[tid].name[0]=='&';
     for (int i = codeIdx + 1; i < mcodeCnt; i++) {//应从下一条语开始
+        if (mCode[i].op == optedOp)
+            continue;
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             used = 1;
             break;
@@ -235,7 +323,12 @@ int canDelTemVar(int codeIdx) {//todo check
         }
         enum MOP op = mCode[i].op;
         if (op == genOp || op == jOp || op == brfOp || op == endFunOp || op == retOp) {//函数调用不用判定
-            used = 0;//函数调用不会改变临时变量的值，除非返回值是这个临时变量，但是会被上面一个if检测到
+            int blk = findInBlk(codeIdx);
+            if (block[blk].out.find(tid) == block[blk].out.end())
+                used = 0;
+            else
+                used = 1;
+//            used = 0;函数调用不会改变临时变量的值，除非返回值是这个临时变量，但是会被上面一个if检测到
             break;//!这种情况按理不会出现
             //! 临时变量不能跨越基本块，局部变量可以
         }
@@ -243,15 +336,21 @@ int canDelTemVar(int codeIdx) {//todo check
     return (!used);
 }
 
-void passConst(int codeIdx) {//没有数据流图，不能跨越基本块，函数可能改变一些变量(仅限全局)
+void passConst(int codeIdx) {//不跨越基本块，函数可能改变全局变量
     int value = mCode[codeIdx].arg1.value;
     int tid = mCode[codeIdx].res.tidx;
 //    int isTempVar=tab[tid].name[0]=='&';
     int isGlobal = tid < btab[0].tidx;
     for (int i = codeIdx + 1; i < mcodeCnt; i++) {
+        if (mCode[i].op == optedOp)
+            continue;
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
             mCode[i].arg1Typ = varg;
             mCode[i].arg1.value = value;
+            if (mCode[i].op == writeOp) {
+                mCode[i].rTyp = targ;
+                mCode[i].res.typ = tab[tid].typ;
+            }
         }
         if (mCode[i].arg2Typ == tiarg && mCode[i].arg2.tidx == tid) {
             mCode[i].arg2Typ = varg;
@@ -337,12 +436,6 @@ int findInDagTab(enum MOP op, int left, int right) {
     return -1;
 }
 
-char moppStr[][10] = {"conOp", "varOp", "funOp", "arrOp", "paraOp", "retOp", "endFunOp", "callOp", "calPaOp", "readOp",
-                      "writeOp",
-                      "jOp", "brfOp", "sltOp", "sleOp", "sgtOp", "sgeOp", "seqOp", "sneOp",
-                      "liop", "addOp", "subOp", "mulOp", "divOp", "setArrOp", "getArrOp", "becomeOp", "genOp",
-                      "optedOp"};
-
 void printDag() {
     for (int k = 0; k < nodeCnt; k++) {
         int sel = nodeTab[k].sel;
@@ -362,7 +455,7 @@ void printDag() {
             fprintf(fout, "dag %d,sel:%d,val:%d,left:%d,right:%d\n", k, dagTab[k].sel, dagTab[k].val, dagTab[k].left,
                     dagTab[k].right);
         } else if (sel == 2) {
-            fprintf(fout, "dag %d,sel:%d,op:%s,left:%d,right:%d\n", k, dagTab[k].sel, moppStr[dagTab[k].val],
+            fprintf(fout, "dag %d,sel:%d,op:%s,left:%d,right:%d\n", k, dagTab[k].sel, mopStr[dagTab[k].val],
                     dagTab[k].left, dagTab[k].right);
         }
 
@@ -451,10 +544,54 @@ void dag() {//math become
         int end = i;
         fprintf(fout, "begin code: %d\n", begin);
         fprintf(fout, "end code %d\n", end);
-        for (int k = begin; k < end; k++) {
-            if (tab[mCode[k].res.tidx].name[0] == '&' && canDelTemVar(k))
-                mCode[k].op = optedOp;
-        }
         printDag();
+    }
+}
+
+void delDeadCode() {
+    //删除死代码
+    for (int k = 0; k < mcodeCnt; k++) {
+        if (mCode[k].op == varOp || mCode[k].op == arrOp || mCode[k].op == optedOp)
+            continue;
+        if (mCode[k].rTyp == tiarg && mCode[k].res.tidx >= btab[0].tidx && canDelTemVar(k))
+            optCode(k);
+    }
+}
+
+struct CmpByValue {
+    bool operator()(const pair<int, int> &lhs, const pair<int, int> &rhs) {
+        return lhs.second < rhs.second;
+    }
+};
+
+void globalReg() {
+    int codeIdx = 0;
+    for (int i = 0; i < btabCnt; i++) {
+        while (mCode[codeIdx].op != funOp)
+            codeIdx++;
+        int beginCode = codeIdx;
+        while (mCode[codeIdx].op != endFunOp)
+            codeIdx++;
+        int endCode = codeIdx;
+        int beginBlk = findInBlk(beginCode);
+        int endBlk = findInBlk(endCode);
+        map<int, int> outMap;
+        for (int j = beginBlk; j < endBlk; j++) {
+            for (set<int>::iterator it = block[j].out.begin(); it != block[j].out.end(); ++it)
+                outMap[(*it)]++;
+        }
+        btab[i].glbReg = (int) outMap.size() < SREGNUM ? (int) outMap.size() : SREGNUM;
+        vector<pair<int, int> > counts(outMap.begin(), outMap.end());
+        sort(counts.begin(), counts.end(), CmpByValue());
+        for (int j = 0; j < btab[i].glbReg; j++) {
+            tab[counts[j].first].regIdx = TREGNUM - 1 + j;//todo check
+        }
+        //输出
+        fprintf(fout, "func:%s size:%d\n", btab[i].name, (int) outMap.size());
+        for (map<int, int>::iterator iter = outMap.begin(); iter != outMap.end(); ++iter) {
+            fprintf(fout, "%s:%d ", tab[iter->first].name, iter->second);
+        }
+        fprintf(fout, "\n");
+
     }
 }

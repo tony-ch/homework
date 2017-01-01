@@ -78,6 +78,7 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
         btab[btabCnt].paraN = value;
         btab[btabCnt].reted = 0;
         btab[btabCnt].callParaN = 0;
+        btab[btabCnt].glbReg = 0;
 #ifdef LEXOUT
         fprintf(fout, "\t\tenter btab index: %d, name: %s, tidx: %d, spacesz:%d, paraN:%d\n",
                 btabCnt, btab[btabCnt].name, btab[btabCnt].tidx, btab[btabCnt].spacesz, btab[btabCnt].paraN);

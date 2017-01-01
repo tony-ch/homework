@@ -3,7 +3,7 @@
 
 #define DEBUG
 
-#define OPT 1
+#define OPT
 //#define LEXOUT
 //#define TABOUT
 
@@ -11,7 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <set>
 
+using namespace std;
 #define ALENMAX 15//id len max
 #define STRMAX 100//max str len
 #define TMAX 512// tab max
@@ -64,6 +66,7 @@ struct BTAB {
     int spacesz;
     int paraN;
     int reted;
+    int glbReg;
 };
 extern struct BTAB btab[TMAX];
 extern int btabCnt;//block tab index
@@ -103,8 +106,23 @@ struct MIDCODE {
 };
 extern char strtab[][STRMAX];
 extern int strCnt;
+extern int labCnt;
+extern int lab[];
 extern struct MIDCODE mCode[];
 extern int mcodeCnt;
+
+//opt
+struct BLOCK {
+    int begin;
+    int end;
+    int next1;
+    int next2;
+    set<int> in;
+    set<int> out;
+    set<int> use;
+    set<int> def;
+};
+extern struct BLOCK block[];
 
 //objcode
 extern FILE *codefile;//结果文件
@@ -141,6 +159,7 @@ void printCode();
 //opt
 void opt();
 
+int findInBlk(int codeIdx);
 //objcode
 void generate();
 

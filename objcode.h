@@ -6,8 +6,6 @@
 #ifndef COMPILE_OBJCODE_H_H
 #define COMPILE_OBJCODE_H_H
 
-#define TREGNUM 8
-#define PAMAX 300
 
 void mathToObj(int op);
 

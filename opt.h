@@ -11,8 +11,6 @@ void delLab(int toDel, int rep);
 
 void optJmp();
 
-void optConst();
-
 void delConst(int tid, int value);
 
 void optExp();
@@ -29,4 +27,7 @@ void dataflow();
 
 int canDelTemVar(int codeIdx);
 
+void delDeadCode();
+
+void globalReg();
 #endif //COMPILE_OPT_H

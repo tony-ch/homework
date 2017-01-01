@@ -68,7 +68,7 @@ void program() {
 #ifdef LEXOUT
         fprintf(fout, "there should be nothing after main func.\n");
 #endif
-        printf("there should be nothing after main func.\n");
+        printf("mainº¯ÊýÖ®ºó²»Ó¦ÓÐÆäËûÄÚÈÝ\n");
     }
     //printCode();
 
@@ -391,7 +391,7 @@ void retFuncDef() {//£¼ÓÐ·µ»ØÖµº¯Êý¶¨Òå£¾  ::=  £¼ÉùÃ÷Í·²¿£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯ ¡
     if (btab[btidCur].reted == 0) {
         error(30);
     }
-    emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
+    emitMid(endFunOp, -1, -1, btidCur, earg, earg, btiarg);
     btab[btidCur].spacesz = adrOffset;
     btab[btidCur].paraN = value;
 #ifdef LEXOUT
@@ -448,7 +448,7 @@ void voidFuncDef() {//£¼ÎÞ·µ»ØÖµº¯Êý¶¨Òå£¾  ::= void£¼±êÊ¶·û£¾¡®(¡¯£¼²ÎÊý£¾¡®)¡¯
         error(13);//!Ó¦ÊÇ}
     else
         updateSymBuf();
-    emitMid(endFunOp, btIdxCur, -1, -1, btiarg, earg, earg);
+    emitMid(endFunOp, -1, -1, btIdxCur, earg, earg, btiarg);
     btab[btIdxCur].spacesz = adrOffset;
     btab[btIdxCur].paraN = value;
 #ifdef LEXOUT
@@ -554,7 +554,7 @@ void mainDef() {//£¼Ö÷º¯Êý£¾    ::= void main¡®(¡¯¡®)¡¯ ¡®{¡¯£¼¸´ºÏÓï¾ä£¾¡®}¡¯
     if (symBuf[symBufIdx].id != rbracesy) {
         error(13);//!Ó¦ÊÇ}
     }
-    emitMid(endFunOp, btidCur, -1, -1, btiarg, earg, earg);
+    emitMid(endFunOp, -1, -1, btidCur, earg, earg, btiarg);
     btab[btidCur].spacesz = adrOffset;
 #ifdef LEXOUT
     fprintf(fout, "\t\tthis is main func dec.\n");
@@ -1275,7 +1275,7 @@ void retStat() {//£¼·µ»ØÓï¾ä£¾::=return[¡®(¡¯£¼±í´ïÊ½£¾¡®)¡¯]
         warn(1);//!Ó¦Îªint·µ»ØÖµ
     if (tab[btab[btabCnt - 1].tidx].typ == chtyp && (hasRet == 0 || (expTid != -1 && tab[expTid].typ != chtyp)))//check2
         warn(2);//!Ó¦Îªchar·µ»ØÖµ
-    emitMid(retOp, expTid, -1, -1, hasRet ? tiarg : earg, earg, earg);
+    emitMid(retOp, expTid, -1, btabCnt - 1, hasRet ? tiarg : earg, earg, btiarg);
 #ifdef LEXOUT
     fprintf(fout, "\t\tthis is a return stat.\n");
 #endif
