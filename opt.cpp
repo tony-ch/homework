@@ -100,6 +100,8 @@ void divdBlk() {
         }
     }
     block[blkCnt - 1].end = mcodeCnt;
+    block[blkCnt - 1].next1 = -1;
+    block[blkCnt - 1].next2 = -1;
     for (int j = 0; j < blkCnt; j++) {
         int codeIdx = block[j].end - 1;
         if (mCode[codeIdx].op == brfOp) {
@@ -478,12 +480,15 @@ void dag() {//math become
         if (!isMathOp(op)) {
             continue;
         }
-        if (i + 1 < mcodeCnt && !isMathOp(mCode[i + 1].op)) {
+        if (i + 1 < mcodeCnt && !isMathOp(mCode[i + 1].op) && !(mCode[i + 1].op != optedOp)) {
             continue;
         }
         int begin = i;
         for (int j = i; j < mcodeCnt; j++) {
             enum MOP mop = mCode[j].op;
+            if (mop == optedOp) {
+                continue;
+            }
             if (!isMathOp(mop)) {
                 i = j - 1;
                 break;
@@ -584,7 +589,7 @@ void globalReg() {
         vector<pair<int, int> > counts(outMap.begin(), outMap.end());
         sort(counts.begin(), counts.end(), CmpByValue());
         for (int j = 0; j < btab[i].glbReg; j++) {
-            tab[counts[j].first].regIdx = TREGNUM - 1 + j;//todo check
+            tab[counts[j].first].regIdx = TREGNUM + j;//todo check
         }
         //Êä³ö
         fprintf(fout, "func:%s size:%d\n", btab[i].name, (int) outMap.size());

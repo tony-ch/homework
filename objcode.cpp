@@ -202,6 +202,10 @@ void freeTemReg(int i) {
         int blk = findInBlk(mIdxCur);
         int used = 0;
         for (int j = mIdxCur + 1;; j++) {
+            if (j == block[blk].end) {
+                used = block[blk].out.find(tid) != block[blk].out.end();
+                break;
+            }
             if ((mCode[j].arg1Typ == tiarg && mCode[j].arg1.tidx == tid) ||
                 (mCode[j].arg2Typ == tiarg && mCode[j].arg2.tidx == tid)) {
                 used = 1;
@@ -211,8 +215,10 @@ void freeTemReg(int i) {
                 used = 0;
                 break;
             }
-            if (j == block[blk].end) {
-                used = block[blk].out.find(tid) != block[blk].out.end();
+        }
+        for (int j = 0; j < paraQue.cnt; j++) {
+            if (paraQue.isTid[j] == 1 && paraQue.para[j].tidx == tid) {
+                used = 1;
                 break;
             }
         }
@@ -688,6 +694,14 @@ void funToObj() {//todo res(type)没有用到
             int adr = tab[funTid + i + 1].adr;
             if (regID >= TREGNUM)
                 fprintf(codefile, "lw $%d,%d($fp)\n", tReg.regId[regID], adr * 4);
+        }
+    }
+    int funTid = btab[btidCur].tidx;
+    int nextFunTid = btidCur + 1 == btabCnt ? tabCnt : btab[btidCur + 1].tidx;
+    for (int i = funTid + 1; i < nextFunTid; i++) {
+        if (tab[i].regIdx >= TREGNUM && tab[i].kind == arrkind) {
+            fprintf(codefile, "addi $%d,$fp,%d #base adr of arr %s\n", tReg.regId[tab[i].regIdx], tab[i].adr * 4,
+                    tab[i].name);
         }
     }
 }
