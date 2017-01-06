@@ -6,8 +6,8 @@
 #ifndef COMPILE_OBJCODE_H_H
 #define COMPILE_OBJCODE_H_H
 
-void mathToObj(int op);
 
+void mathToObj(int op);
 
 void storeGlobal();
 
@@ -23,6 +23,8 @@ void endFunToObj();
 
 void retToObj();
 
+void paraToObj();
+
 void brfToObj();
 
 void callToObj();
@@ -30,26 +32,6 @@ void callToObj();
 void liToObj();
 
 void calPaToObj();
-
-void sltToObj();
-
-void sleToObj();
-
-void sgtToObj();
-
-void sgeToObj();
-
-void seqToObj();
-
-void sneToObj();
-
-void addToObj();
-
-void subToObj();
-
-void mulToObj();
-
-void divToObj();
 
 void getArrToObj();
 

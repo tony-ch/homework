@@ -7,14 +7,15 @@
 //midx;
 #define TREGNUM 8
 #define PAMAX 300
+#define SREGNUM 8
 int mIdxCur = 0;
 int btidCur = -1;
 struct {
-    int lastUsed;
-    int tidx[TREGNUM];
-    int dif[TREGNUM];
-    int busy[TREGNUM];
-    int regId[TREGNUM];
+    int lastIn;//FIFO
+    int tidx[TREGNUM + SREGNUM];
+    int dif[TREGNUM + SREGNUM];
+    int busy[TREGNUM + SREGNUM];
+    int regId[TREGNUM + SREGNUM];
 } tReg;
 char calopStr[][4] = {"slt", "sle", "sgt", "sge", "seq", "sne", "add", "sub", "mul", "div"};
 
@@ -24,16 +25,17 @@ struct {
         int tidx;
         int value;
     } para[PAMAX];
+    int isTid[PAMAX];
 } paraQue;
 
 void init() {
-    tReg.lastUsed = TREGNUM - 1;
+    tReg.lastIn = TREGNUM - 1;
     paraQue.cnt = 0;
     int i;
     for (i = 0; i < TREGNUM; i++) {
         tReg.busy[i] = 0;
         tReg.tidx[i] = -1;
-        tReg.dif[i] = 0;
+        tReg.dif[i] = 0;//->tab[i].regIdx=-1
     }
     tReg.regId[0] = 8;
     tReg.regId[1] = 9;
@@ -43,12 +45,20 @@ void init() {
     tReg.regId[5] = 13;
     tReg.regId[6] = 14;
     tReg.regId[7] = 15;
+    tReg.regId[8] = 16;
+    tReg.regId[9] = 17;
+    tReg.regId[10] = 18;
+    tReg.regId[11] = 19;
+    tReg.regId[12] = 20;
+    tReg.regId[13] = 21;
+    tReg.regId[14] = 22;
+    tReg.regId[15] = 23;
     storeGlobal();
 }
 
 void generate() {
     init();
-    while (mIdxCur < midx) {
+    while (mIdxCur < mcodeCnt) {
         //printf("%d\n",mIdxCur);
         switch (mCode[mIdxCur].op) {
             case conOp:
@@ -64,6 +74,7 @@ void generate() {
                 mIdxCur++;
                 break;
             case paraOp:
+                paraToObj();
                 mIdxCur++;
                 break;
             case arrOp:
@@ -162,6 +173,9 @@ void generate() {
                 genToObj();//gen,_,_,labidx
                 mIdxCur++;
                 break;
+            case optedOp:
+                mIdxCur++;
+                break;
         }
     }
     fprintf(codefile, "end:\n");
@@ -172,18 +186,55 @@ int isGlobal(int tidx) {
 }
 
 void freeTemReg(int i) {
-    int tid = tReg.tidx[i];
-    if (tReg.tidx[i] == -1 || tReg.dif[i] == 0) {// wrong!! tab[tReg.tidx[i]].kind!=varkind
+#ifdef OPT
+    if (i >= TREGNUM)
+        return;
+#endif
+    int tid = tReg.tidx[i];//临时变量可能跨越函数调用
+    if (tid == -1 || tab[tid].inMem == 1) {//tReg.dif[i]==0 // wrong!! tab[tReg.tidx[i]].kind!=varkind
         //-1代表为程序中的立即数
     } else if (isGlobal(tid) && tab[tid].kind == varkind) {
         fprintf(codefile, "sw $%d,glb_%s\n", tReg.regId[i], tab[tid].name);
         fprintf(fout, "sw $%d,glb_%s\n", tReg.regId[i], tab[tid].name);
+        tab[tid].inMem = 1;
     } else if (tab[tid].kind == parakind || tab[tid].kind == varkind) {
-        fprintf(codefile, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
-        fprintf(fout, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
+#ifdef OPT
+        int blk = findInBlk(mIdxCur);
+        int used = 0;
+        for (int j = mIdxCur + 1;; j++) {
+            if (j == block[blk].end) {
+                used = block[blk].out.find(tid) != block[blk].out.end();
+                break;
+            }
+            if ((mCode[j].arg1Typ == tiarg && mCode[j].arg1.tidx == tid) ||
+                (mCode[j].arg2Typ == tiarg && mCode[j].arg2.tidx == tid)) {
+                used = 1;
+                break;
+            }
+            if (mCode[j].rTyp == tiarg && mCode[j].res.tidx == tid) {
+                used = 0;
+                break;
+            }
+        }
+        for (int j = 0; j < paraQue.cnt; j++) {
+            if (paraQue.isTid[j] == 1 && paraQue.para[j].tidx == tid) {
+                used = 1;
+                break;
+            }
+        }
+        if (used) {
+#endif
+            fprintf(codefile, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
+            fprintf(fout, "sw $%d,%d($fp) # sw %s\n", tReg.regId[i], (tab[tid].adr) * 4, tab[tid].name);
+#ifdef OPT
+        }
+#endif
+        tab[tid].inMem = 1;
     }
-    if (tReg.tidx[i] > 0)
+    if (tReg.tidx[i] != -1) {
+        tab[tid].regIdx = -1;
         fprintf(fout, "\t\t\tfree reg %d for %s\n", i, tab[tid].name);
+    }
     tReg.dif[i] = 0;
     tReg.tidx[i] = -1;
     tReg.busy[i] = 0;
@@ -191,7 +242,7 @@ void freeTemReg(int i) {
 
 void clearTemReg() {
     int i;
-    tReg.lastUsed = TREGNUM - 1;
+    tReg.lastIn = TREGNUM - 1;
     for (i = 0; i < TREGNUM; i++) {
         freeTemReg(i);
     }
@@ -209,11 +260,8 @@ void loadToReg(int tid, int reg) {
     fprintf(fout, "\t\t\tlw $%d,%d($fp) # load %s\n", tReg.regId[reg], (tab[tid].adr) * 4, tab[tid].name);
 }
 
-int findInTemReg(int tid) {//todo  tidx of reg to free should't be -1, this should be checked later.
-    int i;
-    for (i = 0; i < TREGNUM && tReg.tidx[i] != tid; i++);
-    if (i == TREGNUM)
-        i = -1;
+int findInReg(int tid) {
+    int i = tab[tid].regIdx;
     fprintf(fout, "\t\tfind %s, res:%d\n", tab[tid].name, i);
     return i;
 }
@@ -222,23 +270,27 @@ int getEmpTemReg(int tid, int regToUse1, int regToUse2) {
     int res;
     for (res = 0; res < TREGNUM && tReg.busy[res] != 0; res++);
     if (res == TREGNUM) {
-        res = tReg.lastUsed;
+        res = tReg.lastIn;
         do {
             res = (res + 1) % TREGNUM;
         } while (res == regToUse1 || res == regToUse2);
-        if (tReg.dif[res] == 1)
+        //if (tReg.dif[res] == 1)
+        //    freeTemReg(res);
             freeTemReg(res);
     }
     tReg.busy[res] = 1;
     tReg.dif[res] = 0;
+    if (tid != -1)
+        tab[tid].regIdx = res;
     tReg.tidx[res] = tid;
-    tReg.lastUsed = res;
+    tReg.lastIn = res;
     fprintf(fout, "\t\t\tget reg %d for %s\n", res, tab[tid].name);
     fprintf(fout, "\t\t\t**************************\n");
     int i;
     for (i = 0; i < 8; i++) {
         if (tReg.busy[i]) {
             fprintf(fout, "\t\t\treg %d: busy:%d,tidx:%d,dirty:%d", i, tReg.busy[i], tReg.tidx[i], tReg.dif[i]);
+            //fprintf(fout, "\t\t\treg %d: busy:%d,tidx:%d", i, tReg.busy[i], tReg.tidx[i]);
             if (tReg.tidx[i] > 0) {
                 fprintf(fout, ",name:%s", tab[tReg.tidx[i]].name);
             }
@@ -263,22 +315,23 @@ void genToObj() {
 }
 
 void bcomToObj() {
-    if (mCode[mIdxCur].arg1Typ == varg) {
+    if (mCode[mIdxCur].arg1Typ == varg) {//todo check
         liToObj();
         return;
     }
     int scTidx = mCode[mIdxCur].arg1.tidx;
-    int scReg = findInTemReg(scTidx);
+    int scReg = findInReg(scTidx);
     if (scReg == -1) {
         scReg = getEmpTemReg(scTidx, -1, -1);
         loadToReg(scTidx, scReg);
     }
     int des = mCode[mIdxCur].res.tidx;
-    int desReg = findInTemReg(des);
+    int desReg = findInReg(des);
     if (desReg == -1) {
         desReg = getEmpTemReg(des, -scReg, -1);
     }
     tReg.dif[desReg] = 1;
+    tab[des].inMem = 0;
     fprintf(codefile, "add $%d,$0,$%d #code %d %s=%s\n",
             tReg.regId[desReg], tReg.regId[scReg], mIdxCur, tab[des].name, tab[scTidx].name);
     fprintf(fout, "add $%d,$0,$%d #code %d %s=%s\n",
@@ -286,7 +339,7 @@ void bcomToObj() {
 }
 
 void brfToObj() {
-    if (mCode[mIdxCur].arg1Typ == varg) {
+    if (mCode[mIdxCur].arg1Typ == varg) {//todo check
         if (mCode[mIdxCur].arg1.value == 0) {
             jmpToObj();
         } else {
@@ -295,7 +348,7 @@ void brfToObj() {
         }
     } else {
         int arg1Tid = mCode[mIdxCur].arg1.tidx;
-        int arg1Reg = findInTemReg(arg1Tid);
+        int arg1Reg = findInReg(arg1Tid);
         if (arg1Reg == -1) {
             arg1Reg = getEmpTemReg(arg1Tid, -1, -1);
             loadToReg(arg1Tid, arg1Reg);
@@ -310,11 +363,12 @@ void brfToObj() {
 void liToObj() {
     int value = mCode[mIdxCur].arg1.value;
     int des = mCode[mIdxCur].res.tidx;
-    int regDes = findInTemReg(des);
+    int regDes = findInReg(des);
     if (regDes == -1) {
         regDes = getEmpTemReg(des, -1, -1);
     }
     tReg.dif[regDes] = 1;
+    tab[des].inMem = 0;
     fprintf(codefile, "li $%d,%d#li %s\n", tReg.regId[regDes], value, tab[des].name);
     fprintf(fout, "li $%d,%d#li %s\n", tReg.regId[regDes], value, tab[des].name);
 }
@@ -322,22 +376,23 @@ void liToObj() {
 void mathToObj(int op) {
     struct MIDCODE code = mCode[mIdxCur];
     int regSrc1, regSrc2;
-    if (code.arg1Typ == varg) {
+    if (code.arg1Typ == varg) {//todo check
         regSrc1 = getEmpTemReg(-1, -1, -1);
         fprintf(codefile, "addi $%d,$0,%d#src1\n", tReg.regId[regSrc1], code.arg1.value);
         fprintf(fout, "addi $%d,$0,%d#src1\n", tReg.regId[regSrc1], code.arg1.value);
     } else {
-        regSrc1 = findInTemReg(code.arg1.tidx);
+        regSrc1 = findInReg(code.arg1.tidx);
         if (regSrc1 == -1) {
             regSrc1 = getEmpTemReg(code.arg1.tidx, -1, -1);
             loadToReg(code.arg1.tidx, regSrc1);
         }
     }
     if (code.arg2Typ == varg && op != 0) {//not slt
-        int regDes = findInTemReg(code.res.tidx);
+        int regDes = findInReg(code.res.tidx);
         if (regDes == -1)
             regDes = getEmpTemReg(code.res.tidx, regSrc1, -1);
         tReg.dif[regDes] = 1;
+        tab[code.res.tidx].inMem = 0;
         fprintf(codefile, "%s $%d,$%d,%d# des: %s\n",
                 calopStr[op], tReg.regId[regDes], tReg.regId[regSrc1], code.arg2.value, tab[code.res.tidx].name);
         fprintf(fout, "%s $%d,$%d,%d# des: %s\n",
@@ -346,23 +401,25 @@ void mathToObj(int op) {
         regSrc2 = getEmpTemReg(-1, -1, regSrc1);
         fprintf(codefile, "addi $%d,$0,%d\n", tReg.regId[regSrc2], code.arg2.value);
         fprintf(fout, "addi $%d,$0,%d\n", tReg.regId[regSrc2], code.arg2.value);
-        int regDes = findInTemReg(code.res.tidx);
+        int regDes = findInReg(code.res.tidx);
         if (regDes == -1)
             regDes = getEmpTemReg(code.res.tidx, regSrc1, regSrc2);
         tReg.dif[regDes] = 1;
+        tab[code.res.tidx].inMem = 0;
         fprintf(codefile, "slt $%d,$%d,$%d\n", tReg.regId[regDes], tReg.regId[regSrc1], tReg.regId[regSrc2]);
         fprintf(fout, "slt $%d,$%d,$%d\n", tReg.regId[regDes], tReg.regId[regSrc1], tReg.regId[regSrc2]);
         freeTemReg(regSrc2);
     } else {
-        regSrc2 = findInTemReg(code.arg2.tidx);
+        regSrc2 = findInReg(code.arg2.tidx);
         if (regSrc2 == -1) {
             regSrc2 = getEmpTemReg(code.arg2.tidx, -1, regSrc1);
             loadToReg(code.arg2.tidx, regSrc2);
         }
-        int regDes = findInTemReg(code.res.tidx);
+        int regDes = findInReg(code.res.tidx);
         if (regDes == -1)
             regDes = getEmpTemReg(code.res.tidx, regSrc1, regSrc2);
         tReg.dif[regDes] = 1;
+        tab[code.res.tidx].inMem = 0;
         fprintf(codefile, "%s $%d,$%d,$%d\n", calopStr[op], tReg.regId[regDes], tReg.regId[regSrc1],
                 tReg.regId[regSrc2]);
         fprintf(fout, "%s $%d,$%d,$%d\n", calopStr[op], tReg.regId[regDes], tReg.regId[regSrc1], tReg.regId[regSrc2]);
@@ -378,6 +435,7 @@ void conToObj() {//con,type,value,name
     fprintf(fout, "addi $at,$0,%d  #code %d\n", mCode[mIdxCur].arg2.value, mIdxCur);
     fprintf(codefile, "sw $at,%d($fp) #const %s code %d\n", tab[tid].adr * 4, tab[tid].name, mIdxCur);
     fprintf(fout, "sw $at,%d($fp) #const %s code %d\n", tab[tid].adr * 4, tab[tid].name, mIdxCur);
+    //tab[tid].inMem = 1;
 }
 
 void varToObj() {//var,type,_,name
@@ -389,32 +447,34 @@ void arrToObj() {//arr,type,size,name;
 }
 
 void storeGlobal() {
-    int i, limit = btab[0].tidx;
     fprintf(codefile, ".data:\n");
     fprintf(fout, ".data:\n");
-    for (i = 0; i < limit; i++) {//const var arr (func para)
-        switch (tab[i].kind) {
-            case conkind:
-                if (tab[i].typ == inttyp) {
-                    fprintf(codefile, "glb_%s: .word %d\n", tab[i].name, tab[i].value);
-                    fprintf(fout, "glb_%s: .word %d\n", tab[i].name, tab[i].value);
+    int i;
+    for (i = 0; i < mcodeCnt && mCode[i].op != funOp; i++) {//const var arr (func para)
+        int tid = mCode[i].res.tidx;
+        switch (mCode[i].op) {
+            case conOp:
+                if (mCode[i].arg1.typ == inttyp) {
+                    fprintf(codefile, "glb_%s: .word %d\n", tab[tid].name, tab[tid].value);
+                    fprintf(fout, "glb_%s: .word %d\n", tab[tid].name, tab[tid].value);
                 } else {
-                    fprintf(codefile, "glb_%s: .word \'%c\'\n", tab[i].name, tab[i].value);
-                    fprintf(fout, "glb_%s: .word \'%c\'\n", tab[i].name, tab[i].value);
+                    fprintf(codefile, "glb_%s: .word \'%c\'\n", tab[tid].name, tab[tid].value);
+                    fprintf(fout, "glb_%s: .word \'%c\'\n", tab[tid].name, tab[tid].value);
                 }
                 break;
-            case varkind://!!注意 不赋值的话不分配地址
-                fprintf(codefile, "glb_%s: .word 0\n", tab[i].name);
-                fprintf(fout, "glb_%s: .word 0\n", tab[i].name);
+            case varOp://!!注意 不赋值的话不分配地址
+                fprintf(codefile, "glb_%s: .word 0\n", tab[tid].name);
+                fprintf(fout, "glb_%s: .word 0\n", tab[tid].name);
                 break;
-            case arrkind:
-                fprintf(codefile, "glb_%s: .space %d\n", tab[i].name, tab[i].value * 4);
-                fprintf(fout, "glb_%s: .space %d\n", tab[i].name, tab[i].value * 4);
+            case arrOp:
+                fprintf(codefile, "glb_%s: .space %d\n", tab[tid].name, tab[tid].value * 4);
+                fprintf(fout, "glb_%s: .space %d\n", tab[tid].name, tab[tid].value * 4);
                 break;
             default:
                 break;
         }
     }
+    mIdxCur = i;
     fprintf(codefile, "#str\n");
     fprintf(fout, "#str\n");
     for (i = 0; i < strCnt; i++) {
@@ -423,7 +483,6 @@ void storeGlobal() {
     }
     fprintf(codefile, "str_newline: .asciiz \"\\n\"\n");
     fprintf(fout, "str_newline: .asciiz \"\\n\"\n");
-    mIdxCur = btab[0].tidx;
     fprintf(codefile, ".text:\n");
     fprintf(fout, ".text:\n");
     fprintf(codefile, "j func_main\n");
@@ -434,11 +493,12 @@ void storeGlobal() {
 void rdToObj() {
     int tid = mCode[mIdxCur].res.tidx;
     int v0 = tab[tid].typ == inttyp ? 5 : 12;
-    int reg = findInTemReg(tid);
+    int reg = findInReg(tid);
     if (reg == -1) {
         reg = getEmpTemReg(tid, -1, -1);
     }
     tReg.dif[reg] = 1;
+    tab[tid].inMem = 0;
     fprintf(codefile, "addi $v0,$0,%d\n", v0);
     fprintf(fout, "addi $v0,$0,%d\n", v0);
     fprintf(codefile, "syscall#read %d\n", mIdxCur);
@@ -447,9 +507,9 @@ void rdToObj() {
     fprintf(fout, "add $%d,$0,$v0\n", tReg.regId[reg]);
 }
 
-void wrToObj() {
+void wrToObj() {//wr,exp,str,type
     int hasStr = mCode[mIdxCur].arg2Typ != earg ? 1 : 0;
-    int hasExp = mCode[mIdxCur].rTyp != earg ? 1 : 0;
+    int hasExp = mCode[mIdxCur].arg1Typ != earg ? 1 : 0;
     if (hasStr) {
         fprintf(codefile, "la $a0,str_%d\n", mCode[mIdxCur].arg2.stridx);
         fprintf(codefile, "addi $v0,$0,4\n");
@@ -458,27 +518,43 @@ void wrToObj() {
         fprintf(fout, "addi $v0,$0,4\n");
         fprintf(fout, "syscall\n");
     }
-    if (hasExp) {//!mCode[mIdxCur].rTyp==tiarg
-        int tid = mCode[mIdxCur].res.tidx;
-        int reg = findInTemReg(tid);
-        if (reg == -1) {
-            reg = getEmpTemReg(tid, -1, -1);
-            loadToReg(tid, reg);
-        }
-        fprintf(codefile, "add $a0,$0,$%d\n", tReg.regId[reg]);
-        fprintf(fout, "add $a0,$0,$%d\n", tReg.regId[reg]);
-        if (tab[tid].typ == chtyp) {
-            fprintf(codefile, "addi $v0,$0,11\n");
-            fprintf(codefile, "syscall\n");
-            fprintf(fout, "addi $v0,$0,11\n");
-            fprintf(fout, "syscall\n");
+    if (hasExp) {//!mCode[mIdxCur].rTyp==tiarg todo check
+        if (mCode[mIdxCur].arg1Typ == varg) {
+            fprintf(codefile, "add $a0,$0,%d\n", mCode[mIdxCur].arg1.value);
+            fprintf(fout, "add $a0,$0,%d\n", mCode[mIdxCur].arg1.value);
+            if (mCode[mIdxCur].res.typ == chtyp) {
+                fprintf(codefile, "addi $v0,$0,11\n");
+                fprintf(codefile, "syscall\n");
+                fprintf(fout, "addi $v0,$0,11\n");
+                fprintf(fout, "syscall\n");
+            } else {
+                fprintf(codefile, "addi $v0,$0,1\n");
+                fprintf(codefile, "syscall\n");
+                fprintf(fout, "addi $v0,$0,1\n");
+                fprintf(fout, "syscall\n");
+            }
         } else {
-            fprintf(codefile, "addi $v0,$0,1\n");
-            fprintf(codefile, "syscall\n");
-            fprintf(fout, "addi $v0,$0,1\n");
-            fprintf(fout, "syscall\n");
+            int tid = mCode[mIdxCur].arg1.tidx;
+            int reg = findInReg(tid);
+            if (reg == -1) {
+                reg = getEmpTemReg(tid, -1, -1);
+                loadToReg(tid, reg);
+            }
+            fprintf(codefile, "add $a0,$0,$%d\n", tReg.regId[reg]);
+            fprintf(fout, "add $a0,$0,$%d\n", tReg.regId[reg]);
+            if (tab[tid].typ == chtyp) {
+                fprintf(codefile, "addi $v0,$0,11\n");
+                fprintf(codefile, "syscall\n");
+                fprintf(fout, "addi $v0,$0,11\n");
+                fprintf(fout, "syscall\n");
+            } else {
+                fprintf(codefile, "addi $v0,$0,1\n");
+                fprintf(codefile, "syscall\n");
+                fprintf(fout, "addi $v0,$0,1\n");
+                fprintf(fout, "syscall\n");
+            }
         }
-    }//todo check avaliable
+    }
     fprintf(codefile, "la $a0,str_newline\n");
     fprintf(codefile, "addi $v0,$0,4\n");
     fprintf(codefile, "syscall\n");
@@ -491,7 +567,7 @@ void getArrToObj() {//=[],arr,idx,des
     struct MIDCODE code = mCode[mIdxCur];
     int regArr, regIdx;
     int arrTid = code.arg1.tidx;
-    regArr = findInTemReg(arrTid);
+    regArr = findInReg(arrTid);
     if (regArr == -1) {
         regArr = getEmpTemReg(arrTid, -1, -1);
         if (arrTid < btab[0].tidx) {
@@ -504,23 +580,25 @@ void getArrToObj() {//=[],arr,idx,des
                     tReg.regId[regArr], tab[arrTid].adr * 4, tab[arrTid].name);
         }
     }
-    if (code.arg2Typ == varg) {
-        int regDes = findInTemReg(code.res.tidx);
+    if (code.arg2Typ == varg) {//todo check
+        int regDes = findInReg(code.res.tidx);
         if (regDes == -1)
             regDes = getEmpTemReg(code.res.tidx, regArr, -1);
         tReg.dif[regDes] = 1;
+        tab[code.res.tidx].inMem = 0;
         fprintf(codefile, "lw $%d,%d($%d)\n", tReg.regId[regDes], code.arg2.value * 4, tReg.regId[regArr]);
         fprintf(fout, "lw $%d,%d($%d)\n", tReg.regId[regDes], code.arg2.value * 4, tReg.regId[regArr]);
     } else {
-        regIdx = findInTemReg(code.arg2.tidx);
+        regIdx = findInReg(code.arg2.tidx);
         if (regIdx == -1) {
             regIdx = getEmpTemReg(-1, -1, regArr);
             loadToReg(code.arg2.tidx, regIdx);
         }
-        int regDes = findInTemReg(code.res.tidx);
+        int regDes = findInReg(code.res.tidx);
         if (regDes == -1)
             regDes = getEmpTemReg(code.res.tidx, regArr, regIdx);
         tReg.dif[regDes] = 1;
+        tab[code.res.tidx].inMem = 0;
         fprintf(codefile, "sll $at,$%d,2\n", tReg.regId[regIdx]);
         fprintf(codefile, "add $at,$at,$%d\n", tReg.regId[regArr]);
         fprintf(codefile, "lw $%d,0($at)\n", tReg.regId[regDes]);
@@ -540,13 +618,13 @@ void setArrToObj() {//[]=,src,idx,arr
         fprintf(codefile, "addi $%d,$0,%d#set arr: src\n", tReg.regId[regSrc], code.arg1.value);
         fprintf(fout, "addi $%d,$0,%d#set arr: src\n", tReg.regId[regSrc], code.arg1.value);
     } else {
-        regSrc = findInTemReg(code.arg1.tidx);
+        regSrc = findInReg(code.arg1.tidx);
         if (regSrc == -1) {
             regSrc = getEmpTemReg(code.arg1.tidx, -1, -1);
             loadToReg(code.arg1.tidx, regSrc);
         }
     }
-    regArr = findInTemReg(arrtid);
+    regArr = findInReg(arrtid);
     if (regArr == -1) {
         regArr = getEmpTemReg(arrtid, regSrc, -1);
         if (arrtid < btab[0].tidx) {
@@ -559,11 +637,11 @@ void setArrToObj() {//[]=,src,idx,arr
                     tReg.regId[regArr], tab[arrtid].adr * 4, tab[arrtid].name);
         }
     }
-    if (code.arg2Typ == varg) {
+    if (code.arg2Typ == varg) {//todo check
         fprintf(codefile, "sw $%d,%d($%d)\n", tReg.regId[regSrc], code.arg2.value * 4, tReg.regId[regArr]);
         fprintf(fout, "sw $%d,%d($%d)\n", tReg.regId[regSrc], code.arg2.value * 4, tReg.regId[regArr]);
     } else {
-        regIdx = findInTemReg(code.arg2.tidx);
+        regIdx = findInReg(code.arg2.tidx);
         if (regIdx == -1) {
             regIdx = getEmpTemReg(-1, regSrc, regArr);
             loadToReg(code.arg2.tidx, regIdx);
@@ -583,11 +661,12 @@ void setArrToObj() {//[]=,src,idx,arr
     }
 }
 
-void funToObj() {
+void funToObj() {//todo res(type)没有用到
     int paraN = mCode[mIdxCur].arg2.value;
-    btidCur = mCode[mIdxCur].res.btid;
-    fprintf(codefile, "func_%s:\n", btab[btidCur].name);
-    fprintf(fout, "func_%s:\n", btab[btidCur].name);
+    btidCur = mCode[mIdxCur].arg1.btid;
+    int glbReg = btab[btidCur].glbReg;
+    fprintf(codefile, "\nfunc_%s:\n", btab[btidCur].name);
+    fprintf(fout, "\nfunc_%s:\n", btab[btidCur].name);
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "addi,$sp,$sp,-%d\n", (btab[btidCur].spacesz) * 4);
         fprintf(fout, "addi,$sp,$sp,-%d\n", (btab[btidCur].spacesz) * 4);
@@ -597,14 +676,42 @@ void funToObj() {
         if (paraN <= 4) {
             fprintf(codefile, "sw $ra,20($fp)\n");
             fprintf(fout, "sw $ra,20($fp)\n");
+            for (int i = 0; i < glbReg; i++) {//保存将要用到的全局寄存器
+                fprintf(codefile, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
+                fprintf(fout, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
+            }
         } else {
             fprintf(codefile, "sw $ra,%d($fp)\n", (paraN + 1) * 4);
             fprintf(fout, "sw $ra,%d($fp)\n", (paraN + 1) * 4);
+            for (int i = 0; i < glbReg; i++) {
+                fprintf(codefile, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], (paraN + 2 + i) * 4);
+                fprintf(fout, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], (paraN + 2 + i) + i * 4);
+            }
+        }
+        int funTid = btab[btidCur].tidx;//todo 用$ax
+        for (int i = 0; i < paraN; i++) {//若全局寄存器里是参数，则将参数lw出来
+            int regID = tab[funTid + i + 1].regIdx;
+            int adr = tab[funTid + i + 1].adr;
+            if (regID >= TREGNUM)
+                fprintf(codefile, "lw $%d,%d($fp)\n", tReg.regId[regID], adr * 4);
+        }
+    }
+    int funTid = btab[btidCur].tidx;
+    int nextFunTid = btidCur + 1 == btabCnt ? tabCnt : btab[btidCur + 1].tidx;
+    for (int i = funTid + 1; i < nextFunTid; i++) {
+        if (tab[i].regIdx >= TREGNUM && tab[i].kind == arrkind) {
+            fprintf(codefile, "addi $%d,$fp,%d #base adr of arr %s\n", tReg.regId[tab[i].regIdx], tab[i].adr * 4,
+                    tab[i].name);
         }
     }
 }
 
-void endFunToObj() {
+void paraToObj() {
+    //int tid = mCode[mIdxCur].arg1.tidx;
+    //tab[tid].inMem = 1;//todo use $ax
+}
+
+void endFunToObj() {//todo res(btidx) 没有用到
     int paraN = btab[btidCur].paraN;
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "addi,$sp,$sp,%d\n", (btab[btidCur].spacesz) * 4);
@@ -617,11 +724,19 @@ void endFunToObj() {
     fprintf(codefile, "add $sp,$0,$fp\n");
     fprintf(fout, "add $sp,$0,$fp\n");
     if (paraN <= 4) {
+        for (int i = 0; i < btab[btidCur].glbReg; i++) {
+            fprintf(codefile, "lw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
+            fprintf(fout, "lw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
+        }
         fprintf(codefile, "lw $ra,20($fp)\n");
         fprintf(fout, "lw $ra,20($fp)\n");
         fprintf(codefile, "lw $fp,16($fp)\n");
         fprintf(fout, "lw $fp,16($fp)\n");
     } else {
+        for (int i = 0; i < btab[btidCur].glbReg; i++) {
+            fprintf(codefile, "lw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], (paraN + 2 + i) * 4);
+            fprintf(fout, "lw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], (paraN + 2 + i) + i * 4);
+        }
         fprintf(codefile, "lw $ra,%d($fp)\n", (paraN + 1) * 4);
         fprintf(fout, "lw $ra,%d($fp)\n", (paraN + 1) * 4);
         fprintf(codefile, "lw $fp,%d($fp)\n", (paraN) * 4);
@@ -634,20 +749,20 @@ void endFunToObj() {
     fprintf(codefile, "nop\n");
 }
 
-void retToObj() {
+void retToObj() {//ret,[ret],_,_
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "j end\n");
         fprintf(fout, "j end\n");
         return;
     }
-    if (mCode[mIdxCur].rTyp == earg) {
+    if (mCode[mIdxCur].arg1Typ == earg) {
         clearTemReg();
         fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
         fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
         fprintf(codefile, "nop\n");
-    } else if (mCode[mIdxCur].rTyp == tiarg) {
-        int tid = mCode[mIdxCur].res.tidx;
-        int resReg = findInTemReg(tid);
+    } else if (mCode[mIdxCur].arg1Typ == tiarg) {
+        int tid = mCode[mIdxCur].arg1.tidx;
+        int resReg = findInReg(tid);
         if (resReg == -1) {
             resReg = getEmpTemReg(tid, -1, -1);
             loadToReg(tid, resReg);
@@ -658,13 +773,20 @@ void retToObj() {
         fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
         fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
         fprintf(codefile, "nop\n");
+    } else if (mCode[mIdxCur].arg1Typ == varg) {//todo check
+        fprintf(codefile, "add $v0,$0,%d\n", mCode[mIdxCur].arg1.value);
+        fprintf(fout, "add $v0,$0,%d\n", mCode[mIdxCur].arg1.value);
+        clearTemReg();
+        fprintf(codefile, "j end_func_%s\n", btab[btidCur].name);
+        fprintf(fout, "j end_func_%s\n", btab[btidCur].name);
+        fprintf(codefile, "nop\n");
     }
 }
 
 
-void callToObj() {//call,ret,paraN,func
-    int funcBtid = mCode[mIdxCur].res.btid;
-    int hasRet = mCode[mIdxCur].arg1Typ != earg ? 1 : 0;
+void callToObj() {//call,func,paraN,ret
+    int funcBtid = mCode[mIdxCur].arg1.btid;
+    int hasRet = mCode[mIdxCur].rTyp != earg ? 1 : 0;
     int calparaN = mCode[mIdxCur].arg2.value;
     int paraN = btab[funcBtid].paraN;
     int i, j;
@@ -675,23 +797,32 @@ void callToObj() {//call,ret,paraN,func
         i = calparaN;
         j = 0;
         while (i > 0) {
-            vparaTid = paraQue.para[paraQue.cnt - i].tidx;
-            if ((regPara = findInTemReg(vparaTid)) == -1) {
-                if (isGlobal(vparaTid)) {
-                    fprintf(codefile, "lw $at,glb_%s\n", tab[vparaTid].name);//use for temp reg
-                    fprintf(fout, "lw $at,glb_%s\n", tab[vparaTid].name);//use for temp reg
-                    fprintf(codefile, "sw $at,%d($sp)\n", j * 4);
-                    fprintf(fout, "sw $at,%d($sp)\n", j * 4);
-                } else {
-                    fprintf(codefile, "lw $at,%d($fp)\n", tab[vparaTid].adr * 4);
-                    fprintf(fout, "lw $at,%d($fp)\n", tab[vparaTid].adr * 4);
-                    fprintf(codefile, "sw $at,%d($sp)\n", j * 4);
-                    fprintf(fout, "sw $at,%d($sp)\n", j * 4);
-                }
+            if (paraQue.isTid[paraQue.cnt - i] == 0) {//sw 不能存常数
+                int value = paraQue.para[paraQue.cnt - i].value;
+                fprintf(codefile, "addi $1,$0,%d\n", value);
+                fprintf(fout, "addi $1,$0,%d\n", value);
+                fprintf(codefile, "sw $1,%d($sp)\n", j * 4);
+                fprintf(fout, "sw $1,%d($sp)\n", j * 4);
             } else {
-                fprintf(codefile, "sw $%d,%d($sp)\n", tReg.regId[regPara], j * 4);
-                fprintf(fout, "sw $%d,%d($sp)\n", tReg.regId[regPara], j * 4);
+                vparaTid = paraQue.para[paraQue.cnt - i].tidx;
+                if ((regPara = findInReg(vparaTid)) == -1) {
+                    if (isGlobal(vparaTid)) {
+                        fprintf(codefile, "lw $at,glb_%s\n", tab[vparaTid].name);//use for temp reg
+                        fprintf(fout, "lw $at,glb_%s\n", tab[vparaTid].name);//use for temp reg
+                        fprintf(codefile, "sw $at,%d($sp)\n", j * 4);
+                        fprintf(fout, "sw $at,%d($sp)\n", j * 4);
+                    } else {
+                        fprintf(codefile, "lw $at,%d($fp)\n", tab[vparaTid].adr * 4);
+                        fprintf(fout, "lw $at,%d($fp)\n", tab[vparaTid].adr * 4);
+                        fprintf(codefile, "sw $at,%d($sp)\n", j * 4);
+                        fprintf(fout, "sw $at,%d($sp)\n", j * 4);
+                    }
+                } else {
+                    fprintf(codefile, "sw $%d,%d($sp)\n", tReg.regId[regPara], j * 4);
+                    fprintf(fout, "sw $%d,%d($sp)\n", tReg.regId[regPara], j * 4);
+                }
             }
+            //tab[btab[funcBtid].tidx+j+1].inMem=1;//!注意,不应该在此处变更,应该在函数声明时改变
             j++;
             i--;
         }
@@ -712,12 +843,13 @@ void callToObj() {//call,ret,paraN,func
     fprintf(fout, "jal func_%s\n", btab[funcBtid].name);
     fprintf(fout, "nop\n");
     if (hasRet == 1) {
-        int retTid = mCode[mIdxCur].arg1.tidx;
-        int retReg = findInTemReg(retTid);
+        int retTid = mCode[mIdxCur].res.tidx;
+        int retReg = findInReg(retTid);
         if (retReg == -1) {
             retReg = getEmpTemReg(retTid, -1, -1);
         }
         tReg.dif[retReg] = 1;
+        tab[retTid].inMem = 0;
         fprintf(codefile, "add $%d,$0,$v0# ret value from call of func %s\n",
                 tReg.regId[retReg], btab[funcBtid].name);
         fprintf(fout, "add $%d,$0,$v0# ret value from call of func %s\n",
@@ -726,11 +858,17 @@ void callToObj() {//call,ret,paraN,func
 
 }
 
-void calPaToObj() {//todo calpa can be value
+void calPaToObj() {
     if (paraQue.cnt == PAMAX) {
         printf("#fatal err: para quene is full\n");
         endProc(-1);
     }
-    paraQue.para[paraQue.cnt].tidx = mCode[mIdxCur].res.tidx;
+    if (mCode[mIdxCur].arg1Typ == varg) {
+        paraQue.para[paraQue.cnt].value = mCode[mIdxCur].arg1.value;
+        paraQue.isTid[paraQue.cnt] = 0;
+    } else {
+        paraQue.para[paraQue.cnt].tidx = mCode[mIdxCur].arg1.tidx;
+        paraQue.isTid[paraQue.cnt] = 1;
+    }
     paraQue.cnt++;
 }

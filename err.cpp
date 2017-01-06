@@ -1,10 +1,26 @@
-#include "err.h"
 #include "global.h"
 
+#define ERRMAX 40// max err num
+
+extern char ch;//最新读入的字符!需要初始化
+extern int lcnt;//line num
+extern int ccnt;
+
 //int err[ERRMAX][3];
+
+//void testAfterStat(char pos);
+
+void showPos();
+
+//void warn(int n);
+
+//void error(int n);
+
+void printErr(int n);
+
 char errPlace;
 int ecnt = 0;//err cnt;
-char *emsg[ERRMAX] = {
+char emsg[ERRMAX][50] = {
         "源文件不完整",//0 updatesymBuf
         "非法字符, 将之跳过",//1 getsym
         "数有前导0或整数太长",//2 getsym
@@ -22,7 +38,7 @@ char *emsg[ERRMAX] = {
         "应是]",//14
         "应是:",//15
         "函数未定义",//16
-        "标识符未定义",//17
+        "标识符未定义或标识符种类不正确",//17
         "常量必须有初始值",//18
         "int常量的初始值应为整数，char常量的初始值应为字符",//19
         "数组的大小应为非0无符号整数",//20
@@ -46,7 +62,7 @@ char *emsg[ERRMAX] = {
         "位置不合法的变量定义"//38
 };
 
-char *wmsg[ERRMAX] = {
+char wmsg[ERRMAX][30] = {
         "赋值语句两端类型不一致",//0
         "返回值类型应为int",//1
         "返回值类型应为char",//2
@@ -82,9 +98,6 @@ void error(int n) {
         case 2://"0 before unsigned or num too long"
             fprintf(fout, "line:%d col:%d errno:%d %s\n", lcnt, ccnt, n, emsg[n]);
             printf("line:%d col:%d errno:%d %s\n", lcnt, ccnt, n, emsg[n]);
-            while (isdigit(ch)) {
-                getch();
-            }
             break;
         case 3://"should be \' "
             fprintf(fout, "line:%d col:%d errno:%d %s\n", lcnt, ccnt, n, emsg[n]);
@@ -97,14 +110,14 @@ void error(int n) {
             break;
         case 7://未知的常量类型标识 const def中遇到
             printErr(n);
-            while (symBuf[symBufIdx].id != semicolon) {
+            while (symBuf[symBufIdx].id != semicolonsy) {
                 updateSymBuf();
             }
             showPos();
             break;
         case 8://未知的参数类型
             printErr(n);
-            while (symBuf[symBufIdx].id != comma && symBuf[symBufIdx].id != rparent) {
+            while (symBuf[symBufIdx].id != commasy && symBuf[symBufIdx].id != rparentsy) {
                 updateSymBuf();
             }
             showPos();
@@ -112,23 +125,23 @@ void error(int n) {
         case 9://应是标识符
             printErr(n);
             if (errPlace == 'c') {//condef
-                while (symBuf[symBufIdx].id != semicolon) {
+                while (symBuf[symBufIdx].id != semicolonsy) {
                     updateSymBuf();
                 }
             } else if (errPlace == 'v') {//vardef
-                while (symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != comma) {
+                while (symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != commasy) {
                     updateSymBuf();
                 }
             } else if (errPlace == 'f') {//funcdef
-                while (symBuf[symBufIdx].id != lparent) {
+                while (symBuf[symBufIdx].id != lparentsy) {
                     updateSymBuf();
                 }
             } else if (errPlace == 'p') {//paralist
-                while (symBuf[symBufIdx].id != rparent && symBuf[symBufIdx].id != comma) {
+                while (symBuf[symBufIdx].id != rparentsy && symBuf[symBufIdx].id != commasy) {
                     updateSymBuf();
                 }
             } else if (errPlace == 'r') {//read
-                while (symBuf[symBufIdx].id != rparent && symBuf[symBufIdx].id != comma) {
+                while (symBuf[symBufIdx].id != rparentsy && symBuf[symBufIdx].id != commasy) {
                     updateSymBuf();
                 }
             }
@@ -137,36 +150,37 @@ void error(int n) {
             break;
         case 10://应是(
             printErr(n);
-            if (symBuf[symBufIdx].id == lbrace || symBuf[symBufIdx].id == lbrack)
+            if (symBuf[symBufIdx].id == lbracesy || symBuf[symBufIdx].id == lbracksy)
                 updateSymBuf();
             break;
         case 11://应是)
             printErr(n);
-            if (symBuf[symBufIdx].id == rbrace || symBuf[symBufIdx].id == rbrack)
+            if (symBuf[symBufIdx].id == rbracesy || symBuf[symBufIdx].id == rbracksy)
                 updateSymBuf();
             break;
         case 12://应是{
             printErr(n);
-            if (symBuf[symBufIdx].id == lparent || symBuf[symBufIdx].id == lbrack)
+            if (symBuf[symBufIdx].id == lparentsy || symBuf[symBufIdx].id == lbracksy)
                 updateSymBuf();
             break;
         case 13://应是}
             printErr(n);
-            if (symBuf[symBufIdx].id == rparent || symBuf[symBufIdx].id == rbrack)
+            if (symBuf[symBufIdx].id == rparentsy || symBuf[symBufIdx].id == rbracksy)
                 updateSymBuf();
             break;
         case 14://应是]
             printErr(n);
-            if (symBuf[symBufIdx].id == rbrace || symBuf[symBufIdx].id == rparent)
+            if (symBuf[symBufIdx].id == rbracesy || symBuf[symBufIdx].id == rparentsy)
                 updateSymBuf();
             break;
         case 15://应是:
             printErr(n);
-            while (symBuf[symBufIdx].id != ifsy && symBuf[symBufIdx].id != whilesy && symBuf[symBufIdx].id != lbrace &&
+            while (symBuf[symBufIdx].id != ifsy && symBuf[symBufIdx].id != whilesy &&
+                   symBuf[symBufIdx].id != lbracesy &&
                    symBuf[symBufIdx].id != scanfsy && symBuf[symBufIdx].id != printfsy &&
                    symBuf[symBufIdx].id != returnsy &&
-                   symBuf[symBufIdx].id != switchsy && symBuf[symBufIdx].id != ident &&
-                   symBuf[symBufIdx].id != semicolon) {//!first集合
+                   symBuf[symBufIdx].id != switchsy && symBuf[symBufIdx].id != identsy &&
+                   symBuf[symBufIdx].id != semicolonsy) {//!first集合
                 updateSymBuf();
             }
             showPos();
@@ -174,20 +188,20 @@ void error(int n) {
         case 16://函数未定义,call()中出现,因子和语句分别调用
             printErr(n);//到语句的结束位置
             if (errPlace == 's') {//语句中调用
-                while (symBuf[symBufIdx].id != semicolon)
+                while (symBuf[symBufIdx].id != semicolonsy)
                     updateSymBuf();
             } else {//factor f
-                while (symBuf[symBufIdx].id != rparent)
+                while (symBuf[symBufIdx].id != rparentsy)
                     updateSymBuf();
                 updateSymBuf();
             }
             showPos();
             errPlace = 0;
             break;
-        case 17://标识符未定义 赋值语句 read语句 因子
+        case 17://标识符未定义或标识符种类不正确 赋值语句 read语句 因子
             printErr(n);//赋值语句的结束位置
             if (errPlace == 'a') {//赋值语句中调用 assign
-                while (symBuf[symBufIdx].id != semicolon)
+                while (symBuf[symBufIdx].id != semicolonsy)
                     updateSymBuf();
                 showPos();
             }//else//因子中调用 f //do nothing
@@ -196,27 +210,27 @@ void error(int n) {
         case 18://常量必须有初始值
         case 19://int常量的初始值应为整数，char常量的初始值应为字符
             printErr(n);//
-            while (symBuf[symBufIdx].id != semicolon)
+            while (symBuf[symBufIdx].id != semicolonsy)
                 updateSymBuf();
             showPos();
             break;
         case 20://数组的大小应为非0无符号整数
             printErr(n);//
-            while (symBuf[symBufIdx].id != rbrack)
+            while (symBuf[symBufIdx].id != rbracksy)
                 updateSymBuf();
             showPos();
             break;
         case 21://非法的整数 numdef中遇到, constdef c, factor f, onecase o
             printErr(n);//到表达式或者语句的结束位置
             if (errPlace == 'c') {//constdef
-                while (symBuf[symBufIdx].id != semicolon)
+                while (symBuf[symBufIdx].id != semicolonsy)
                     updateSymBuf();
             } else if (errPlace == 'f') {//factor
-                while (symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != rbrack &&
-                       symBuf[symBufIdx].id != rparent)
+                while (symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != rbracksy &&
+                       symBuf[symBufIdx].id != rparentsy)
                     updateSymBuf();
             } else {//one case
-                while (symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != rbrace)
+                while (symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != rbracesy)
                     updateSymBuf();
             }
             showPos();
@@ -229,14 +243,14 @@ void error(int n) {
             break;
         case 24://非法因子
             printErr(n);
-            while (symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != rbrack &&
-                   symBuf[symBufIdx].id != rparent)
+            while (symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != rbracksy &&
+                   symBuf[symBufIdx].id != rparentsy)
                 updateSymBuf();
             showPos();
             break;
         case 25://非法语句
             printErr(n);
-            while (symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != rbrace)
+            while (symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != rbracesy)
                 updateSymBuf();
             showPos();
             break;
@@ -253,7 +267,7 @@ void error(int n) {
             break;
         case 33://不合法的变量定义
             printErr(n);
-            while (symBuf[symBufIdx].id != comma && symBuf[symBufIdx].id != semicolon)
+            while (symBuf[symBufIdx].id != commasy && symBuf[symBufIdx].id != semicolonsy)
                 updateSymBuf();
             showPos();
             break;
@@ -269,11 +283,12 @@ void error(int n) {
             break;
         case 36:
             printErr(n);
-            while (symBuf[symBufIdx].id != ifsy && symBuf[symBufIdx].id != whilesy && symBuf[symBufIdx].id != lbrace &&
+            while (symBuf[symBufIdx].id != ifsy && symBuf[symBufIdx].id != whilesy &&
+                   symBuf[symBufIdx].id != lbracesy &&
                    symBuf[symBufIdx].id != scanfsy && symBuf[symBufIdx].id != printfsy &&
                    symBuf[symBufIdx].id != returnsy &&
-                   symBuf[symBufIdx].id != switchsy && symBuf[symBufIdx].id != ident &&
-                   symBuf[symBufIdx].id != semicolon && symBuf[symBufIdx].id != rbrace) {
+                   symBuf[symBufIdx].id != switchsy && symBuf[symBufIdx].id != identsy &&
+                   symBuf[symBufIdx].id != semicolonsy && symBuf[symBufIdx].id != rbracesy) {
                 if (errPlace == 'i' && symBuf[symBufIdx].id == elsesy)//else after if is valid
                     break;
                 if (errPlace == 'c' && (symBuf[symBufIdx].id == defaultsy ||
@@ -313,8 +328,8 @@ void testAfterStat(char pos) {
         return;
     if (pos == 'c' && (sym == casesy || sym == defaultsy))
         return;
-    if (sym != ifsy && sym != whilesy && sym != lbrace && sym != scanfsy && sym != printfsy && sym != returnsy &&
-        sym != switchsy && sym != ident && sym != semicolon && sym != rbrace) {
+    if (sym != ifsy && sym != whilesy && sym != lbracesy && sym != scanfsy && sym != printfsy && sym != returnsy &&
+        sym != switchsy && sym != identsy && sym != semicolonsy && sym != rbracesy) {
         errPlace = pos;// save errPos
         error(36);
 //        switch (pos){

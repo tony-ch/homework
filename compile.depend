@@ -1,36 +1,41 @@
 # depslib dependency file v1.0
-1481483475 source:d:\clion\compile\err.c
-	"err.h"
+1483095185 source:d:\clion\compile\err.cpp
 	"global.h"
 
-1481483475 d:\clion\compile\err.h
-
-1481527828 d:\clion\compile\global.h
+1483207081 d:\clion\compile\global.h
 	<stdio.h>
 	<stdlib.h>
 	<string.h>
 	<ctype.h>
-	<unistd.h>
+	<set>
 
-1481514111 source:d:\clion\compile\lex.c
+1483160484 source:d:\clion\compile\lex.cpp
 	"global.h"
-	"err.h"
 
-1481527888 source:d:\clion\compile\main.c
+1483098264 source:d:\clion\compile\main.cpp
 	"global.h"
-	"err.h"
 
-1481514130 source:d:\clion\compile\midcode.c
+1483201511 source:d:\clion\compile\midcode.cpp
 	"global.h"
-	"err.h"
 
-1481514144 source:d:\clion\compile\objcode.c
+1483224780 source:d:\clion\compile\objcode.cpp
 	"global.h"
 	"objcode.h"
 
-1481483475 d:\clion\compile\objcode.h
+1483202896 d:\clion\compile\objcode.h
 
-1481524425 source:d:\clion\compile\syntax.c
+1483229830 source:d:\clion\compile\opt.cpp
 	"global.h"
-	"err.h"
+	"opt.h"
+	<algorithm>
+	<map>
+	<vector>
+
+1483200892 d:\clion\compile\opt.h
+
+1483176288 source:d:\clion\compile\syntax.cpp
+	"global.h"
+	"syntax.h"
+
+1482953913 d:\clion\compile\syntax.h
 

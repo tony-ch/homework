@@ -1,5 +1,12 @@
 #include "global.h"
-#include "err.h"
+
+#define KEYNO 14//number of key words
+#define LLEN 200//line len limit
+#define NMAX 10//num max len
+
+void getch();
+
+void getsym();
 
 char ch = ' ';//最新读入的字符!需要初始化
 char line[LLEN];
@@ -9,7 +16,7 @@ int ccnt = 0;
 //char punc[SPSN];//分隔符号
 //struct SYMSTRC symBuf[3];
 int symBufIdx = 0;
-char *key[KEYNO] =//保留字
+char key[KEYNO][10] =//保留字
         {
                 "const", "int", "char", "void",
                 "main", "if", "else", "while",
@@ -23,16 +30,15 @@ enum SYMBOL ksym[KEYNO] =//保留字
                 switchsy, casesy, defaultsy, scanfsy,
                 printfsy, returnsy
         };
-char *symbolstr[] = {
+char symbolstr[][20] = {
         "EOFSY", "CONSTSY", "INTSY", "CHARSY", "VOIDSY",
         "MAINSY", "IFSY", "ELSESY", "WHILESY",
         "SWITCHSY", "CASESY", "DEFAULTSY", "SCANFSY",
         "PRINTFSY", "RETURNSY",
-        "PLUS", "MINUS", "MUL", "DIVD",
-        "LES", "GTR", "BECOME", "SEMICOLON ",
+        "PLUS", "MINUS", "MUL", "DIVD", "LES", "GTR", "LEQ", "GEQ", "NEQ", "EQL",
+        "BECOME", "SEMICOLON ",
         "COMMA", "LPARENT", "RPARENT", "LBRACK",
         "RBRACK", "LBRACE", "RBRACE", "COLON",
-        "LEQ", "GEQ", "NEQ", "EQL",
         "IDENT", "UNSIGNUM", "ZERO",
         "CHARCON", "STRCON",
         "NUL"
@@ -81,20 +87,23 @@ void getsym() {
             }
         }
         if (j == KEYNO) {
-            symBuf[symBufIdx].id = ident;
+            symBuf[symBufIdx].id = identsy;
         }
     } else if (ch == '0') {
-        symBuf[symBufIdx].id = zero;
+        symBuf[symBufIdx].id = zerosy;
         symBuf[symBufIdx].token[0] = '0';
         symBuf[symBufIdx].token[1] = 0;
         //num=0;
         getch();
         if (isdigit(ch)) {
             error(2);//! "0 before unsigned or num too long"(T)
+            while (isdigit(ch)) {
+                getch();
+            }
         }
     } else if (isdigit(ch)) {
         int i = 0;
-        symBuf[symBufIdx].id = unsignum;
+        symBuf[symBufIdx].id = unsignumsy;
         //num=0;
         while (isdigit(ch)) {
             if (i < NMAX) {//!NMAX
@@ -104,6 +113,9 @@ void getsym() {
                 //num=num*10+(ch-'0');
             } else {
                 error(2);//! "0 before unsigned or num too long"(T)
+                while (isdigit(ch)) {
+                    getch();
+                }
             }
         }
         symBuf[symBufIdx].token[i] = 0;
@@ -119,7 +131,7 @@ void getsym() {
         con = ch;
         getch();
         if (ch == '\'') {
-            symBuf[symBufIdx].id = charcon;
+            symBuf[symBufIdx].id = charconsy;
             symBuf[symBufIdx].token[0] = '\'';
             symBuf[symBufIdx].token[1] = con;
             symBuf[symBufIdx].token[2] = '\'';
@@ -128,14 +140,14 @@ void getsym() {
         } else {
             error(3);//! 应是'(F)
             if (ch == '\"') {//!
-                symBuf[symBufIdx].id = charcon;
+                symBuf[symBufIdx].id = charconsy;
                 symBuf[symBufIdx].token[0] = '\'';
                 symBuf[symBufIdx].token[1] = con;
                 symBuf[symBufIdx].token[2] = '\'';
                 symBuf[symBufIdx].token[3] = 0;
                 getch();
             } else {//!增加一个'
-                symBuf[symBufIdx].id = charcon;
+                symBuf[symBufIdx].id = charconsy;
                 symBuf[symBufIdx].token[0] = '\'';
                 symBuf[symBufIdx].token[1] = con;
                 symBuf[symBufIdx].token[2] = '\'';
@@ -144,7 +156,7 @@ void getsym() {
         }
     } else if (ch == '\"') {
         int i = 0;
-        symBuf[symBufIdx].id = strcon;
+        symBuf[symBufIdx].id = strconsy;
         do {
             if (ch >= 32 && ch <= 126) {// && ch!=34
                 if (i <= STRMAX - 3) {
@@ -169,12 +181,12 @@ void getsym() {
             symBuf[symBufIdx].token[0] = '<';
             symBuf[symBufIdx].token[1] = '=';
             symBuf[symBufIdx].token[2] = 0;
-            symBuf[symBufIdx].id = leq;
+            symBuf[symBufIdx].id = leqsy;
             getch();
         } else {
             symBuf[symBufIdx].token[0] = '<';
             symBuf[symBufIdx].token[1] = 0;
-            symBuf[symBufIdx].id = les;
+            symBuf[symBufIdx].id = lessy;
         }
     } else if (ch == '>') {
         getch();
@@ -182,24 +194,24 @@ void getsym() {
             symBuf[symBufIdx].token[0] = '>';
             symBuf[symBufIdx].token[1] = '=';
             symBuf[symBufIdx].token[2] = 0;
-            symBuf[symBufIdx].id = geq;
+            symBuf[symBufIdx].id = geqsy;
             getch();
         } else {
             symBuf[symBufIdx].token[0] = '>';
             symBuf[symBufIdx].token[1] = 0;
-            symBuf[symBufIdx].id = gtr;
+            symBuf[symBufIdx].id = gtrsy;
         }
     } else if (ch == '!') {
         getch();
         if (ch == '=') {
-            symBuf[symBufIdx].id = neq;
+            symBuf[symBufIdx].id = neqsy;
             symBuf[symBufIdx].token[0] = '!';
             symBuf[symBufIdx].token[1] = '=';
             symBuf[symBufIdx].token[2] = 0;
             getch();
         } else {
             error(1);//! invalid character (F)
-            symBuf[symBufIdx].id = neq;
+            symBuf[symBufIdx].id = neqsy;
             symBuf[symBufIdx].token[0] = '!';
             symBuf[symBufIdx].token[1] = '=';
             symBuf[symBufIdx].token[2] = 0;
@@ -207,88 +219,88 @@ void getsym() {
     } else if (ch == '=') {
         getch();
         if (ch == '=') {
-            symBuf[symBufIdx].id = eql;
+            symBuf[symBufIdx].id = eqlsy;
             symBuf[symBufIdx].token[0] = '=';
             symBuf[symBufIdx].token[1] = '=';
             symBuf[symBufIdx].token[2] = 0;
             getch();
         } else {
-            symBuf[symBufIdx].id = become;
+            symBuf[symBufIdx].id = becomesy;
             symBuf[symBufIdx].token[0] = '=';
             symBuf[symBufIdx].token[1] = 0;
         }
     } else if (ch == '+') {
-        symBuf[symBufIdx].id = plus;
+        symBuf[symBufIdx].id = plussy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '-') {
-        symBuf[symBufIdx].id = minus;
+        symBuf[symBufIdx].id = minussy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '*') {
-        symBuf[symBufIdx].id = mul;
+        symBuf[symBufIdx].id = mulsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '/') {
-        symBuf[symBufIdx].id = divd;
+        symBuf[symBufIdx].id = divsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == ';') {
-        symBuf[symBufIdx].id = semicolon;
+        symBuf[symBufIdx].id = semicolonsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == ',') {
-        symBuf[symBufIdx].id = comma;
+        symBuf[symBufIdx].id = commasy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '(') {
-        symBuf[symBufIdx].id = lparent;
+        symBuf[symBufIdx].id = lparentsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == ')') {
-        symBuf[symBufIdx].id = rparent;
+        symBuf[symBufIdx].id = rparentsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '[') {
-        symBuf[symBufIdx].id = lbrack;
+        symBuf[symBufIdx].id = lbracksy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == ']') {
-        symBuf[symBufIdx].id = rbrack;
+        symBuf[symBufIdx].id = rbracksy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '{') {
-        symBuf[symBufIdx].id = lbrace;
+        symBuf[symBufIdx].id = lbracesy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == '}') {
-        symBuf[symBufIdx].id = rbrace;
+        symBuf[symBufIdx].id = rbracesy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else if (ch == ':') {
-        symBuf[symBufIdx].id = colon;
+        symBuf[symBufIdx].id = colonsy;
         symBuf[symBufIdx].token[0] = ch;
         symBuf[symBufIdx].token[1] = 0;
         getch();
     } else {
         if (ch == EOF) {
-            symBuf[symBufIdx].id = eofs;
+            symBuf[symBufIdx].id = eofsy;
             symBuf[symBufIdx].token[0] = 0;
         } else {
             error(1);//! invalid character (T)
-            symBuf[symBufIdx].id = nul;
+            symBuf[symBufIdx].id = nulsy;
             symBuf[symBufIdx].token[0] = ch;
             symBuf[symBufIdx].token[1] = 0;
             getch();
@@ -300,7 +312,7 @@ void initSymBuf() {
     for (symBufIdx = 0; symBufIdx < 3; symBufIdx++) {
         do {
             getsym();
-        } while (symBuf[symBufIdx].id == nul);
+        } while (symBuf[symBufIdx].id == nulsy);
     }
     symBufIdx = 0;
 }
@@ -310,21 +322,23 @@ void updateSymBuf() {
     //printf("%-10s:\t\t%s\n",symbolstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
     do {
         getsym();
-    } while (symBuf[symBufIdx].id == nul);
+    } while (symBuf[symBufIdx].id == nulsy);
     symBufIdx += 1;
     if (symBufIdx == 3) {
         symBufIdx = 0;
     }
-    if (symBuf[symBufIdx].id == eofs) {
-        printf("%d,%d", eofs, symBuf[symBufIdx].id);
+    if (symBuf[symBufIdx].id == eofsy) {
+        printf("%d,%d", eofsy, symBuf[symBufIdx].id);
         error(0);//!incomplete source file, exit (T)
     }
 }
 
 int reachEof() {
-    return (symBuf[(symBufIdx + 1) % 3].id == eofs);
+    return (symBuf[(symBufIdx + 1) % 3].id == eofsy);
 }
 
 void printSym() {
+#ifdef LEXOUT
     fprintf(fout, "%-10s:\t\t%s\n", symbolstr[symBuf[symBufIdx].id], symBuf[symBufIdx].token);
+#endif
 }

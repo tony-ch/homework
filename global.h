@@ -3,80 +3,43 @@
 
 #define DEBUG
 
+#define OPT
+//#define LEXOUT
+//#define TABOUT
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <unistd.h>
+#include <set>
 
-#define PATHLEN 100//
-#define KEYNO 14//number of key words
-#define LLEN 200//line len limit
+using namespace std;
 #define ALENMAX 15//id len max
 #define STRMAX 100//max str len
-#define STRNUMMAX 100
 #define TMAX 512// tab max
-#define NMAX 10//num max len
-#define CODEMAX 4096
-#define LABMAX 512
-#define CASEMAX 30
+
+//err
+extern char errPlace;
+extern int ecnt;
 //lex
 extern FILE *fin;//源文件
 extern FILE *fout;//结果文件
-extern char ch;//最新读入的字符!需要初始化
-//extern char line[LLEN];
-extern int lcnt;//line num
-//extern int lleng;
-extern int ccnt;
 enum SYMBOL {
-    eofs,
-    constsy,
-    intsy,
-    charsy,
-    voidsy,
-    mainsy,
-    ifsy,
-    elsesy,
-    whilesy,
-    switchsy,
-    casesy,
-    defaultsy,
-    scanfsy,
-    printfsy,
-    returnsy,
-    plus,
-    minus,
-    mul,
-    divd,
-    les,
-    gtr,
-    become,
-    semicolon,
-    comma,
-    lparent,
-    rparent,
-    lbrack,
-    rbrack,
-    lbrace,
-    rbrace,
-    colon,
-    leq,
-    geq,
-    neq,
-    eql,
-    ident,
-    unsignum,
-    zero,
-    charcon,
-    strcon,
-    nul
+    eofsy, constsy, intsy, charsy, voidsy, mainsy,
+    ifsy, elsesy, whilesy, switchsy, casesy, defaultsy,
+    scanfsy, printfsy, returnsy,
+    plussy, minussy, mulsy, divsy, lessy, gtrsy, leqsy, geqsy, neqsy, eqlsy,
+    becomesy, semicolonsy, commasy, lparentsy, rparentsy, lbracksy, rbracksy, lbracesy, rbracesy, colonsy,
+    identsy, unsignumsy, zerosy, charconsy, strconsy,
+    nulsy
 };
-struct {
+struct SYMBUF {
     enum SYMBOL id;
     char token[STRMAX];
     int lin;
     int col;
-} symBuf[3];
+};
+extern struct SYMBUF symBuf[3];
 extern int symBufIdx;
 //tab
 enum KINDS {
@@ -85,7 +48,7 @@ enum KINDS {
 enum TYPES {
     voidtyp, inttyp, chtyp
 };
-struct {
+struct TAB {
     char name[ALENMAX];
     enum KINDS kind;
     enum TYPES typ;
@@ -93,23 +56,26 @@ struct {
     int adr;// for not para adr relative to b base$fp
     int inMem;
     int regIdx;
-} tab[TMAX];
-extern int adrOffset;
-extern int tidx;//tab index
-struct {
+};
+extern struct TAB tab[TMAX];
+extern int tabCnt;//tab index
+struct BTAB {
     char name[ALENMAX];
     int tidx;//index in tab
     int callParaN;
     int spacesz;
     int paraN;
     int reted;
-} btab[TMAX];
-extern int btidx;//block tab index
+    int glbReg;
+};
+extern struct BTAB btab[TMAX];
+extern int btabCnt;//block tab index
 //midcode
 enum MOP {
     conOp, varOp, funOp, arrOp, paraOp, retOp, endFunOp, callOp, calPaOp, readOp, writeOp,
     jOp, brfOp, sltOp, sleOp, sgtOp, sgeOp, seqOp, sneOp,
-    liop, addOp, subOp, mulOp, divOp, setArrOp, getArrOp, becomeOp, genOp
+    liop, addOp, subOp, mulOp, divOp, setArrOp, getArrOp, becomeOp, genOp,
+    optedOp
 };
 enum ARGTYP {
     earg, targ, varg, tiarg, liarg, siarg, btiarg//empty type value idx str btidx
@@ -120,6 +86,7 @@ struct MIDCODE {
         enum TYPES typ;
         int value;
         int tidx;
+        int btid;
     } arg1;
     union {
         int value;
@@ -131,35 +98,38 @@ struct MIDCODE {
         int btid;
         int labIdx;
         //int value;
+        enum TYPES typ;
     } res;
     enum ARGTYP arg1Typ;
     enum ARGTYP arg2Typ;
     enum ARGTYP rTyp;
 };
-extern char strtab[STRNUMMAX][STRMAX];
+extern char strtab[][STRMAX];
 extern int strCnt;
-extern struct MIDCODE mCode[CODEMAX];
-extern int midx;
-extern int temVarCnt;
 extern int labCnt;
-extern int lab[LABMAX];
-struct CASTAB {
-    int caseCnt;
-    int labIdx[CASEMAX];
-    int midx[CASEMAX];
-    int cValue[CASEMAX];
+extern int lab[];
+extern struct MIDCODE mCode[];
+extern int mcodeCnt;
+
+//opt
+struct BLOCK {
+    int begin;
+    int end;
+    int next1;
+    int next2;
+    set<int> in;
+    set<int> out;
+    set<int> use;
+    set<int> def;
 };
-extern int labCnt;
+extern struct BLOCK block[];
+
 //objcode
 extern FILE *codefile;//结果文件
 
 void endProc(int n);//end program
 
 //lex
-void getch();
-
-void getsym();
-
 void initSymBuf();
 
 void updateSymBuf();
@@ -170,59 +140,6 @@ void printSym();
 
 //syn
 void program();
-
-void decConst();
-
-void constDef();
-
-//void decVar();
-void varDef();
-
-int numDef(char);       //return num value ; param:pos
-void retFuncDef();
-
-void voidFuncDef();
-
-int paraList();     //return para cnt
-void mainDef();
-
-int call(int needRet);
-
-int valueParaList(int funcid);
-
-void complexStat();
-
-void stat(char pos);
-
-void statList();
-
-int expr();
-
-int term();
-
-int factor();
-
-void assignment();
-
-void ifStat();
-
-void whileStat();
-
-int condition();
-
-void switchStat();
-
-void caseStat(struct CASTAB *tab);
-
-void oneCase(struct CASTAB *tab);
-
-void defaultCase(struct CASTAB *tab);
-
-void readStat();
-
-void writeStat();
-
-void retStat();
 
 //midcode
 void enter(char *name, enum KINDS k, enum TYPES t, int value);
@@ -239,7 +156,18 @@ void emitMid(enum MOP op, int a1, int a2, int r, enum ARGTYP a1t, enum ARGTYP a2
 
 void printCode();
 
+//opt
+void opt();
+
+int findInBlk(int codeIdx);
 //objcode
 void generate();
+
+//err
+void warn(int n);
+
+void error(int n);
+
+void testAfterStat(char pos);
 
 #endif // GLOBAL_H_INCLUDED
