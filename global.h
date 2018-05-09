@@ -35,6 +35,8 @@ extern "C" {
 	#include <sys/wait.h>
 	#include <sys/ioctl.h>
 	#include <sys/termios.h>
+	#include <readline/readline.h>
+	#include <readline/history.h>
     typedef struct SimpleCmd {
         int isBack;     // 是否后台运行
         char **args;    // 命令及参数

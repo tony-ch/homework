@@ -43,7 +43,7 @@ fgCommand       :    simpleCmd
 					|pipeCmd						
 ;
 
-pipeCmd			:	simpleCmd '|' simpleCmd			{isPipeFlag=1;}
+pipeCmd			:	simpleCmd pipeMark simpleCmd			
 ;
 
 simpleCmd       :    args
@@ -51,7 +51,8 @@ simpleCmd       :    args
 					|args outputRedirect
 					|args inputRedirect outputRedirect
 ;
-
+pipeMark		:	'|'								{isPipeFlag=1;}
+;
 inputRedirect   :   '<' STRING						{ioExtend($2,1);}//1 : input
 ;
 
@@ -121,28 +122,39 @@ int main(int argc, char** argv) {
     init(); //初始化环境
 	reset();//初始化相应变量
     commandDone = 0;
+    char* input;
+    char shell_prompt[100]="\0";
+    snprintf(shell_prompt, sizeof(shell_prompt), "\033[1;32mB529-sh >\033[0m");
+    rl_bind_key('\t', rl_complete);
     while(1){
-        char c;
+        //char c;
         SIGCHLD_Handler();
 		//printf("yourname@computer:%s$ ", get_current_dir_name()); //打印提示符信息
 		//printf("B529-sh: %s$", get_current_dir_name());
-		printf("\033[1;32mB529-sh >\033[0m");
+		//printf("\033[1;32mB529-sh >\033[0m");
 		//printf("B529-sh>");
-		if((c=getchar())==EOF){
+		/*if((c=getchar())==EOF){
 			continue;
 		}else{
 			ungetc(c,stdin);
-		}
+		}*/
 		//SIGCHLD_Handler();//检测是否有进程退出
+		input = readline(shell_prompt);
+		if(input==NULL){
+			printf("\n");
+			continue;
+		}
+		yy_scan_string(input);
         yyparse(); //调用语法分析函数，该函数由yylex()提供当前输入的单词符号
 
         if(commandDone == 1){ //命令已经执行完成后，添加历史记录信息
             commandDone = 0;
             addHistory(inputBuff);
         }
+        add_history(input);
+        free(input);
 		reset();//重置相关变量，为下一次处理做准备
      }
-
     return (EXIT_SUCCESS);
 }
 
