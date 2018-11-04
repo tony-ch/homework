@@ -8,22 +8,22 @@ void getch();
 
 void getsym();
 
-char ch = ' ';//×îĞÂ¶ÁÈëµÄ×Ö·û!ĞèÒª³õÊ¼»¯
+char ch = ' ';//æœ€æ–°è¯»å…¥çš„å­—ç¬¦!éœ€è¦åˆå§‹åŒ–
 char line[LLEN];
 int lcnt = 0;//line num
 int lleng = 0;
 int ccnt = 0;
-//char punc[SPSN];//·Ö¸ô·ûºÅ
+//char punc[SPSN];//åˆ†éš”ç¬¦å·
 //struct SYMSTRC symBuf[3];
 int symBufIdx = 0;
-char key[KEYNO][10] =//±£Áô×Ö
+char key[KEYNO][10] =//ä¿ç•™å­—
         {
                 "const", "int", "char", "void",
                 "main", "if", "else", "while",
                 "switch", "case", "default", "scanf",
                 "printf", "return"
         };
-enum SYMBOL ksym[KEYNO] =//±£Áô×Ö
+enum SYMBOL ksym[KEYNO] =//ä¿ç•™å­—
         {
                 constsy, intsy, charsy, voidsy,
                 mainsy, ifsy, elsesy, whilesy,
@@ -44,8 +44,8 @@ char symbolstr[][20] = {
         "NUL"
 };
 
-void getch() {//¶ÁÈ¡ÏÂÒ»¸ö×Ö·û£¬´æ·Åµ½chÖĞ
-    if (ccnt == lleng) {//Ò»ĞĞ½áÊø
+void getch() {//è¯»å–ä¸‹ä¸€ä¸ªå­—ç¬¦ï¼Œå­˜æ”¾åˆ°chä¸­
+    if (ccnt == lleng) {//ä¸€è¡Œç»“æŸ
         if (feof(fin)) {
             ch = EOF;
             return;
@@ -138,7 +138,7 @@ void getsym() {
             symBuf[symBufIdx].token[3] = 0;
             getch();
         } else {
-            error(3);//! Ó¦ÊÇ'(F)
+            error(3);//! åº”æ˜¯'(F)
             if (ch == '\"') {//!
                 symBuf[symBufIdx].id = charconsy;
                 symBuf[symBufIdx].token[0] = '\'';
@@ -146,7 +146,7 @@ void getsym() {
                 symBuf[symBufIdx].token[2] = '\'';
                 symBuf[symBufIdx].token[3] = 0;
                 getch();
-            } else {//!Ôö¼ÓÒ»¸ö'
+            } else {//!å¢åŠ ä¸€ä¸ª'
                 symBuf[symBufIdx].id = charconsy;
                 symBuf[symBufIdx].token[0] = '\'';
                 symBuf[symBufIdx].token[1] = con;
@@ -172,7 +172,7 @@ void getsym() {
         if (ch != '\"') {
             error(35);
         }
-        getch();//£¡ĞèÒªÔÙ¶ÁÒ»¸ö×Ö·û
+        getch();//ï¼éœ€è¦å†è¯»ä¸€ä¸ªå­—ç¬¦
         i++;
         symBuf[symBufIdx].token[i] = 0;
     } else if (ch == '<') {

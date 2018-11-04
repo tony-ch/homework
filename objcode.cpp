@@ -190,9 +190,9 @@ void freeTemReg(int i) {
     if (i >= TREGNUM)
         return;
 #endif
-    int tid = tReg.tidx[i];//ÁÙÊ±±äÁ¿¿ÉÄÜ¿çÔ½º¯Êıµ÷ÓÃ
+    int tid = tReg.tidx[i];//ä¸´æ—¶å˜é‡å¯èƒ½è·¨è¶Šå‡½æ•°è°ƒç”¨
     if (tid == -1 || tab[tid].inMem == 1) {//tReg.dif[i]==0 // wrong!! tab[tReg.tidx[i]].kind!=varkind
-        //-1´ú±íÎª³ÌĞòÖĞµÄÁ¢¼´Êı
+        //-1ä»£è¡¨ä¸ºç¨‹åºä¸­çš„ç«‹å³æ•°
     } else if (isGlobal(tid) && tab[tid].kind == varkind) {
         fprintf(codefile, "sw $%d,glb_%s\n", tReg.regId[i], tab[tid].name);
         fprintf(fout, "sw $%d,glb_%s\n", tReg.regId[i], tab[tid].name);
@@ -462,7 +462,7 @@ void storeGlobal() {
                     fprintf(fout, "glb_%s: .word \'%c\'\n", tab[tid].name, tab[tid].value);
                 }
                 break;
-            case varOp://!!×¢Òâ ²»¸³ÖµµÄ»°²»·ÖÅäµØÖ·
+            case varOp://!!æ³¨æ„ ä¸èµ‹å€¼çš„è¯ä¸åˆ†é…åœ°å€
                 fprintf(codefile, "glb_%s: .word 0\n", tab[tid].name);
                 fprintf(fout, "glb_%s: .word 0\n", tab[tid].name);
                 break;
@@ -645,7 +645,7 @@ void setArrToObj() {//[]=,src,idx,arr
         if (regIdx == -1) {
             regIdx = getEmpTemReg(-1, regSrc, regArr);
             loadToReg(code.arg2.tidx, regIdx);
-            freeTemReg(regIdx);//ÈôÊÇÖ®Ç°²»ÔÚ¼Ä´æÆ÷ÖĞ£¬ÌáÇ°ÊÍ·Å
+            freeTemReg(regIdx);//è‹¥æ˜¯ä¹‹å‰ä¸åœ¨å¯„å­˜å™¨ä¸­ï¼Œæå‰é‡Šæ”¾
         }
         fprintf(codefile, "sll $at,$%d,2 # cal arr offset\n", tReg.regId[regIdx]);
         fprintf(codefile, "add $at,$at,$%d #cal adr\n", tReg.regId[regArr]);
@@ -661,7 +661,7 @@ void setArrToObj() {//[]=,src,idx,arr
     }
 }
 
-void funToObj() {//todo res(type)Ã»ÓĞÓÃµ½
+void funToObj() {//todo res(type)æ²¡æœ‰ç”¨åˆ°
     int paraN = mCode[mIdxCur].arg2.value;
     btidCur = mCode[mIdxCur].arg1.btid;
     int glbReg = btab[btidCur].glbReg;
@@ -676,7 +676,7 @@ void funToObj() {//todo res(type)Ã»ÓĞÓÃµ½
         if (paraN <= 4) {
             fprintf(codefile, "sw $ra,20($fp)\n");
             fprintf(fout, "sw $ra,20($fp)\n");
-            for (int i = 0; i < glbReg; i++) {//±£´æ½«ÒªÓÃµ½µÄÈ«¾Ö¼Ä´æÆ÷
+            for (int i = 0; i < glbReg; i++) {//ä¿å­˜å°†è¦ç”¨åˆ°çš„å…¨å±€å¯„å­˜å™¨
                 fprintf(codefile, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
                 fprintf(fout, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], 24 + i * 4);
             }
@@ -688,8 +688,8 @@ void funToObj() {//todo res(type)Ã»ÓĞÓÃµ½
                 fprintf(fout, "sw $%d,%d($fp)\n", tReg.regId[TREGNUM + i], (paraN + 2 + i) + i * 4);
             }
         }
-        int funTid = btab[btidCur].tidx;//todo ÓÃ$ax
-        for (int i = 0; i < paraN; i++) {//ÈôÈ«¾Ö¼Ä´æÆ÷ÀïÊÇ²ÎÊı£¬Ôò½«²ÎÊılw³öÀ´
+        int funTid = btab[btidCur].tidx;//todo ç”¨$ax
+        for (int i = 0; i < paraN; i++) {//è‹¥å…¨å±€å¯„å­˜å™¨é‡Œæ˜¯å‚æ•°ï¼Œåˆ™å°†å‚æ•°lwå‡ºæ¥
             int regID = tab[funTid + i + 1].regIdx;
             int adr = tab[funTid + i + 1].adr;
             if (regID >= TREGNUM)
@@ -711,7 +711,7 @@ void paraToObj() {
     //tab[tid].inMem = 1;//todo use $ax
 }
 
-void endFunToObj() {//todo res(btidx) Ã»ÓĞÓÃµ½
+void endFunToObj() {//todo res(btidx) æ²¡æœ‰ç”¨åˆ°
     int paraN = btab[btidCur].paraN;
     if (strcmp(btab[btidCur].name, "main") == 0) {
         fprintf(codefile, "addi,$sp,$sp,%d\n", (btab[btidCur].spacesz) * 4);
@@ -797,7 +797,7 @@ void callToObj() {//call,func,paraN,ret
         i = calparaN;
         j = 0;
         while (i > 0) {
-            if (paraQue.isTid[paraQue.cnt - i] == 0) {//sw ²»ÄÜ´æ³£Êı
+            if (paraQue.isTid[paraQue.cnt - i] == 0) {//sw ä¸èƒ½å­˜å¸¸æ•°
                 int value = paraQue.para[paraQue.cnt - i].value;
                 fprintf(codefile, "addi $1,$0,%d\n", value);
                 fprintf(fout, "addi $1,$0,%d\n", value);
@@ -822,7 +822,7 @@ void callToObj() {//call,func,paraN,ret
                     fprintf(fout, "sw $%d,%d($sp)\n", tReg.regId[regPara], j * 4);
                 }
             }
-            //tab[btab[funcBtid].tidx+j+1].inMem=1;//!×¢Òâ,²»Ó¦¸ÃÔÚ´Ë´¦±ä¸ü,Ó¦¸ÃÔÚº¯ÊıÉùÃ÷Ê±¸Ä±ä
+            //tab[btab[funcBtid].tidx+j+1].inMem=1;//!æ³¨æ„,ä¸åº”è¯¥åœ¨æ­¤å¤„å˜æ›´,åº”è¯¥åœ¨å‡½æ•°å£°æ˜æ—¶æ”¹å˜
             j++;
             i--;
         }

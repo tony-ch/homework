@@ -88,8 +88,8 @@ void enter(char *name, enum KINDS k, enum TYPES t, int value) {
     tabCnt = tabCnt + 1;
 }
 
-int lookup(char *name, int isfunc) {//todo func and ident ·Ö¿ª
-    int result = -1;//checked ´Ë´¦Î´Ê¹ÓÃ ¼ì²éµ÷ÓÃÕß(all chceked)
+int lookup(char *name, int isfunc) {//todo func and ident åˆ†å¼€
+    int result = -1;//checked æ­¤å¤„æœªä½¿ç”¨ æ£€æŸ¥è°ƒç”¨è€…(all chceked)
     int i;
     if (isfunc == 1) {
         for (i = 0; i < btabCnt; i++)
@@ -115,10 +115,10 @@ int getTemVar() {
     int ti = tabCnt;
     char name[ALENMAX] = "&";
 //    itoa(temVarCnt,name+1,10);
-    sprintf(name + 1, "%d", temVarCnt);//!itoa ¸ÄÎªsprintf
+    sprintf(name + 1, "%d", temVarCnt);//!itoa æ”¹ä¸ºsprintf
     temVarCnt++;
-    enter(name, varkind, inttyp, 0);//½«ÁÙÊ±±äÁ¿¼ÓÈë·ûºÅ±í
-    adrOffset++;//·ÖÅä¿Õ¼ä
+    enter(name, varkind, inttyp, 0);//å°†ä¸´æ—¶å˜é‡åŠ å…¥ç¬¦å·è¡¨
+    adrOffset++;//åˆ†é…ç©ºé—´
     return ti;
 }
 
@@ -163,7 +163,7 @@ void printCode() {
     }
 #endif
     if (ecnt > 0) {
-        return;//È·±£²»»á·ÃÎÊÏÂ±ê-1µÄÔªËØ
+        return;//ç¡®ä¿ä¸ä¼šè®¿é—®ä¸‹æ ‡-1çš„å…ƒç´ 
     }
     for (i = 0; i < mcodeCnt; i++) {
         fprintf(fout, "%5d%20s", i, mopStr[mCode[i].op]);

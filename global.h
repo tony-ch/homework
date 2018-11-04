@@ -22,8 +22,8 @@ using namespace std;
 extern char errPlace;
 extern int ecnt;
 //lex
-extern FILE *fin;//Ô´ÎÄ¼ş
-extern FILE *fout;//½á¹ûÎÄ¼ş
+extern FILE *fin;//æºæ–‡ä»¶
+extern FILE *fout;//ç»“æœæ–‡ä»¶
 enum SYMBOL {
     eofsy, constsy, intsy, charsy, voidsy, mainsy,
     ifsy, elsesy, whilesy, switchsy, casesy, defaultsy,
@@ -125,7 +125,7 @@ struct BLOCK {
 extern struct BLOCK block[];
 
 //objcode
-extern FILE *codefile;//½á¹ûÎÄ¼ş
+extern FILE *codefile;//ç»“æœæ–‡ä»¶
 
 void endProc(int n);//end program
 

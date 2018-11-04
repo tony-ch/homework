@@ -2,17 +2,17 @@
 //#include <unistd.h>
 #define PATHLEN 100//
 
-int getPath(char *path);//¶ÁÈ¡¿ØÖÆÌ¨ÊäÈëµÄÂ·¾¶
-FILE *fin = NULL;//Ô´ÎÄ¼ş
-FILE *fout = NULL;//½á¹ûÎÄ¼ş
-FILE *codefile = NULL;//Ä¿±ê´úÂëÎÄ¼ş
+int getPath(char *path);//è¯»å–æ§åˆ¶å°è¾“å…¥çš„è·¯å¾„
+FILE *fin = NULL;//æºæ–‡ä»¶
+FILE *fout = NULL;//ç»“æœæ–‡ä»¶
+FILE *codefile = NULL;//ç›®æ ‡ä»£ç æ–‡ä»¶
 int main() {
 //    char cwd[100];
 //    getcwd(cwd, 100);
 //    printf("cwd:\"%s\"\n", cwd);
     char finPath[PATHLEN];
     char foutPath[PATHLEN];
-    while (fin == NULL) {//´ò¿ªÔ´ÎÄ¼ş
+    while (fin == NULL) {//æ‰“å¼€æºæ–‡ä»¶
         printf("please input source file path:\n");
         if (getPath(finPath) < 0)
             continue;
@@ -20,7 +20,7 @@ int main() {
             printf("can't open source file\n");
     }
 #ifdef DEBUG
-    while (fout == NULL) {//´ò¿ª½á¹ûÎÄ¼ş
+    while (fout == NULL) {//æ‰“å¼€ç»“æœæ–‡ä»¶
         printf("please input mid code file path: (press enter to use default: a.out)\n");
         if (getPath(foutPath) < 0)
             continue;
@@ -43,7 +43,7 @@ int main() {
         char fcodePath[PATHLEN];
 #ifdef DEBUG
         printf("no error, begin to generate obj code.\n");
-        while (codefile == NULL) {//´ò¿ª½á¹ûÎÄ¼ş
+        while (codefile == NULL) {//æ‰“å¼€ç»“æœæ–‡ä»¶
             printf("please input code file path: (press enter to use default: a.asm)\n");
             if (getPath(fcodePath) < 0)
                 continue;
@@ -68,7 +68,7 @@ int main() {
     return 0;
 }
 
-int getPath(char *path) {//¶ÁÈ¡¿ØÖÆÌ¨ÊäÈëµÄÂ·¾¶
+int getPath(char *path) {//è¯»å–æ§åˆ¶å°è¾“å…¥çš„è·¯å¾„
     int i = 0;
     char ch;
     int flag = 0;
@@ -78,7 +78,7 @@ int getPath(char *path) {//¶ÁÈ¡¿ØÖÆÌ¨ÊäÈëµÄÂ·¾¶
         else
             flag = 1;
     }
-    if (flag) {//´óÓÚ³¤¶ÈÏŞÖÆ,±¨´í
+    if (flag) {//å¤§äºé•¿åº¦é™åˆ¶,æŠ¥é”™
         printf("path is too long\n");
         return -1;//checked
     }

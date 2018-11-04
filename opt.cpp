@@ -40,15 +40,15 @@ void opt() {
 #ifndef OPT
         return;
 #endif
-    optLab();//É¾³ı¶àÓà±êÇ©
-    optJmp();//É¾³ı¶àÓàÌø×ª
+    optLab();//åˆ é™¤å¤šä½™æ ‡ç­¾
+    optJmp();//åˆ é™¤å¤šä½™è·³è½¬
 
-    divdBlk();//»®·Ö»ù±¾¿é
-    dataflow();//½¨Á¢Êı¾İÁ÷Í¼
+    divdBlk();//åˆ’åˆ†åŸºæœ¬å—
+    dataflow();//å»ºç«‹æ•°æ®æµå›¾
 
-    optExp();//ÓÅ»¯±í´ïÊ½£¬ºÏ²¢³£Êı todo check
-    dag();//É¾³ı¹«¹²×Ó±í´ïÊ½
-    delDeadCode();//É¾³ıËÀ´úÂë
+    optExp();//ä¼˜åŒ–è¡¨è¾¾å¼ï¼Œåˆå¹¶å¸¸æ•° todo check
+    dag();//åˆ é™¤å…¬å…±å­è¡¨è¾¾å¼
+    delDeadCode();//åˆ é™¤æ­»ä»£ç 
     globalReg();
 }
 
@@ -113,7 +113,7 @@ void divdBlk() {
 }
 void dataflow() {
     for (int i = 0; i < blkCnt; i++) {
-        //³õÊ¼»¯useºÍdef
+        //åˆå§‹åŒ–useå’Œdef
         for (int j = block[i].begin; j < block[i].end; j++) {
             if (mCode[j].op == optedOp)
                 continue;
@@ -185,8 +185,8 @@ void dataflow() {
 }
 
 void optLab() {
-    for (int i = 0; i < mcodeCnt - 1; i++) {//0-midx-2 µÚ¶şÌõµ½µ¹ÊıµÚ¶şÌõ
-        if (mCode[i].op == genOp) {//×ÜÊÇ±£ÁôµÚÒ»ÌõgenÓï¾ä
+    for (int i = 0; i < mcodeCnt - 1; i++) {//0-midx-2 ç¬¬äºŒæ¡åˆ°å€’æ•°ç¬¬äºŒæ¡
+        if (mCode[i].op == genOp) {//æ€»æ˜¯ä¿ç•™ç¬¬ä¸€æ¡genè¯­å¥
             int labId = mCode[i].res.labIdx;
             int j = i + 1;
             while (mCode[j].op == genOp) {
@@ -207,7 +207,7 @@ void delLab(int toDel, int replaceLabIdx) {
 }
 
 void optJmp() {
-    for (int i = 1; i < mcodeCnt - 1; i++) {//0-midx-2 µÚÒ»Ìõµ½µ¹ÊıµÚ¶şÌõ
+    for (int i = 1; i < mcodeCnt - 1; i++) {//0-midx-2 ç¬¬ä¸€æ¡åˆ°å€’æ•°ç¬¬äºŒæ¡
         if (mCode[i].op != jOp && mCode[i].op != brfOp)
             continue;
         if (mCode[i + 1].op != genOp && mCode[i - 1].op != genOp)
@@ -237,11 +237,11 @@ void delConst(int tid, int value) {
             mCode[i].arg2.value = value;
         }
     }
-    //¸ü¸ÄtabÖĞµÄµØÖ·Æ«ÒÆ
+    //æ›´æ”¹tabä¸­çš„åœ°å€åç§»
     for (int i = tid + 1; i < tabCnt && tab[i].kind != funkind; i++) {
         tab[i].adr -= 1;
     }
-    if (tid >= btab[0].tidx) {//²»ÊÇÈ«¾Ö±äÁ¿
+    if (tid >= btab[0].tidx) {//ä¸æ˜¯å…¨å±€å˜é‡
         for (int i = 0; i < btabCnt; i++) {
             if (tid < btab[i].tidx) {
                 btab[i - 1].spacesz -= 1;
@@ -275,23 +275,23 @@ void optExp() {
                 mCode[i].arg2Typ = earg;
             }
         }
-        //ÓÅ»¯x=³£Êı
+        //ä¼˜åŒ–x=å¸¸æ•°
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == varg) {
-//            mCode[i].op=optedOp;¿ÉÄÜ¿çÔ½»ù±¾¿é£¬²»ÄÜÖ±½ÓÉ¾µô
+//            mCode[i].op=optedOp;å¯èƒ½è·¨è¶ŠåŸºæœ¬å—ï¼Œä¸èƒ½ç›´æ¥åˆ æ‰
             passConst(i);
-            if (mCode[i].res.tidx >= btab[0].tidx && canDelTemVar(i)) {//Àı×Ó£ºreturn(1+2+x());
-                //mCode[i].op = optedOp;//ÁÙÊ±±äÁ¿²»ÄÜ¿çÔ½»ù±¾¿é£¬¿ÉÒÔÔÚÂú×ãÇé¿öµÄÌõ¼şÏÂÉ¾µô
+            if (mCode[i].res.tidx >= btab[0].tidx && canDelTemVar(i)) {//ä¾‹å­ï¼šreturn(1+2+x());
+                //mCode[i].op = optedOp;//ä¸´æ—¶å˜é‡ä¸èƒ½è·¨è¶ŠåŸºæœ¬å—ï¼Œå¯ä»¥åœ¨æ»¡è¶³æƒ…å†µçš„æ¡ä»¶ä¸‹åˆ æ‰
                 optCode(i);
             }
         }
-        //ÓÅ»¯x=x
+        //ä¼˜åŒ–x=x
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == mCode[i].res.tidx) {
             optCode(i);
         }
-        //ÓÅ»¯tx=x y=tx
+        //ä¼˜åŒ–tx=x y=tx
         if (mCode[i].op == becomeOp && mCode[i].arg1Typ == tiarg &&
             mCode[i - 1].rTyp == tiarg && mCode[i - 1].res.tidx == mCode[i].arg1.tidx
-            && mCode[i].arg1.tidx >= btab[0].tidx) {//È«¾Ö±äÁ¿¾Í×÷¸Ä±ä
+            && mCode[i].arg1.tidx >= btab[0].tidx) {//å…¨å±€å˜é‡å°±ä½œæ”¹å˜
             mCode[i].arg1Typ = earg;
             if (canDelTemVar(i - 1)) {
                 optCode(i);
@@ -303,12 +303,12 @@ void optExp() {
     }
 }
 
-//´Ëº¯ÊıÓÃÓÚ³¢ÊÔ¶ÔÁÙÊ±±äÁ¿µÄ½øĞĞ¸³Öµ(¸Ä±äÆäÖµ)µÄËÄÔªÊ½½øĞĞÓÅ»¯
+//æ­¤å‡½æ•°ç”¨äºå°è¯•å¯¹ä¸´æ—¶å˜é‡çš„è¿›è¡Œèµ‹å€¼(æ”¹å˜å…¶å€¼)çš„å››å…ƒå¼è¿›è¡Œä¼˜åŒ–
 int canDelTemVar(int codeIdx) {//todo check
     int tid = mCode[codeIdx].res.tidx;
     int used = 0;
 //    int isTem=tab[tid].name[0]=='&';
-    for (int i = codeIdx + 1; i < mcodeCnt; i++) {//Ó¦´ÓÏÂÒ»ÌõÓï¿ªÊ¼
+    for (int i = codeIdx + 1; i < mcodeCnt; i++) {//åº”ä»ä¸‹ä¸€æ¡è¯­å¼€å§‹
         if (mCode[i].op == optedOp)
             continue;
         if (mCode[i].arg1Typ == tiarg && mCode[i].arg1.tidx == tid) {
@@ -319,26 +319,26 @@ int canDelTemVar(int codeIdx) {//todo check
             used = 1;
             break;
         }
-        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid) {//ÉÏÒ»¸ö¶¨Òåµã±»kill
+        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid) {//ä¸Šä¸€ä¸ªå®šä¹‰ç‚¹è¢«kill
             used = 0;
             break;
         }
         enum MOP op = mCode[i].op;
-        if (op == genOp || op == jOp || op == brfOp || op == endFunOp || op == retOp) {//º¯Êıµ÷ÓÃ²»ÓÃÅĞ¶¨
+        if (op == genOp || op == jOp || op == brfOp || op == endFunOp || op == retOp) {//å‡½æ•°è°ƒç”¨ä¸ç”¨åˆ¤å®š
             int blk = findInBlk(codeIdx);
             if (block[blk].out.find(tid) == block[blk].out.end())
                 used = 0;
             else
                 used = 1;
-//            used = 0;º¯Êıµ÷ÓÃ²»»á¸Ä±äÁÙÊ±±äÁ¿µÄÖµ£¬³ı·Ç·µ»ØÖµÊÇÕâ¸öÁÙÊ±±äÁ¿£¬µ«ÊÇ»á±»ÉÏÃæÒ»¸öif¼ì²âµ½
-            break;//!ÕâÖÖÇé¿ö°´Àí²»»á³öÏÖ
-            //! ÁÙÊ±±äÁ¿²»ÄÜ¿çÔ½»ù±¾¿é£¬¾Ö²¿±äÁ¿¿ÉÒÔ
+//            used = 0;å‡½æ•°è°ƒç”¨ä¸ä¼šæ”¹å˜ä¸´æ—¶å˜é‡çš„å€¼ï¼Œé™¤éè¿”å›å€¼æ˜¯è¿™ä¸ªä¸´æ—¶å˜é‡ï¼Œä½†æ˜¯ä¼šè¢«ä¸Šé¢ä¸€ä¸ªifæ£€æµ‹åˆ°
+            break;//!è¿™ç§æƒ…å†µæŒ‰ç†ä¸ä¼šå‡ºç°
+            //! ä¸´æ—¶å˜é‡ä¸èƒ½è·¨è¶ŠåŸºæœ¬å—ï¼Œå±€éƒ¨å˜é‡å¯ä»¥
         }
     }
     return (!used);
 }
 
-void passConst(int codeIdx) {//²»¿çÔ½»ù±¾¿é£¬º¯Êı¿ÉÄÜ¸Ä±äÈ«¾Ö±äÁ¿
+void passConst(int codeIdx) {//ä¸è·¨è¶ŠåŸºæœ¬å—ï¼Œå‡½æ•°å¯èƒ½æ”¹å˜å…¨å±€å˜é‡
     int value = mCode[codeIdx].arg1.value;
     int tid = mCode[codeIdx].res.tidx;
 //    int isTempVar=tab[tid].name[0]=='&';
@@ -358,13 +358,13 @@ void passConst(int codeIdx) {//²»¿çÔ½»ù±¾¿é£¬º¯Êı¿ÉÄÜ¸Ä±äÈ«¾Ö±äÁ¿
             mCode[i].arg2Typ = varg;
             mCode[i].arg2.value = value;
         }
-        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid)//µ½´ïÏÂÒ»¸ö¶¨Òåµã£¬²»ÄÜÔÙ½øĞĞÖµ´«µİ
+        if (mCode[i].rTyp == tiarg && mCode[i].res.tidx == tid)//åˆ°è¾¾ä¸‹ä¸€ä¸ªå®šä¹‰ç‚¹ï¼Œä¸èƒ½å†è¿›è¡Œå€¼ä¼ é€’
             break;
         enum MOP op = mCode[i].op;
-        if (op == brfOp || op == jOp || op == genOp || op == endFunOp || op == retOp)//²»ÄÜ¿çÔ½»ù±¾¿é
+        if (op == brfOp || op == jOp || op == genOp || op == endFunOp || op == retOp)//ä¸èƒ½è·¨è¶ŠåŸºæœ¬å—
             break;
-        if (isGlobal && op == callOp)//ÁÙÊ±±äÁ¿¿ÉÒÔ¿çÔ½º¯Êıµ÷ÓÃ todo check
-            break;//È«¾Ö±äÁ¿²»ÄÜ¿çÔ½º¯Êıµ÷ÓÃ
+        if (isGlobal && op == callOp)//ä¸´æ—¶å˜é‡å¯ä»¥è·¨è¶Šå‡½æ•°è°ƒç”¨ todo check
+            break;//å…¨å±€å˜é‡ä¸èƒ½è·¨è¶Šå‡½æ•°è°ƒç”¨
     }
 }
 
@@ -528,8 +528,8 @@ void dag() {//math become
                 nodeTab[resNode].dagIdx = dagCnt;
                 dagTab[dagCnt] = {2, mop, nodeTab[arg1Node].dagIdx, nodeTab[arg2Node].dagIdx};
                 dagCnt++;
-                //Ã»ÓĞÕÒµ½¹«¹²±í´ïÊ½£¬³¢ÊÔ½«²Ù×÷ÊıÓÅ»¯
-                int newArg1Node = findFisrtNode(nodeTab[arg1Node].dagIdx);//Ò»¶¨²»Îª-1£¬ÖÁÉÙ¿ÉÒÔÕÒµ½arg1Node
+                //æ²¡æœ‰æ‰¾åˆ°å…¬å…±è¡¨è¾¾å¼ï¼Œå°è¯•å°†æ“ä½œæ•°ä¼˜åŒ–
+                int newArg1Node = findFisrtNode(nodeTab[arg1Node].dagIdx);//ä¸€å®šä¸ä¸º-1ï¼Œè‡³å°‘å¯ä»¥æ‰¾åˆ°arg1Node
                 int newArg2Node = findFisrtNode(nodeTab[arg2Node].dagIdx);
                 mCode[j].arg1Typ = nodeTab[newArg1Node].sel == 0 ? tiarg : varg;
                 mCode[j].arg1.value = nodeTab[newArg1Node].val;
@@ -537,8 +537,8 @@ void dag() {//math become
                 mCode[j].arg2.value = nodeTab[newArg2Node].val;
             } else {
                 nodeTab[resNode].dagIdx = resDag;
-                int newSrcNode = findFisrtNode(resDag);//ÕÒµ½ÁË¹«¹²±í´ïÊ½£¬×ª»»Îª¸³Öµ
-                if (newSrcNode != -1) {//todo ¿ÉÄÜÎª-1Âğ£¿
+                int newSrcNode = findFisrtNode(resDag);//æ‰¾åˆ°äº†å…¬å…±è¡¨è¾¾å¼ï¼Œè½¬æ¢ä¸ºèµ‹å€¼
+                if (newSrcNode != -1) {//todo å¯èƒ½ä¸º-1å—ï¼Ÿ
                     mCode[j].op = becomeOp;
                     mCode[j].arg2Typ = earg;
                     mCode[j].arg1.value = nodeTab[newSrcNode].val;
@@ -554,7 +554,7 @@ void dag() {//math become
 }
 
 void delDeadCode() {
-    //É¾³ıËÀ´úÂë
+    //åˆ é™¤æ­»ä»£ç 
     for (int k = 0; k < mcodeCnt; k++) {
         if (mCode[k].op == varOp || mCode[k].op == arrOp || mCode[k].op == optedOp)
             continue;
@@ -591,7 +591,7 @@ void globalReg() {
         for (int j = 0; j < btab[i].glbReg; j++) {
             tab[counts[j].first].regIdx = TREGNUM + j;//todo check
         }
-        //Êä³ö
+        //è¾“å‡º
         fprintf(fout, "func:%s size:%d\n", btab[i].name, (int) outMap.size());
         for (map<int, int>::iterator iter = outMap.begin(); iter != outMap.end(); ++iter) {
             fprintf(fout, "%s:%d ", tab[iter->first].name, iter->second);
