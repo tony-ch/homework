@@ -7,14 +7,14 @@ extern wchar_t ch;
 int main() {
     setlocale(LC_ALL,"");
     fin = getFile("r","input source file","input_test.txt");
-#if LOG_LEVEL==LOG_DEBUG
+#if LOG_LEVEL==DEBUG_LOG
     fout = getFile("w","result file","./res.out");
     codefile = getFile("w","mid code file","./code.out");
 #endif
-
+    initSymBuf(fin);
     while(1){
-        getch(fin);
-        if(ch==EOF)
+        updateSymBuf(fin);
+        if(readEOF())
             break;
     }
 
