@@ -3,22 +3,25 @@
 //
 #include "common.h"
 #define PATHLEN 100
+#define RET_ERR -1
+#define RET_SUCCESS 0
+#define LOGSRC "UTIL"
 
-int getPath(wchar_t *path);
-const wchar_t* LOG_LEVEL_STR[]={L"DEBUG",L"INFO",L"WARN",L"ERR"};
+int getPath(char *path);
+const char* LOG_LEVEL_STR[]={"DEBUG","INFO","WARN","ERR"};
 wchar_t MSG[MSGLEN]={};
 
-void LOG(int level, const wchar_t* source, const wchar_t* msg){
+void LOG(int level, const char* source, const wchar_t* msg){
     if(level >= LOG_LEVEL){
-        wprintf(L"[%ls] %ls: %ls\n",LOG_LEVEL_STR[level],source,msg);
+        wprintf(L"[%s] %s: %ls\n",LOG_LEVEL_STR[level],source,msg);
     }
 }
 
-int getPath(wchar_t *path){
+int getPath(char *path){
     int i = 0;
-    wchar_t ch;
+    char ch;
     int flag = 0;
-    while ((ch = getwchar()) != EOF && ch != L'\n') {
+    while ((ch = getchar()) != EOF && ch != L'\n') {
         if (i < PATHLEN - 1)
             path[i++] = ch;
         else
@@ -26,31 +29,31 @@ int getPath(wchar_t *path){
     }
     if (flag) {//大于长度限制,报错
         wprintf(L"path is too long\n");
-        return -1;//checked
+        return RET_ERR;//checked
     }
     path[i] = L'\0';
-    return 0;
+    return RET_SUCCESS;
 }
 
-FILE* getFile(const wchar_t* name, const wchar_t* default_path){
+FILE* getFile(const char* mode,const char* name, const char* default_path){
     FILE *f=NULL;
-    wchar_t path[PATHLEN];
+    char path[PATHLEN];
     while (f == NULL) {//打开源文件
-        wprintf(L"please %ls path:",name);
+        wprintf(L"please %s path:",name);
         if(default_path!=NULL){
-            wprintf(L"(press enter to use default: %ls)",default_path);
+            wprintf(L"(press enter to use default: %s)",default_path);
         }
         wprintf(L"\n");
-        if (getPath(path) < 0)
+        if (getPath(path) != RET_SUCCESS)
             continue;
-        if(default_path!=NULL && (wcscmp(path, L"") == 0 || wcscmp(path, L" ") == 0) ){
-            wcpcpy(path, default_path);
+        if(default_path!=NULL && (strcmp(path, "") == 0 || strcmp(path, " ") == 0) ){
+            strcpy(path, default_path);
         }
-        if ((f = fopen(path, "r")) == NULL)
-            wprintf(L"can't open %ls\n",name);
+        if ((f = fopen(path, mode)) == NULL)
+            wprintf(L"can't open %s\n",name);
     }
-    swprintf(MSG,MSGLEN,L"%ls, %ls",name,path);
-    LOG(LOG_INFO,L"UTIL",MSG);
+    swprintf(MSG,MSGLEN,L"%s, %s",name,path);
+    LOG(LOG_INFO,LOGSRC,MSG);
     return f;
 }
 
