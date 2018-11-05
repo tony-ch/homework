@@ -61,6 +61,9 @@ extern int symBufIdx;
 void LOG(int level, const char* source, const wchar_t* format, ...);
 void endProc(int n);
 FILE* getFile(const char* mode,const char* name, const char* default_path);
+inline const char * getSymStr(enum SYMBOL sym);
+inline const char * getErrStr(enum ERRORTYPE e);
+
 
 // lex
 void getch(FILE* fin);

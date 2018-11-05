@@ -16,11 +16,6 @@ int lcnt = 0;//line num
 int ccnt = 0;//col cnt
 int lleng = 0;//len of currnt line
 
-char *symstr[] = {"EOFSYM","DEFSYM","LPARENNTSYM","RPARENTSYM","COMMASYM",
-                     "EQUSYM","IMPSYM","DISJSYM","CONJSYM","XORSYM","NOTSYM",
-                     "IDENTSYM","LOGNUMSYM","NOLOGNSYM",
-                     "NULSYM"};
-
 void getch(FILE* fin){//读取下一个字符，放到ch中
     if(ccnt==lleng){
         if(feof(fin)){
@@ -146,7 +141,7 @@ void getsym(FILE* fin){
             break;
     }
 
-    LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",symstr[symBuf[symBufIdx].id],symBuf[symBufIdx].token);
+    LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
 }
 
 void initSymBuf(FILE* fin){

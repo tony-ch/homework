@@ -7,6 +7,8 @@
 #define SUCCESS_RET 0
 #define LOGSRC "UTIL"
 
+#define ENUM_TO_STR(x) case x: return (#x);
+
 int getPath(char *path);
 const char* LOG_LEVEL_STR[]={"DEBUG","INFO","WARN","ERR"};
 
@@ -70,4 +72,34 @@ void endProc(int n){
     wprintf(L"press enter to end process ...\n");
     getwchar();
     exit(n);
+}
+
+const char * getSymStr(enum SYMBOL sym){
+    switch (sym){
+        ENUM_TO_STR(EOFSYM)
+        ENUM_TO_STR(DEFSYM)
+        ENUM_TO_STR(LPARENNTSYM)
+        ENUM_TO_STR(RPARENTSYM)
+        ENUM_TO_STR(COMMASYM)
+        ENUM_TO_STR(EQUSYM)
+        ENUM_TO_STR(IMPSYM)
+        ENUM_TO_STR(DISJSYM)
+        ENUM_TO_STR(CONJSYM)
+        ENUM_TO_STR(XORSYM)
+        ENUM_TO_STR(NOTSYM)
+        ENUM_TO_STR(IDENTSYM)
+        ENUM_TO_STR(LOGNUMSYM)
+        ENUM_TO_STR(NOLOGNSYM)
+        ENUM_TO_STR(NULSYM)
+    }
+    return "INVALID SYM";
+}
+
+const char * getErrStr(enum ERRORTYPE e){
+    switch (e){
+        ENUM_TO_STR(INCOMPLETE_INPUT_ERR)
+        ENUM_TO_STR(INVAID_CHAR_ERR)
+        ENUM_TO_STR(RUNTIME_ERR)
+    }
+    return "INVALID ERR TYPE";
 }
