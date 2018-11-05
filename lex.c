@@ -47,62 +47,10 @@ void getsym(FILE* fin){
     symBuf[symBufIdx].col = ccnt;
 
     switch (ch) {
-        case L'#':
-            symBuf[symBufIdx].id = DEFSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'(':
-            symBuf[symBufIdx].id = LPARENNTSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L')':
-            symBuf[symBufIdx].id = RPARENTSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L',':
-            symBuf[symBufIdx].id = COMMASYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'↔':
-            symBuf[symBufIdx].id = EQUSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'→':
-            symBuf[symBufIdx].id = IMPSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'∨':
-            symBuf[symBufIdx].id = DISJSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'∧':
-            symBuf[symBufIdx].id = CONJSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'⊕':
-            symBuf[symBufIdx].id = XORSYM;
-            symBuf[symBufIdx].token[0] = ch;
-            symBuf[symBufIdx].token[1] = 0;
-            getch(fin);
-            break;
-        case L'¬':
-            symBuf[symBufIdx].id = NOTSYM;
+        case L'#':case L'(':case L')':case L',':
+        case L'↔':case L'→':case L'∨':case L'∧':
+        case L'⊕':case L'¬':
+            symBuf[symBufIdx].id = ch;
             symBuf[symBufIdx].token[0] = ch;
             symBuf[symBufIdx].token[1] = 0;
             getch(fin);
