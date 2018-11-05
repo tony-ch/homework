@@ -3,17 +3,21 @@
 //
 #include "common.h"
 #define PATHLEN 100
-#define RET_ERR -1
-#define RET_SUCCESS 0
+#define ERR_RET -1
+#define SUCCESS_RET 0
 #define LOGSRC "UTIL"
 
 int getPath(char *path);
 const char* LOG_LEVEL_STR[]={"DEBUG","INFO","WARN","ERR"};
-wchar_t MSG[MSGLEN]={};
 
-void LOG(int level, const char* source, const wchar_t* msg){
+void LOG(int level, const char* source, const wchar_t* format, ...){
     if(level >= LOG_LEVEL){
-        wprintf(L"[%s] %s: %ls\n",LOG_LEVEL_STR[level],source,msg);
+        wprintf(L"[%s] %s: ",LOG_LEVEL_STR[level],source);
+        va_list arglist;
+        va_start(arglist,format);
+        vwprintf(format,arglist);
+        wprintf(L"\n");
+        va_end(arglist);
     }
 }
 
@@ -29,10 +33,10 @@ int getPath(char *path){
     }
     if (flag) {//大于长度限制,报错
         wprintf(L"path is too long\n");
-        return RET_ERR;//checked
+        return ERR_RET;//checked
     }
     path[i] = L'\0';
-    return RET_SUCCESS;
+    return SUCCESS_RET;
 }
 
 FILE* getFile(const char* mode,const char* name, const char* default_path){
@@ -44,7 +48,7 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
             wprintf(L"(press enter to use default: %s)",default_path);
         }
         wprintf(L"\n");
-        if (getPath(path) != RET_SUCCESS)
+        if (getPath(path) != SUCCESS_RET)
             continue;
         if(default_path!=NULL && (strcmp(path, "") == 0 || strcmp(path, " ") == 0) ){
             strcpy(path, default_path);
@@ -52,8 +56,7 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
         if ((f = fopen(path, mode)) == NULL)
             wprintf(L"can't open %s\n",name);
     }
-    swprintf(MSG,MSGLEN,L"%s, %s",name,path);
-    LOG(LOG_INFO,LOGSRC,MSG);
+    LOG(INFO_LOG,LOGSRC,L"%s, %s",name,path);
     return f;
 }
 
