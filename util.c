@@ -88,8 +88,8 @@ const char * getSymStr(enum SYMBOL sym){
         ENUM_TO_STR(XORSYM)
         ENUM_TO_STR(NOTSYM)
         ENUM_TO_STR(IDENTSYM)
-        ENUM_TO_STR(LOGNUMSYM)
-        ENUM_TO_STR(NOLOGNSYM)
+        ENUM_TO_STR(NUMSYM)
+        ENUM_TO_STR(LOGICNUMSYM)
         ENUM_TO_STR(NULSYM)
     }
     return "INVALID SYM";
@@ -99,6 +99,8 @@ const char * getErrStr(enum ERRORTYPE e){
     switch (e){
         ENUM_TO_STR(INCOMPLETE_INPUT_ERR)
         ENUM_TO_STR(INVAID_CHAR_ERR)
+        ENUM_TO_STR(ASSERT_ERROR)
+        ENUM_TO_STR(PARA_NUM_TOO_LARGE_ERR)
         ENUM_TO_STR(RUNTIME_ERR)
     }
     return "INVALID ERR TYPE";

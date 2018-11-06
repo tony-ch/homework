@@ -24,25 +24,27 @@
 #define WARN_LOG 2
 #define ERR_LOG 3
 #define LOG_LEVEL DEBUG_LOG
+#define NUMMAX 10
 // lex
 enum SYMBOL{
     EOFSYM,DEFSYM=L'#',LPARENNTSYM=L'(',RPARENTSYM=L')',COMMASYM=L',',
     EQUSYM=L'↔',IMPSYM=L'→',DISJSYM=L'∨',CONJSYM=L'∧',XORSYM=L'⊕',NOTSYM=L'¬',
-    IDENTSYM,LOGNUMSYM,NOLOGNSYM,
+    IDENTSYM,NUMSYM,LOGICNUMSYM,
     NULSYM
 };
 
 enum ERRORTYPE{
-    INCOMPLETE_INPUT_ERR,INVAID_CHAR_ERR,RUNTIME_ERR
+    INCOMPLETE_INPUT_ERR,INVAID_CHAR_ERR,INVAID_SENTENCE,ASSERT_ERROR,PARA_NUM_TOO_LARGE_ERR,RUNTIME_ERR
 };
 
 #define SYMBUFSZ 3
-struct SYMBUF{
+struct SYMITEM{
     enum SYMBOL id;
     wchar_t token[STRMAX];
     int line;
     int col;
 };
+
 // var
 // common
 extern FILE *fin;//源文件
@@ -51,8 +53,9 @@ extern FILE *codefile; //中间代码文件
 // util
 
 // lex
-extern struct SYMBUF symBuf[SYMBUFSZ];
+extern struct SYMITEM symBuf[SYMBUFSZ];
 extern int symBufIdx;
+
 
 // function
 // common
@@ -72,6 +75,10 @@ void initSymBuf(FILE *fin);
 void updateSymBuf(FILE *fin);
 int readEOF();
 
+// syntax
+void program();
+
 // error
 void error(enum ERRORTYPE e, const char *source,int,int);
+void assert(int value);
 #endif //LOGIC_COMMON_H

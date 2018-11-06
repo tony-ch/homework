@@ -10,7 +10,7 @@
 
 wchar_t ch=L' ';//current ch
 wchar_t line[LLENMAX];//current line
-struct SYMBUF symBuf[SYMBUFSZ];
+struct SYMITEM symBuf[SYMBUFSZ];
 int symBufIdx=0;
 int lcnt = 0;//line num
 int ccnt = 0;//col cnt
@@ -69,16 +69,29 @@ void getsym(FILE* fin){
                     }
                     getch(fin);
                 }while (iswalnum(ch) || ch == L'_');
+                symBuf[symBufIdx].token[i]=0;
                 symBuf[symBufIdx].id = IDENTSYM;
             }else if(iswdigit(ch)){
-                symBuf[symBufIdx].token[0] = ch;
-                symBuf[symBufIdx].token[1] = 0;
-                if(ch==L'0' || ch == L'1'){
-                    symBuf[symBufIdx].id = LOGNUMSYM;
+                enum SYMBOL lastid = symBuf[(symBufIdx+SYMBUFSZ-1)%SYMBUFSZ].id;
+                if(lastid==NUMSYM || lastid == LOGICNUMSYM){
+                    symBuf[symBufIdx].id = LOGICNUMSYM;
+                    symBuf[symBufIdx].token[0]=ch;
+                    symBuf[symBufIdx].token[1]=0;
+                    getch(fin);
                 }else{
-                    symBuf[symBufIdx].id = NOLOGNSYM;
+                    symBuf[symBufIdx].id = NUMSYM;
+                    int i=0;
+                    while (iswalnum(ch)){
+                        if(i<NUMMAX-1){
+                            symBuf[symBufIdx].token[i] = ch;
+                            i += 1;
+                        } else{
+                            LOG(WARN_LOG,LOGSRC,L"num to long, line %d, col %d",lcnt,ccnt);
+                        }
+                        getch(fin);
+                    }
+                    symBuf[symBufIdx].token[i] = 0;
                 }
-                getch(fin);
             }else {
                 error(INVAID_CHAR_ERR, LOGSRC, lcnt, ccnt);
                 symBuf[symBufIdx].id = NULSYM;
