@@ -36,7 +36,7 @@ void getch(FILE* fin){//读取下一个字符，放到ch中
     }
     ch = line[ccnt];
     ccnt += 1;
-    LOG(DEBUG_LOG,LOGSRC,L"get ch:%x,%lc",ch,ch);
+    //LOG(DEBUG_LOG,LOGSRC,L"get ch:%x,%lc",ch,ch);
 }
 
 void getsym(FILE* fin){
@@ -81,7 +81,7 @@ void getsym(FILE* fin){
                 }else{
                     symBuf[symBufIdx].id = NUMSYM;
                     int i=0;
-                    while (iswalnum(ch)){
+                    while (iswdigit(ch)){
                         if(i<NUMMAX-1){
                             symBuf[symBufIdx].token[i] = ch;
                             i += 1;
@@ -101,13 +101,12 @@ void getsym(FILE* fin){
             }
             break;
     }
-
-    LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
 }
 
 void initSymBuf(FILE* fin){
     for(symBufIdx=0;symBufIdx<SYMBUFSZ;symBufIdx+=1){
         getsym(fin);
+        LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     }
     symBufIdx=0;
 }
@@ -117,9 +116,10 @@ void updateSymBuf(FILE* fin){
         error(INCOMPLETE_INPUT_ERR,LOGSRC,lcnt,ccnt);
     }
     getsym(fin);
+    LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     symBufIdx = (symBufIdx+1)%SYMBUFSZ;
 }
 
 int readEOF(){
-    return (symBuf[(symBufIdx+1) % SYMBUFSZ].id == EOFSYM);
+    return (symBuf[symBufIdx].id == EOFSYM);
 }

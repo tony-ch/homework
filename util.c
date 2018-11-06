@@ -101,6 +101,7 @@ const char * getErrStr(enum ERRORTYPE e){
         ENUM_TO_STR(INVAID_CHAR_ERR)
         ENUM_TO_STR(ASSERT_ERROR)
         ENUM_TO_STR(PARA_NUM_TOO_LARGE_ERR)
+        ENUM_TO_STR(FUNC_DEF_ERR)
         ENUM_TO_STR(RUNTIME_ERR)
     }
     return "INVALID ERR TYPE";

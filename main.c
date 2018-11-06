@@ -12,13 +12,11 @@ int main() {
     codefile = getFile("w","mid code file","./code.out");
 #endif
     initSymBuf(fin);
-    while(1){
+    program();
+    while (!readEOF()){
         updateSymBuf(fin);
-        if(readEOF())
-            break;
     }
-
-    endProc(0);
+    // endProc(0);
     return 0;
 }
 

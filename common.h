@@ -34,7 +34,7 @@ enum SYMBOL{
 };
 
 enum ERRORTYPE{
-    INCOMPLETE_INPUT_ERR,INVAID_CHAR_ERR,INVAID_SENTENCE,ASSERT_ERROR,PARA_NUM_TOO_LARGE_ERR,RUNTIME_ERR
+    INCOMPLETE_INPUT_ERR,INVAID_CHAR_ERR,INVAID_SENTENCE,ASSERT_ERROR,PARA_NUM_TOO_LARGE_ERR,FUNC_DEF_ERR,RUNTIME_ERR
 };
 
 #define SYMBUFSZ 3
@@ -44,6 +44,39 @@ struct SYMITEM{
     int line;
     int col;
 };
+
+// syn
+#define TRUTHMAX 2048
+#define FUNCMAX 100
+#define TABMAX 200
+#define EXPMAX 100
+//#define CODEMAX 300
+
+struct FUNCITEM{
+    wchar_t name[STRMAX];
+    int para_num;
+    const char truth_table[TRUTHMAX];
+};
+
+enum ENTRY_TYPES{
+    VARTYPE,TEMTYPE,CONSTTYPE,PARATYPE,FUNCTYPE
+};
+
+struct TABITEM{
+    wchar_t name[STRMAX];
+    enum ENTRY_TYPES type;
+    int value;
+    int addr;
+};
+
+//struct MIDCODE;
+
+struct EXPITEM{
+    int var_num;
+    struct TABITEM tab[TABMAX];
+    //struct MIDCODE codes[CODEMAX];
+};
+
 
 // var
 // common
@@ -56,6 +89,11 @@ extern FILE *codefile; //中间代码文件
 extern struct SYMITEM symBuf[SYMBUFSZ];
 extern int symBufIdx;
 
+// syn
+extern struct FUNCITEM functab[FUNCMAX];
+extern struct EXPITEM exptab[EXPMAX];
+extern int funccnt;
+extern int funcidx;
 
 // function
 // common
