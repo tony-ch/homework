@@ -69,6 +69,10 @@ void endProc(int n){
         fclose(fout);
     if (codefile != NULL)
         fclose(codefile);
+    for(int i=0;i<funccnt;i++){
+        free(functab[i].truth_table);
+        functab[i].truth_table = NULL;
+    }
     wprintf(L"press enter to end process ...\n");
     getwchar();
     exit(n);
@@ -105,4 +109,13 @@ const char * getErrStr(enum ERRORTYPE e){
         ENUM_TO_STR(RUNTIME_ERR)
     }
     return "INVALID ERR TYPE";
+}
+
+int lookup_func(const wchar_t* name){
+    for(int i=0;i<funccnt;i++){
+        if(wcscmp(name,functab[i].name)==0){
+            return i;
+        }
+    }
+    return -1;
 }

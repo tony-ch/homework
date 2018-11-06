@@ -14,6 +14,8 @@
 #include <wctype.h>
 #include <locale.h>
 #include <stdarg.h>
+#include <stdint.h>
+#include <malloc.h>
 
 // define
 // common
@@ -46,7 +48,7 @@ struct SYMITEM{
 };
 
 // syn
-#define TRUTHMAX 2048
+#define TRUTHMAX 1024
 #define FUNCMAX 100
 #define TABMAX 200
 #define EXPMAX 100
@@ -55,7 +57,7 @@ struct SYMITEM{
 struct FUNCITEM{
     wchar_t name[STRMAX];
     int para_num;
-    const char truth_table[TRUTHMAX];
+    uint8_t* truth_table;
 };
 
 enum ENTRY_TYPES{
@@ -102,9 +104,9 @@ extern int funcidx;
 void LOG(int level, const char* source, const wchar_t* format, ...);
 void endProc(int n);
 FILE* getFile(const char* mode,const char* name, const char* default_path);
-inline const char * getSymStr(enum SYMBOL sym);
-inline const char * getErrStr(enum ERRORTYPE e);
-
+const char * getSymStr(enum SYMBOL sym);
+const char * getErrStr(enum ERRORTYPE e);
+int lookup_func(const wchar_t* name);
 
 // lex
 void getch(FILE* fin);
@@ -112,8 +114,11 @@ void getsym(FILE* fin);
 void initSymBuf(FILE *fin);
 void updateSymBuf(FILE *fin);
 int readEOF();
+void reset_lex(FILE*);
 
 // syntax
+void init(int);
+void functions();
 void program();
 
 // error

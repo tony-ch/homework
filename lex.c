@@ -16,6 +16,18 @@ int lcnt = 0;//line num
 int ccnt = 0;//col cnt
 int lleng = 0;//len of currnt line
 
+void reset_lex(FILE *fin){
+    ch=L' ';//current ch
+    //wchar_t line[LLENMAX];//current line
+    //struct SYMITEM symBuf[SYMBUFSZ];
+    symBufIdx=0;
+    lcnt = 0;//line num
+    ccnt = 0;//col cnt
+    lleng = 0;//len of currnt line
+    fseek(fin,0,SEEK_SET);
+    initSymBuf(fin);
+}
+
 void getch(FILE* fin){//读取下一个字符，放到ch中
     if(ccnt==lleng){
         if(feof(fin)){
@@ -106,7 +118,7 @@ void getsym(FILE* fin){
 void initSymBuf(FILE* fin){
     for(symBufIdx=0;symBufIdx<SYMBUFSZ;symBufIdx+=1){
         getsym(fin);
-        LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
+        //LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     }
     symBufIdx=0;
 }
@@ -116,7 +128,7 @@ void updateSymBuf(FILE* fin){
         error(INCOMPLETE_INPUT_ERR,LOGSRC,lcnt,ccnt);
     }
     getsym(fin);
-    LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
+    //LOG(DEBUG_LOG,LOGSRC,L"get %s, token:%ls",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     symBufIdx = (symBufIdx+1)%SYMBUFSZ;
 }
 

@@ -1,5 +1,8 @@
 #include "common.h"
 
+#define LOGSRC "MAIN"
+#define PASSONE 0
+#define PASSTWO 1
 FILE *fin = NULL;//源文件
 FILE *fout = NULL;//结果代码文件
 FILE *codefile = NULL; //中间代码文件
@@ -11,12 +14,15 @@ int main() {
     fout = getFile("w","result file","./res.out");
     codefile = getFile("w","mid code file","./code.out");
 #endif
-    initSymBuf(fin);
+    init(PASSONE);
+    functions();
+    LOG(DEBUG_LOG,LOGSRC,L"two pass");
+    init(PASSTWO);
     program();
     while (!readEOF()){
         updateSymBuf(fin);
     }
-    // endProc(0);
+    endProc(0);
     return 0;
 }
 

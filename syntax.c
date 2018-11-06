@@ -11,10 +11,52 @@
 #define LIN (symBuf[symBufIdx].line)
 #define COL (symBuf[symBufIdx].col)
 
-struct FUNCITEM functab[FUNCMAX];
-struct EXPITEM exptab[EXPMAX];
+struct FUNCITEM functab[FUNCMAX]={};
+struct EXPITEM exptab[EXPMAX]={};
 int funccnt = 0;
 int funcidx = 0;
+int PASSTWO = 0;
+
+void init(int passtwo){
+    PASSTWO = passtwo;
+    funcidx=0;
+    reset_lex(fin);
+}
+
+void functions(){
+#define ONEPASS
+    while(SYMID!=EOFSYM){
+        if(SYMID!=DEFSYM){
+            updateSymBuf(fin);
+            continue;
+        }
+        updateSymBuf(fin);
+        while(SYMID==IDENTSYM && NSYMID==NUMSYM){
+            wcscpy(functab[funccnt].name,TOKEN);
+            updateSymBuf(fin);
+            int para_num = (int)wcstol(TOKEN,NULL,10);
+            updateSymBuf(fin);
+            functab[funccnt].para_num = para_num;
+            int truth_num = 1 << para_num;
+            functab[funccnt].truth_table = (uint8_t*)malloc(sizeof(truth_num));
+            for (int i=0;i<truth_num;i++){
+                functab[funccnt].truth_table[i] = (uint8_t)wcstol(TOKEN,NULL,10);
+                updateSymBuf(fin);
+            }
+            funccnt +=1;
+        }
+    }
+#if LOG_LEVEL==DEBUG_LOG
+    for(int i=0;i<funccnt;i++){
+        wprintf(L"FUNC: name:%ls,para_num:%d\n",functab[i].name,functab[i].para_num);
+        for(int j=0;j<1<<functab[i].para_num;j++){
+            wprintf(L"%d ",functab[i].truth_table[j]);
+        }
+        wprintf(L"\n");
+    }
+#endif
+#undef ONEPASS
+}
 
 void program(){// 程序 = 语句 {语句}
     while(SYMID==IDENTSYM || SYMID==NOTSYM || SYMID==LPARENNTSYM || SYMID==DEFSYM){
@@ -115,11 +157,15 @@ void factor(){
         updateSymBuf(fin);
         factor();
     }else if(SYMID==IDENTSYM && NSYMID==LPARENNTSYM){
-        func_call();
-    }else if (SYMID == NUMSYM){//TODO
+        if(!PASSTWO || lookup_func(TOKEN)>=0){
+            func_call();
+        }else{
+            updateSymBuf(fin);
+        }
+    }else if (SYMID == NUMSYM){
         assert(wcslen(TOKEN)==1);
         updateSymBuf(fin);
-    }else if(SYMID==IDENTSYM){//TODO 也可能是左括号，下一语句开始
+    }else if(SYMID==IDENTSYM){
         updateSymBuf(fin);
     }
     LOG(DEBUG_LOG,LOGSRC,L"this is a factor");
