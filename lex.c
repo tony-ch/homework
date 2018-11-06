@@ -72,7 +72,7 @@ void getsym(FILE* fin){
             symBuf[symBufIdx].token[0] = 0;
             break;
         default:
-            if(iswalpha(ch) || ch == L'_' ) {
+            if(is_alpha(ch)) {
                 int i=0;
                 do{
                     if(i<=IDENLENMAX-3){
@@ -80,10 +80,10 @@ void getsym(FILE* fin){
                         i += 1;
                     }
                     getch(fin);
-                }while (iswalnum(ch) || ch == L'_');
+                }while (is_alnum(ch));
                 symBuf[symBufIdx].token[i]=0;
                 symBuf[symBufIdx].id = IDENTSYM;
-            }else if(iswdigit(ch)){
+            }else if(is_digit(ch)){
                 enum SYMBOL lastid = symBuf[(symBufIdx+SYMBUFSZ-1)%SYMBUFSZ].id;
                 if(lastid==NUMSYM || lastid == LOGICNUMSYM){
                     symBuf[symBufIdx].id = LOGICNUMSYM;

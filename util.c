@@ -119,3 +119,13 @@ int lookup_func(const wchar_t* name){
     }
     return -1;
 }
+
+int is_digit(const wchar_t ch){
+    return ch >=L'0' && ch <= L'9';
+}
+int is_alpha(const wchar_t ch){
+    return (ch >= L'a' && ch <= L'z') || (ch >= L'A' && ch <= L'Z') || ch == L'_';
+}
+int is_alnum(const wchar_t ch){
+    return is_alpha(ch) || is_digit(ch);
+}

@@ -107,6 +107,9 @@ FILE* getFile(const char* mode,const char* name, const char* default_path);
 const char * getSymStr(enum SYMBOL sym);
 const char * getErrStr(enum ERRORTYPE e);
 int lookup_func(const wchar_t* name);
+int is_digit(wchar_t ch);
+int is_alpha(wchar_t ch);
+int is_alnum(wchar_t ch);
 
 // lex
 void getch(FILE* fin);
