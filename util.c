@@ -111,13 +111,18 @@ const char * getErrStr(enum ERRORTYPE e){
     return "INVALID ERR TYPE";
 }
 
-int lookup_func(const wchar_t* name){
-    for(int i=0;i<funccnt;i++){
-        if(wcscmp(name,functab[i].name)==0){
-            return i;
-        }
+const char * getMopStr(enum MOP op){
+    switch (op){
+        ENUM_TO_STR(PARAOP)
+        ENUM_TO_STR(CALLOP)
+        ENUM_TO_STR(EQUOP)
+        ENUM_TO_STR(IMPOP)
+        ENUM_TO_STR(CONJOP)
+        ENUM_TO_STR(DISJOP)
+        ENUM_TO_STR(XOROP)
+        ENUM_TO_STR(NOTOP)
     }
-    return -1;
+    return "INVALID OP TYPE";
 }
 
 int is_digit(const wchar_t ch){

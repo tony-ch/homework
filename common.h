@@ -48,11 +48,10 @@ struct SYMITEM{
 };
 
 // syn
-#define TRUTHMAX 1024
 #define FUNCMAX 100
 #define TABMAX 200
 #define EXPMAX 100
-//#define CODEMAX 300
+#define CODEMAX 300
 
 struct FUNCITEM{
     wchar_t name[STRMAX];
@@ -71,15 +70,44 @@ struct TABITEM{
     int addr;
 };
 
-//struct MIDCODE;
+// midcode
+enum MOP{
+    PARAOP,CALLOP,
+    EQUOP,IMPOP,CONJOP,DISJOP,XOROP,NOTOP
+};
+
+enum ARGTYPE{
+    NULARG,VALUEARG,TIDXARG,FUNCARG
+};
+#define NON -1
+#define NOTFOUND -1
+struct MIDCODE{
+    enum MOP op;
+    union {
+        int value;
+        int tidx;
+    } arg1;
+    union {
+        int value;
+        int tidx;
+    }arg2;
+    union {
+        int value;
+        int tidx;
+    }res;
+    enum ARGTYPE a1_type;
+    enum ARGTYPE a2_type;
+    enum ARGTYPE r_type;
+};
 
 struct EXPITEM{
     int var_num;
+    int codecnt;
+    int tabcnt;
     struct TABITEM tab[TABMAX];
-    //struct MIDCODE codes[CODEMAX];
+    struct MIDCODE codes[CODEMAX];
+    int varidx[TABMAX];
 };
-
-
 // var
 // common
 extern FILE *fin;//源文件
@@ -94,8 +122,12 @@ extern int symBufIdx;
 // syn
 extern struct FUNCITEM functab[FUNCMAX];
 extern struct EXPITEM exptab[EXPMAX];
-extern int funccnt;
+extern int funccnt;//for first pass
 extern int funcidx;
+//extern int tabidx;
+extern int expidx;
+//extern int codeidx;
+extern int tmpv_cnt;
 
 // function
 // common
@@ -106,7 +138,7 @@ void endProc(int n);
 FILE* getFile(const char* mode,const char* name, const char* default_path);
 const char * getSymStr(enum SYMBOL sym);
 const char * getErrStr(enum ERRORTYPE e);
-int lookup_func(const wchar_t* name);
+const char * getMopStr(enum MOP op);
 int is_digit(wchar_t ch);
 int is_alpha(wchar_t ch);
 int is_alnum(wchar_t ch);
@@ -123,6 +155,13 @@ void reset_lex(FILE*);
 void init(int);
 void functions();
 void program();
+
+//midcode
+void enter(wchar_t* name, enum ENTRY_TYPES typ, int value);
+int lookup_func(const wchar_t* name);
+int lookup_name(const wchar_t* name);
+int getTemVar();
+void emitMid(enum MOP,int a1,int a2,int r,enum ARGTYPE a1t,enum ARGTYPE a2t, enum ARGTYPE rt);
 
 // error
 void error(enum ERRORTYPE e, const char *source,int,int);

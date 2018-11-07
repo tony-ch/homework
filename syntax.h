@@ -8,14 +8,14 @@
 void sentence();
 void def_sentence();
 void func_def();
-void logic_sentence();
-void imp_term();
-void xor_term();
-void disj_term();
-void conj_term();
-void factor();
-void func_call();
-void para_list();
+int logic_sentence();
+int imp_term();
+int xor_term();
+int disj_term();
+int conj_term();
+int factor();
+int func_call();
+int para_list();
 
 
 #endif //LOGIC_SYNTAX_H
