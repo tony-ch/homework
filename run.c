@@ -43,7 +43,7 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case CALLOP: // a1 funcid a2 paranum
             for(int i=0;i<a2;i++){
                 int tmp = pop();
-                truthidx = truthidx<<1 | tmp;//TODO check
+                truthidx = truthidx | tmp<<i;
             }
             tab[code.res.tidx].value = functab[a1].truth_table[truthidx];
             LOG(DEBUG_LOG,LOGSRC,L"call fun %ls get %d",functab[a1].name,tab[code.res.tidx].value );
@@ -55,7 +55,7 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case XOROP:
         case NOTOP:
             tab[code.res.tidx].value = run_math(code.op,a1,a2);
-            LOG(DEBUG_LOG,LOGSRC,L"run %ls %ls:%d %ls:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
+            LOG(DEBUG_LOG,LOGSRC,L"run %s %ls:%d %ls:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
             break;
     }
 }
@@ -124,22 +124,9 @@ int produce_narg_truth(int func, int n){
     }
 }
 
-int produce_truth(int func,int a, int b){
-    if(functab[func].para_num==0)
-        return 0;
-    push(a);
-    push(b);
-    if(functab[func].para_num==1) {
-        int r2 = produce_narg_truth(func, 1);
-        pop();
-        int r1 = produce_narg_truth(func, 1);
-        return r1|r2;
-    }
-    if(functab[func].para_num==2)
-        return produce_narg_truth(func,2);
-}
-
 void check_complete(){
+    if(funccnt==0)
+        return;
     swprintf(records[0b0000],EXPLENMAX,L"0");
     swprintf(records[0b1111],EXPLENMAX,L"1");
     swprintf(records[0b0011],EXPLENMAX,L"p");
