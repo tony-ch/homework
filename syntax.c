@@ -84,7 +84,8 @@ void sentence(){// 语句 = 逻辑语句 | 定义语句
         CODEIDX = 0;
         VARNUM = 0;
         EXPSTRIDX = 0;
-        logic_sentence();
+        int res_tid = logic_sentence();
+        emitMid(ENDOP,NON,NON,res_tid,NULARG,NULARG,TIDXARG);
         LOG(DEBUG_LOG,LOGSRC,L"this is a sentence with %d para.",exptab[expidx].var_num);
         expidx += 1;
     }
@@ -235,10 +236,17 @@ int factor(){
     }else if(SYMID==IDENTSYM){
         res_tid = lookup_name(TOKEN);
         if(res_tid == NOTFOUND){
-            res_tid = TABIDX;
-            enter(TOKEN,VARTYPE,NON);
-            exptab[expidx].varidx[VARNUM]=res_tid;
-            VARNUM += 1;
+            int funcid = lookup_func(TOKEN);
+            if(funcid!=NOTFOUND){
+                assert(functab[funcid].para_num==0);
+                res_tid = getTemVar();
+                emitMid(CALLOP,funcid,0,res_tid,FUNCARG,VALUEARG,TIDXARG);
+            } else{
+                res_tid = TABIDX;
+                enter(TOKEN,VARTYPE,NON);
+                exptab[expidx].varidx[VARNUM]=res_tid;
+                VARNUM += 1;
+            }
         }
         wcsncpy(EXPSTR+EXPSTRIDX,TOKEN,wcslen(TOKEN));
         EXPSTRIDX += wcslen(TOKEN);

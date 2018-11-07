@@ -121,6 +121,7 @@ const char * getMopStr(enum MOP op){
         ENUM_TO_STR(DISJOP)
         ENUM_TO_STR(XOROP)
         ENUM_TO_STR(NOTOP)
+        ENUM_TO_STR(ENDOP)
     }
     return "INVALID OP TYPE";
 }
