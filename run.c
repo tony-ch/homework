@@ -6,6 +6,9 @@
 #define LOGSRC "RUN"
 int stack[STACKSZ]={0};
 int pstack = 0;
+#define TRUTH_ELE 4
+#define COMPLETE 16
+wchar_t records[COMPLETE][EXPLENMAX]={0};
 
 #define getbit(x,y) ((x)>>(y)&1)
 
@@ -40,9 +43,10 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case CALLOP: // a1 funcid a2 paranum
             for(int i=0;i<a2;i++){
                 int tmp = pop();
-                truthidx = truthidx | tmp<i;//TODO check
+                truthidx = truthidx<<1 | tmp;//TODO check
             }
             tab[code.res.tidx].value = functab[a1].truth_table[truthidx];
+            LOG(DEBUG_LOG,LOGSRC,L"call fun %ls get %d",functab[a1].name,tab[code.res.tidx].value );
             break;
         case EQUOP:
         case IMPOP:
@@ -51,6 +55,7 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case XOROP:
         case NOTOP:
             tab[code.res.tidx].value = run_math(code.op,a1,a2);
+            LOG(DEBUG_LOG,LOGSRC,L"run %ls %ls:%d %ls:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
             break;
     }
 }
@@ -87,4 +92,80 @@ void run(){
         wprintf(L"%ls\n",exptab[i].str);
         run_exp(&(exptab[i]));
     }
+}
+
+unsigned int int_to_int(unsigned int k) {
+    return (k == 0 || k == 1 ? k : ((k % 2) + 10 * int_to_int(k / 2)));
+}
+
+int produce_1arg_truth(int func,int a){
+    int truth_idx = 0;
+    for(int i=0;i<TRUTH_ELE;i++){
+        truth_idx = truth_idx | (functab[func].truth_table[getbit(a,i)]<<i);
+    }
+    if(wcslen(records[truth_idx])==0) {
+        swprintf(records[truth_idx],EXPLENMAX,L"%ls(%ls)",functab[func].name,records[a]);
+        LOG(DEBUG_LOG,LOGSRC,L"%ls(%ls) %04u",functab[func].name,records[a],int_to_int((unsigned int)truth_idx));
+        return 1;
+    } else{
+        return 0;
+    }
+}
+
+int produce_2arg_truth(int func, int a, int b){
+    int truth_idx = 0;
+    for(int i=0;i<TRUTH_ELE;i++){
+        truth_idx = truth_idx | functab[func].truth_table[getbit(a,i)<<1 | getbit(b,i)] << i;
+    }
+    if(wcslen(records[truth_idx])==0){
+        swprintf(records[truth_idx],EXPLENMAX,L"%ls(%ls,%ls)",functab[func].name,records[a],records[b]);
+        LOG(DEBUG_LOG,LOGSRC,L"%ls(%ls,%ls) %04u",functab[func].name,records[a],records[b],int_to_int((unsigned int)truth_idx));
+        return 1;
+    } else{
+        return 0;
+    }
+}
+
+int produce_truth(int func,int a, int b){
+    if(functab[func].para_num==0)
+        return 0;
+    if(functab[func].para_num==1) {
+        int r1 = produce_1arg_truth(func, a);
+        int r2 = produce_1arg_truth(func, b);
+        return r1|r2;
+    }
+    if(functab[func].para_num==2)
+        return produce_2arg_truth(func,a,b);
+}
+
+void check_complete(){
+    swprintf(records[0b0000],EXPLENMAX,L"0");
+    swprintf(records[0b1111],EXPLENMAX,L"1");
+    swprintf(records[0b0011],EXPLENMAX,L"p");
+    swprintf(records[0b0101],EXPLENMAX,L"q");
+    int hasnew;
+    do{
+        hasnew=0;
+        for(int i=0;i<COMPLETE;i++){
+            if(wcslen(records[i])==0){
+                continue;
+            }
+            for(int j=0;j<COMPLETE;j++){
+                if(wcslen(records[j])==0)
+                    continue;
+                for(int func=0;func<funccnt;func++){
+                    hasnew = hasnew | produce_truth(func,i,j);
+                }
+            }
+        }
+    }while (hasnew==1);
+    int cnt = 0;
+    for(unsigned i=0;i<COMPLETE;i++){
+        if(wcslen(records[i])==0){
+            continue;
+        }
+        wprintf(L"%ls %04u\n",records[i],int_to_int(i));
+        cnt++;
+    }
+    wprintf(L"get %d, %d total\n",cnt,COMPLETE);
 }

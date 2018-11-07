@@ -179,6 +179,7 @@ void emitMid(enum MOP,int a1,int a2,int r,enum ARGTYPE a1t,enum ARGTYPE a2t, enu
 
 // run
 void run();
+void check_complete();
 
 // error
 void error(enum ERRORTYPE e, const char *source,int,int);

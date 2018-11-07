@@ -20,6 +20,7 @@ int main() {
     init(PASSTWO);
     program();
     run();
+    check_complete();
     endProc(0);
     return 0;
 }

@@ -138,12 +138,14 @@ int is_alnum(const wchar_t ch){
 int push(int value){
     stack[pstack] = value;
     pstack++;
+    LOG(DEBUG_LOG,LOGSRC,L"stack push %d;p:%d",value,pstack);
     return value;
 }
 
 int pop(){
-    int res = stack[pstack];
     pstack += -1;
+    int res = stack[pstack];
     assert(pstack>=0);
+    LOG(DEBUG_LOG,LOGSRC,L"stack pop %d;p:%d",res,pstack);
     return res;
 }
