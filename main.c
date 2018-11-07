@@ -19,9 +19,7 @@ int main() {
     LOG(DEBUG_LOG,LOGSRC,L"two pass");
     init(PASSTWO);
     program();
-    while (!readEOF()){
-        updateSymBuf(fin);
-    }
+    run();
     endProc(0);
     return 0;
 }

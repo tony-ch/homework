@@ -134,3 +134,16 @@ int is_alpha(const wchar_t ch){
 int is_alnum(const wchar_t ch){
     return is_alpha(ch) || is_digit(ch);
 }
+
+int push(int value){
+    stack[pstack] = value;
+    pstack++;
+    return value;
+}
+
+int pop(){
+    int res = stack[pstack];
+    pstack += -1;
+    assert(pstack>=0);
+    return res;
+}

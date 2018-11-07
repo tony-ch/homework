@@ -77,4 +77,5 @@ void emitMid(enum MOP op,int a1,int a2,int r,enum ARGTYPE a1t,enum ARGTYPE a2t, 
     arg2str(a2t,a2,a2s);
     arg2str(rt,r,rs);
     LOG(DEBUG_LOG,LOGSRC,L"EMIT %s %ls %ls %ls",getMopStr(op),a1s,a2s,rs);
+    CODEIDX += 1;
 }

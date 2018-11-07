@@ -25,7 +25,7 @@
 #define INFO_LOG 1
 #define WARN_LOG 2
 #define ERR_LOG 3
-#define LOG_LEVEL DEBUG_LOG
+#define LOG_LEVEL INFO_LOG
 #define NUMMAX 10
 // lex
 enum SYMBOL{
@@ -52,6 +52,7 @@ struct SYMITEM{
 #define TABMAX 200
 #define EXPMAX 100
 #define CODEMAX 300
+#define EXPLENMAX 300
 
 struct FUNCITEM{
     wchar_t name[STRMAX];
@@ -104,10 +105,16 @@ struct EXPITEM{
     int var_num;
     int codecnt;
     int tabcnt;
+    int strlen;
+    wchar_t str[EXPLENMAX];
     struct TABITEM tab[TABMAX];
     struct MIDCODE codes[CODEMAX];
     int varidx[TABMAX];
 };
+
+// run
+#define STACKSZ 100
+
 // var
 // common
 extern FILE *fin;//源文件
@@ -129,6 +136,11 @@ extern int expidx;
 //extern int codeidx;
 extern int tmpv_cnt;
 
+//run
+
+extern int stack[STACKSZ];
+extern int pstack;
+
 // function
 // common
 
@@ -142,6 +154,8 @@ const char * getMopStr(enum MOP op);
 int is_digit(wchar_t ch);
 int is_alpha(wchar_t ch);
 int is_alnum(wchar_t ch);
+int push(int);
+int pop();
 
 // lex
 void getch(FILE* fin);
@@ -162,6 +176,9 @@ int lookup_func(const wchar_t* name);
 int lookup_name(const wchar_t* name);
 int getTemVar();
 void emitMid(enum MOP,int a1,int a2,int r,enum ARGTYPE a1t,enum ARGTYPE a2t, enum ARGTYPE rt);
+
+// run
+void run();
 
 // error
 void error(enum ERRORTYPE e, const char *source,int,int);
