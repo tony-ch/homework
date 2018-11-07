@@ -99,12 +99,12 @@ unsigned int int_to_int(unsigned int k) {
 }
 
 int produce_narg_truth(int func, int n){
-    pstack = pstack - n;
+    int pstack_here = pstack - n;
     int recordIdx = 0;
     for(int i=0;i<TRUTH_ELE;i++){
         int tmp=0;
         for(int j=0;j<n;j++){//求每一位的真值
-            tmp = getbit(stack[pstack+j],i)<<(n-j-1) | tmp;
+            tmp = getbit(stack[pstack_here+j],i)<<(n-j-1) | tmp;
         }
         recordIdx = recordIdx | functab[func].truth_table[tmp]<<i;
     }
@@ -113,8 +113,8 @@ int produce_narg_truth(int func, int n){
         swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls(",functab[func].name);
         stridx+=wcslen(functab[func].name)+wcslen(L"(");
         for(int i=0;i<n;i++){
-            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls,",records[stack[pstack+i]]);
-            stridx+=wcslen(records[stack[pstack+i]])+wcslen(L",");
+            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls,",records[stack[pstack_here+i]]);
+            stridx+=wcslen(records[stack[pstack_here+i]])+wcslen(L",");
         }
         swprintf(records[recordIdx]+stridx-1,EXPLENMAX,L")");
         LOG(DEBUG_LOG,LOGSRC,L"%ls %04u",records[recordIdx],int_to_int((unsigned int)recordIdx));
@@ -147,17 +147,28 @@ void check_complete(){
     int hasnew;
     do{
         hasnew=0;
-        for(int i=0;i<COMPLETE;i++){
-            if(wcslen(records[i])==0){
-                continue;
-            }
-            for(int j=0;j<COMPLETE;j++){
-                if(wcslen(records[j])==0)
+        for(int func=0;func<funccnt;func++){
+            int para_num = functab[func].para_num;
+            for(int i=0;i<COMPLETE;i++){
+                if(wcslen(records[i])==0)
                     continue;
-                for(int func=0;func<funccnt;func++){
-                    hasnew = hasnew | produce_truth(func,i,j);
+                push(i);
+                for(int j=0;j<COMPLETE;j++){
+                    if(wcslen(records[j])==0)
+                        continue;
+                    push(j);
+                    for(int k=0;k<COMPLETE;k++){
+                        if(wcslen(records[k])==0)
+                            continue;
+                        push(k);
+                        hasnew = hasnew | produce_narg_truth(func,para_num);
+                        pop();
+                    }
+                    pop();
                 }
+                pop();
             }
+
         }
     }while (hasnew==1);
     int cnt = 0;
