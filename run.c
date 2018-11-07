@@ -98,28 +98,26 @@ unsigned int int_to_int(unsigned int k) {
     return (k == 0 || k == 1 ? k : ((k % 2) + 10 * int_to_int(k / 2)));
 }
 
-int produce_1arg_truth(int func,int a){
-    int truth_idx = 0;
+int produce_narg_truth(int func, int n){
+    pstack = pstack - n;
+    int recordIdx = 0;
     for(int i=0;i<TRUTH_ELE;i++){
-        truth_idx = truth_idx | (functab[func].truth_table[getbit(a,i)]<<i);
+        int tmp=0;
+        for(int j=0;j<n;j++){//求每一位的真值
+            tmp = getbit(stack[pstack+j],i)<<(n-j-1) | tmp;
+        }
+        recordIdx = recordIdx | functab[func].truth_table[tmp]<<i;
     }
-    if(wcslen(records[truth_idx])==0) {
-        swprintf(records[truth_idx],EXPLENMAX,L"%ls(%ls)",functab[func].name,records[a]);
-        LOG(DEBUG_LOG,LOGSRC,L"%ls(%ls) %04u",functab[func].name,records[a],int_to_int((unsigned int)truth_idx));
-        return 1;
-    } else{
-        return 0;
-    }
-}
-
-int produce_2arg_truth(int func, int a, int b){
-    int truth_idx = 0;
-    for(int i=0;i<TRUTH_ELE;i++){
-        truth_idx = truth_idx | functab[func].truth_table[getbit(a,i)<<1 | getbit(b,i)] << i;
-    }
-    if(wcslen(records[truth_idx])==0){
-        swprintf(records[truth_idx],EXPLENMAX,L"%ls(%ls,%ls)",functab[func].name,records[a],records[b]);
-        LOG(DEBUG_LOG,LOGSRC,L"%ls(%ls,%ls) %04u",functab[func].name,records[a],records[b],int_to_int((unsigned int)truth_idx));
+    if(wcslen(records[recordIdx])==0){
+        int stridx = 0;
+        swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls(",functab[func].name);
+        stridx+=wcslen(functab[func].name)+wcslen(L"(");
+        for(int i=0;i<n;i++){
+            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls,",records[stack[pstack+i]]);
+            stridx+=wcslen(records[stack[pstack+i]])+wcslen(L",");
+        }
+        swprintf(records[recordIdx]+stridx-1,EXPLENMAX,L")");
+        LOG(DEBUG_LOG,LOGSRC,L"%ls %04u",records[recordIdx],int_to_int((unsigned int)recordIdx));
         return 1;
     } else{
         return 0;
@@ -129,13 +127,16 @@ int produce_2arg_truth(int func, int a, int b){
 int produce_truth(int func,int a, int b){
     if(functab[func].para_num==0)
         return 0;
+    push(a);
+    push(b);
     if(functab[func].para_num==1) {
-        int r1 = produce_1arg_truth(func, a);
-        int r2 = produce_1arg_truth(func, b);
+        int r2 = produce_narg_truth(func, 1);
+        pop();
+        int r1 = produce_narg_truth(func, 1);
         return r1|r2;
     }
     if(functab[func].para_num==2)
-        return produce_2arg_truth(func,a,b);
+        return produce_narg_truth(func,2);
 }
 
 void check_complete(){
