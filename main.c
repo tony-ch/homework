@@ -1,4 +1,4 @@
-#include "common.h"
+﻿#include "common.h"
 
 #define LOGSRC "MAIN"
 #define PASSONE 0
