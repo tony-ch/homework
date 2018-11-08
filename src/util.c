@@ -45,20 +45,30 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
     FILE *f=NULL;
     char path[PATHLEN];
     while (f == NULL) {//打开源文件
-        wprintf(L"please input %S path:",name);
+        wprintf(L"please input %S path: like ../input_test.txt  ",name);
         if(default_path!=NULL){
-            wprintf(L"(press enter to use default: %S)",default_path);
-        }
+            wprintf(L"(press 'Enter' to use default: %S)",default_path);
+		}else{
+			wprintf(L"(press 'Enter' to use stdin instead of file)");
+		}
         wprintf(L"\n");
         if (getPath(path) != SUCCESS_RET)
             continue;
-        if(default_path!=NULL && (strcmp(path, "") == 0 || strcmp(path, " ") == 0) ){
-            strcpy(path, default_path);
-        }
+		if (strcmp(path, "") == 0 || strcmp(path, " ") == 0) {
+			if (default_path == NULL) {
+				wprintf(L"using stdin, press 'Ctrl'+'Z' and 'Enter' to end input\n");
+				f = stdin;
+				break;
+			}
+			else {
+				strcpy(path, default_path);
+			}
+		}
         if ((f = fopen(path, mode)) == NULL)
             wprintf(L"can't open %S\n",name);
     }
-    LOG(INFO_LOG,LOGSRC,L"%S, %S",name,path);
+	if(f!=stdin)
+		LOG(INFO_LOG,LOGSRC,L"%S, %S",name,path);
     return f;
 }
 
@@ -74,7 +84,7 @@ void endProc(int n){
         functab[i].truth_table = NULL;
     }
     wprintf(L"press enter to end process ...\n");
-    getwchar();
+	getwchar();
     exit(n);
 }
 

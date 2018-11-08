@@ -3,10 +3,13 @@
 //
 #include "common.h"
 
+#define INTLIMIT  0xefefefef
 #define LLENMAX 400 // line length limit
 #define NLENMAX 10  // num length limit
 #define IDENLENMAX 20 // ident length limix
 #define LOGSRC "LEX"
+
+int fileend = INTLIMIT;
 
 wchar_t ch=L' ';//current ch
 wchar_t line[LLENMAX];//current line
@@ -30,8 +33,9 @@ void reset_lex(FILE *fin){
 
 void getch(FILE* fin){//读取下一个字符，放到ch中
     if(ccnt==lleng){
-        if(feof(fin)){
+        if(fileend==ftell(fin) || feof(fin)){
             ch = WEOF;
+			fileend = ftell(fin);
             return;
         }
         lcnt += 1;
