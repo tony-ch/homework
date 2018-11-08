@@ -9,10 +9,11 @@ FILE *codefile = NULL; //中间代码文件
 extern wchar_t ch;
 int main() {
     setlocale(LC_ALL,"");
-    fin = getFile("r","input source file","input_test.txt");
+    fin = getFile("r,ccs=UTF-8","input source file","input_test.txt");
 #if LOG_LEVEL==DEBUG_LOG
-    fout = getFile("w","result file","./res.out");
-    codefile = getFile("w","mid code file","./code.out");
+    fout = getFile("w,ccs=UTF-8","result file","./res.out");
+    codefile = getFile("w,ccs=UTF-8
+","mid code file","./code.out");
 #endif
     init(PASSONE);
     functions();

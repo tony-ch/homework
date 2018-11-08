@@ -17,11 +17,11 @@ void error(enum ERRORTYPE e, const char *source, int l, int c){
         case ASSERT_ERROR:
         case PARA_NUM_TOO_LARGE_ERR:
         case FUNC_DEF_ERR:
-            LOG(ERR_LOG,source,L"%s, line %d, col %d",getErrStr(e),l,c);
+            LOG(ERR_LOG,source,L"%S, line %d, col %d",getErrStr(e),l,c);
             endProc(-1);
             break;
         default:
-            LOG(ERR_LOG,source,L"%s",getErrStr(e));
+            LOG(ERR_LOG,source,L"%S",getErrStr(e));
             endProc(-1);
     }
 }

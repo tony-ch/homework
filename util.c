@@ -14,7 +14,7 @@ const char* LOG_LEVEL_STR[]={"DEBUG","INFO","WARN","ERR"};
 
 void LOG(int level, const char* source, const wchar_t* format, ...){
     if(level >= LOG_LEVEL){
-        wprintf(L"[%s] %s: ",LOG_LEVEL_STR[level],source);
+        wprintf(L"[%S] %S: ",LOG_LEVEL_STR[level],source);
         va_list arglist;
         va_start(arglist,format);
         vwprintf(format,arglist);
@@ -45,9 +45,9 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
     FILE *f=NULL;
     char path[PATHLEN];
     while (f == NULL) {//打开源文件
-        wprintf(L"please %s path:",name);
+        wprintf(L"please input %S path:",name);
         if(default_path!=NULL){
-            wprintf(L"(press enter to use default: %s)",default_path);
+            wprintf(L"(press enter to use default: %S)",default_path);
         }
         wprintf(L"\n");
         if (getPath(path) != SUCCESS_RET)
@@ -56,9 +56,9 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
             strcpy(path, default_path);
         }
         if ((f = fopen(path, mode)) == NULL)
-            wprintf(L"can't open %s\n",name);
+            wprintf(L"can't open %S\n",name);
     }
-    LOG(INFO_LOG,LOGSRC,L"%s, %s",name,path);
+    LOG(INFO_LOG,LOGSRC,L"%S, %S",name,path);
     return f;
 }
 

@@ -55,7 +55,7 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case XOROP:
         case NOTOP:
             tab[code.res.tidx].value = run_math(code.op,a1,a2);
-            LOG(DEBUG_LOG,LOGSRC,L"run %s %ls:%d %ls:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
+            LOG(DEBUG_LOG,LOGSRC,L"run %S %s:%d %s:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
             break;
     }
 }
@@ -78,7 +78,7 @@ void run_exp(struct EXPITEM *exp){
         if(res == 1){
             truth_cnt++;
             for (int j = 0;j <var_num;j++){// set value
-                wprintf(L"%ls: %d  ",exp->tab[exp->varidx[j]].name,getbit(i,j));
+                wprintf(L"%s: %d  ",exp->tab[exp->varidx[j]].name,getbit(i,j));
             }
             wprintf(L"\n");
             LOG(DEBUG_LOG,LOGSRC,L"%d true",i);
@@ -89,7 +89,7 @@ void run_exp(struct EXPITEM *exp){
 
 void run(){
     for(int i=0;i<expidx;i++){
-        wprintf(L"%ls\n",exptab[i].str);
+        wprintf(L"%s\n",exptab[i].str);
         run_exp(&(exptab[i]));
     }
 }
@@ -110,14 +110,14 @@ int produce_narg_truth(int func, int n){
     }
     if(wcslen(records[recordIdx])==0){
         int stridx = 0;
-        swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls(",functab[func].name);
+        swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s(",functab[func].name);
         stridx+=wcslen(functab[func].name)+wcslen(L"(");
         for(int i=0;i<n;i++){
-            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%ls,",records[stack[pstack_here+i]]);
+            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s,",records[stack[pstack_here+i]]);
             stridx+=wcslen(records[stack[pstack_here+i]])+wcslen(L",");
         }
         swprintf(records[recordIdx]+stridx-1,EXPLENMAX,L")");
-        LOG(DEBUG_LOG,LOGSRC,L"%ls %04u",records[recordIdx],int_to_int((unsigned int)recordIdx));
+        LOG(DEBUG_LOG,LOGSRC,L"%s %04u",records[recordIdx],int_to_int((unsigned int)recordIdx));
         return 1;
     } else{
         return 0;
@@ -163,7 +163,7 @@ void check_complete(){
         if(wcslen(records[i])==0){
             continue;
         }
-        wprintf(L"%ls %04u\n",records[i],int_to_int(i));
+        wprintf(L"%s %04u\n",records[i],int_to_int(i));
         cnt++;
     }
     wprintf(L"get %d, %d total\n",cnt,COMPLETE);

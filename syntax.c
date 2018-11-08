@@ -12,8 +12,8 @@
 #define COL (symBuf[symBufIdx].col)
 #define TAB exptab[expidx].tab
 
-struct FUNCITEM functab[FUNCMAX]={};
-struct EXPITEM exptab[EXPMAX]={};
+struct FUNCITEM functab[FUNCMAX]={0};
+struct EXPITEM exptab[EXPMAX]={0};
 int funccnt = 0;
 int funcidx = 0;
 int PASSTWO = 0;
@@ -57,7 +57,7 @@ void functions(){
     }
 #if LOG_LEVEL==DEBUG_LOG
     for(int i=0;i<funccnt;i++){
-        wprintf(L"FUNC: name:%ls,para_num:%d\n",functab[i].name,functab[i].para_num);
+        wprintf(L"FUNC: name:%s,para_num:%d\n",functab[i].name,functab[i].para_num);
         for(int j=0;j<1<<functab[i].para_num;j++){
             wprintf(L"%d ",functab[i].truth_table[j]);
         }
