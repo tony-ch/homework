@@ -26,15 +26,17 @@ int run_math(enum MOP op, int a1, int a2){
             return a1!=a2;
         case NOTOP:
             return a1==0?1:0;
+        default:
+            return NON;
     }
 }
 
 void run_code(struct MIDCODE code, struct TABITEM *tab){
     enum ARGTYPE a1t = code.a1_type;
     enum ARGTYPE a2t = code.a2_type;
-    enum ARGTYPE rt = code.r_type;
+    //enum ARGTYPE rt = code.r_type;
     int a1 = a1t==TIDXARG ? tab[code.arg1.tidx].value: code.arg1.value;
-    int a2 = a1t==TIDXARG ? tab[code.arg2.tidx].value: code.arg2.value;
+    int a2 = a2t==TIDXARG ? tab[code.arg2.tidx].value: code.arg2.value;
     int truthidx = 0;
     switch (code.op){
         case PARAOP://r argtidx
@@ -56,6 +58,8 @@ void run_code(struct MIDCODE code, struct TABITEM *tab){
         case NOTOP:
             tab[code.res.tidx].value = run_math(code.op,a1,a2);
             LOG(DEBUG_LOG,LOGSRC,L"run %S %s:%d %s:%d get %d",getMopStr(code.op),tab[code.arg1.tidx].name,a1,tab[code.arg2.tidx].name,a2,tab[code.res.tidx].value);
+            break;
+        default:
             break;
     }
 }
@@ -110,13 +114,16 @@ int produce_narg_truth(int func, int n){
     }
     if(wcslen(records[recordIdx])==0){
         int stridx = 0;
-        swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s(",functab[func].name);
+		//swprintf(records[recordIdx] + stridx, EXPLENMAX, L"%s(", functab[func].name);
+		snwprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s(",functab[func].name);
         stridx+=wcslen(functab[func].name)+wcslen(L"(");
         for(int i=0;i<n;i++){
-            swprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s,",records[stack[pstack_here+i]]);
+			//swprintf(records[recordIdx] + stridx, EXPLENMAX, L"%s,", records[stack[pstack_here + i]]);
+			snwprintf(records[recordIdx]+stridx,EXPLENMAX,L"%s,",records[stack[pstack_here+i]]);
             stridx+=wcslen(records[stack[pstack_here+i]])+wcslen(L",");
         }
-        swprintf(records[recordIdx]+stridx-1,EXPLENMAX,L")");
+		//swprintf(records[recordIdx] + stridx - 1, EXPLENMAX, L")");
+		snwprintf(records[recordIdx]+stridx-1,EXPLENMAX,L")");
         LOG(DEBUG_LOG,LOGSRC,L"%s %04u",records[recordIdx],int_to_int((unsigned int)recordIdx));
         return 1;
     } else{
@@ -127,10 +134,14 @@ int produce_narg_truth(int func, int n){
 void check_complete(){
     if(funccnt==0)
         return;
-    swprintf(records[0b0000],EXPLENMAX,L"0");
-    swprintf(records[0b1111],EXPLENMAX,L"1");
-    swprintf(records[0b0011],EXPLENMAX,L"p");
-    swprintf(records[0b0101],EXPLENMAX,L"q");
+    //swprintf(records[0b0000],EXPLENMAX,L"0");
+    //swprintf(records[0b1111],EXPLENMAX,L"1");
+    //swprintf(records[0b0011],EXPLENMAX,L"p");
+    //swprintf(records[0b0101],EXPLENMAX,L"q");
+	snwprintf(records[0b0000], EXPLENMAX, L"0");
+	snwprintf(records[0b1111], EXPLENMAX, L"1");
+	snwprintf(records[0b0011], EXPLENMAX, L"p");
+	snwprintf(records[0b0101], EXPLENMAX, L"q");
     int hasnew;
     do{
         hasnew=0;

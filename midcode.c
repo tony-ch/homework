@@ -40,7 +40,8 @@ int lookup_name(const wchar_t* name){
 int getTemVar(){
     int ti = TABIDX;
     wchar_t name[STRMAX];
-    swprintf(name,STRMAX,L"&%d",ti);
+    //swprintf(name,STRMAX,L"&%d",ti);
+	snwprintf(name, STRMAX, L"&%d", ti);
     tmpv_cnt +=1;
     enter(name,TEMTYPE, NON);
     return ti;
@@ -49,10 +50,12 @@ int getTemVar(){
 void arg2str(enum ARGTYPE typ, int value, wchar_t * str){
     switch (typ){
         case NULARG:
-            swprintf(str,STRMAX,L"  ");
+            //swprintf(str,STRMAX,L"  ");
+            snwprintf(str,STRMAX,L"  ");
             break;
         case VALUEARG:
-            swprintf(str,STRMAX,L"%d",value);
+            //swprintf(str,STRMAX,L"%d",value);
+            snwprintf(str,STRMAX,L"%d",value);
             break;
         case TIDXARG:
             wcscpy(str,TAB[value].name);

@@ -12,8 +12,7 @@ int main() {
     fin = getFile("r,ccs=UTF-8","input source file","input_test.txt");
 #if LOG_LEVEL==DEBUG_LOG
     fout = getFile("w,ccs=UTF-8","result file","./res.out");
-    codefile = getFile("w,ccs=UTF-8
-","mid code file","./code.out");
+    codefile = getFile("w,ccs=UTF-8","mid code file","./code.out");
 #endif
     init(PASSONE);
     functions();

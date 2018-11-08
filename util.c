@@ -101,6 +101,7 @@ const char * getSymStr(enum SYMBOL sym){
 
 const char * getErrStr(enum ERRORTYPE e){
     switch (e){
+        ENUM_TO_STR(INVAID_SENTENCE)
         ENUM_TO_STR(INCOMPLETE_INPUT_ERR)
         ENUM_TO_STR(INVAID_CHAR_ERR)
         ENUM_TO_STR(ASSERT_ERROR)
@@ -126,13 +127,13 @@ const char * getMopStr(enum MOP op){
     return "INVALID OP TYPE";
 }
 
-int is_digit(const wchar_t ch){
+int is_digit(wchar_t ch){
     return ch >=L'0' && ch <= L'9';
 }
-int is_alpha(const wchar_t ch){
+int is_alpha(wchar_t ch){
     return (ch >= L'a' && ch <= L'z') || (ch >= L'A' && ch <= L'Z') || ch == L'_';
 }
-int is_alnum(const wchar_t ch){
+int is_alnum(wchar_t ch){
     return is_alpha(ch) || is_digit(ch);
 }
 
