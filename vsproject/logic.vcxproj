@@ -103,17 +103,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="error.c" />
-    <ClCompile Include="lex.c" />
-    <ClCompile Include="main.c" />
-    <ClCompile Include="midcode.c" />
-    <ClCompile Include="run.c" />
-    <ClCompile Include="syntax.c" />
-    <ClCompile Include="util.c" />
+    <ClCompile Include="../src/error.c" />
+    <ClCompile Include="../src/lex.c" />
+    <ClCompile Include="../src/main.c" />
+    <ClCompile Include="../src/midcode.c" />
+    <ClCompile Include="../src/run.c" />
+    <ClCompile Include="../src/syntax.c" />
+    <ClCompile Include="../src/util.c" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="common.h" />
-    <ClInclude Include="syntax.h" />
+    <ClInclude Include="../src/common.h" />
+    <ClInclude Include="../src/syntax.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

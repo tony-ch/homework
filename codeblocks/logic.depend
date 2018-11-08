@@ -1,0 +1,71 @@
+# depslib dependency file v1.0
+1541641751 source: .\..\src\error.c
+	"common.h"
+
+1541663108 .\..\src\common.h
+	<stdio.h>
+	<wchar.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<wctype.h>
+	<locale.h>
+	<stdarg.h>
+	<stdint.h>
+	<malloc.h>
+
+1541644156 .\..\src\lex.c
+	"common.h"
+
+1541662820 .\..\src\midcode.c
+	"common.h"
+
+1541663088 .\..\src\run.c
+	"common.h"
+
+1541644385 .\..\src\syntax.c
+	"common.h"
+	"syntax.h"
+
+1541641111 .\..\src\syntax.h
+
+1541663167 .\..\src\util.c
+	"common.h"
+
+1541648338 .\..\src\main.c
+
+1541641751 source:c:\users\tony\source\repos\logic\src\error.c
+	"common.h"
+
+1541665857 c:\users\tony\source\repos\logic\src\common.h
+	<stdio.h>
+	<wchar.h>
+	<stdlib.h>
+	<string.h>
+	<ctype.h>
+	<wctype.h>
+	<locale.h>
+	<stdarg.h>
+	<stdint.h>
+	<malloc.h>
+
+1541644156 source:c:\users\tony\source\repos\logic\src\lex.c
+	"common.h"
+
+1541648338 source:c:\users\tony\source\repos\logic\src\main.c
+
+1541662820 source:c:\users\tony\source\repos\logic\src\midcode.c
+	"common.h"
+
+1541663088 source:c:\users\tony\source\repos\logic\src\run.c
+	"common.h"
+
+1541644385 source:c:\users\tony\source\repos\logic\src\syntax.c
+	"common.h"
+	"syntax.h"
+
+1541641111 c:\users\tony\source\repos\logic\src\syntax.h
+
+1541663167 source:c:\users\tony\source\repos\logic\src\util.c
+	"common.h"
+

@@ -4,7 +4,9 @@
 
 #ifndef LOGIC_COMMON_H
 #define LOGIC_COMMON_H
-
+#if _MSC_VER
+#define snwprintf _snwprintf
+#endif
 //include
 #include <stdio.h>
 #include <wchar.h>
