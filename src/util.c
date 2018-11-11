@@ -47,25 +47,24 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
     while (f == NULL) {//打开源文件
         wprintf(L"please input %S path: like ../input_test.txt  ",name);
         if(default_path!=NULL){
-            wprintf(L"(press 'Enter' to use default: %S)",default_path);
+            wprintf(L"using default: %S\n",default_path);
+			if ((f = fopen(default_path, mode)) == NULL) {
+				wprintf(L"can't open %S\n", name);
+				default_path = NULL;
+				continue;
+			}
 		}else{
-			wprintf(L"(press 'Enter' to use stdin instead of file)");
-		}
-        wprintf(L"\n");
-        if (getPath(path) != SUCCESS_RET)
-            continue;
-		if (strcmp(path, "") == 0 || strcmp(path, " ") == 0) {
-			if (default_path == NULL) {
+			wprintf(L"(press 'Enter' to use stdin instead of file)\n");
+			if (getPath(path) != SUCCESS_RET)
+				continue;
+			if (strcmp(path, "") == 0 || strcmp(path, " ") == 0) {
 				wprintf(L"using stdin, press 'Ctrl'+'Z' and 'Enter' to end input\n");
 				f = stdin;
 				break;
 			}
-			else {
-				strcpy(path, default_path);
-			}
+			if ((f = fopen(path, mode)) == NULL)
+				wprintf(L"can't open %S\n", name);
 		}
-        if ((f = fopen(path, mode)) == NULL)
-            wprintf(L"can't open %S\n",name);
     }
 	if(f!=stdin)
 		LOG(INFO_LOG,LOGSRC,L"%S, %S",name,path);
@@ -73,7 +72,7 @@ FILE* getFile(const char* mode,const char* name, const char* default_path){
 }
 
 void endProc(int n){
-    if (fin != NULL)
+    if (fin != NULL && fin !=stdin)
         fclose(fin);
     if (fout != NULL)
         fclose(fout);
