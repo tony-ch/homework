@@ -55,7 +55,9 @@ void functions(){
             funccnt +=1;
         }
     }
-#if LOG_LEVEL==DEBUG_LOG
+	if(funccnt>0){
+		wprintf(L"\n###### functions #######\n");
+	}
     for(int i=0;i<funccnt;i++){
         wprintf(L"FUNC: name:%s,para_num:%d\n",functab[i].name,functab[i].para_num);
         for(int j=0;j<1<<functab[i].para_num;j++){
@@ -63,7 +65,6 @@ void functions(){
         }
         wprintf(L"\n");
     }
-#endif
 }
 
 void program(){// 程序 = 语句 {语句}

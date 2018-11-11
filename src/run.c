@@ -89,9 +89,16 @@ void run_exp(struct EXPITEM *exp){
         }
     }
     LOG(INFO_LOG,LOGSRC,L"%d true, %d condition total",truth_cnt,total_condition);
+	if (truth_cnt == total_condition) {
+		LOG(INFO_LOG, LOGSRC, L"always true");
+	}
+	else if (truth_cnt == 0) {
+		LOG(INFO_LOG, LOGSRC, L"always false");
+	}
 }
 
 void run(){
+	wprintf(L"\n######### exps #########\n");
     for(int i=0;i<expidx;i++){
         wprintf(L"%s\n",exptab[i].str);
         run_exp(&(exptab[i]));
@@ -132,8 +139,9 @@ int produce_narg_truth(int func, int n){
 }
 
 void check_complete(){
-    if(funccnt==0)
-        return;
+	if (funccnt == 0)
+		return;
+	wprintf(L"\n### check functions ####\n");
     //swprintf(records[0b0000],EXPLENMAX,L"0");
     //swprintf(records[0b1111],EXPLENMAX,L"1");
     //swprintf(records[0b0011],EXPLENMAX,L"p");
@@ -178,4 +186,10 @@ void check_complete(){
         cnt++;
     }
     wprintf(L"get %d, %d total\n",cnt,COMPLETE);
+	if (cnt == COMPLETE) {
+		wprintf(L"complete set\n");
+	}
+	else {
+		wprintf(L"not complete set\n");
+	}
 }
