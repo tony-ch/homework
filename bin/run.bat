@@ -1,0 +1,1 @@
+for /f %%i in (./batch/list.txt) do logic.exe %%i
