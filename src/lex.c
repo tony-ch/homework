@@ -3,13 +3,14 @@
 //
 #include "common.h"
 
-#define INTLIMIT  0xefefefef
 #define LLENMAX 400 // line length limit
 #define NLENMAX 10  // num length limit
 #define IDENLENMAX 20 // ident length limix
+#define CHCNTMAX 10000
 #define LOGSRC "LEX"
 
-int fileend = INTLIMIT;
+int fileend = 0;
+wchar_t all_ch[CHCNTMAX] = {0};
 
 wchar_t ch=L' ';//current ch
 wchar_t line[LLENMAX];//current line
@@ -17,6 +18,7 @@ struct SYMITEM symBuf[SYMBUFSZ];
 int symBufIdx=0;
 int lcnt = 0;//line num
 int ccnt = 0;//col cnt
+int chcnt = 0;//ch cnt
 int lleng = 0;//len of currnt line
 
 void reset_lex(FILE *fin){
@@ -27,27 +29,47 @@ void reset_lex(FILE *fin){
     lcnt = 0;//line num
     ccnt = 0;//col cnt
     lleng = 0;//len of currnt line
-    fseek(fin,0,SEEK_SET);
+	chcnt = 0;
     initSymBuf(fin);
 }
 
 void getch(FILE* fin){//读取下一个字符，放到ch中
-    if(ccnt==lleng){
-        if(fileend==ftell(fin) || feof(fin)){
-            ch = WEOF;
-			fileend = ftell(fin);
-            return;
-        }
-        lcnt += 1;
-        ccnt = 0;
-        lleng = 0;
-		fgetws(line, LLENMAX, fin);
-        LOG(DEBUG_LOG,LOGSRC,L"get line:%s",line);
-		lleng = wcslen(line);
-    }
-    ch = line[ccnt];
-    ccnt += 1;
-    //LOG(DEBUG_LOG,LOGSRC,L"get ch:%x,%lc",ch,ch);
+	if (fileend > 0) {//secend pass
+		if (chcnt >= fileend) {
+			ch = WEOF;
+			return;
+		}
+		lcnt = lcnt == 0 ? 1 : lcnt;
+		ch = all_ch[chcnt];
+		//chcnt += 1;
+		if (ch == L'\n') {
+			lcnt += 1;
+			ccnt = 0;
+		}
+		ccnt += 1;
+	}
+	else { // first pass
+		if (ccnt == lleng) {
+			if ((fgetws(line, LLENMAX, fin)) == NULL) {
+				ch = WEOF;
+				fileend = chcnt;
+				return;
+			}
+			lcnt += 1;
+			ccnt = 0;
+			lleng = 0;
+			if (fin != stdin)
+				wprintf(L"%s", line);
+			LOG(DEBUG_LOG, LOGSRC, L"get line:%s", line);
+			lleng = wcslen(line);
+			//line[lleng-1] = L'\n';
+		}
+		ch = line[ccnt];
+		all_ch[chcnt] = ch;
+		ccnt += 1;
+	}
+	chcnt += 1;
+    LOG(DEBUG_LOG,LOGSRC,L"get ch:%x,%lc,%d,%d",ch,ch,chcnt,fileend);
 }
 
 void getsym(FILE* fin){
@@ -117,7 +139,7 @@ void getsym(FILE* fin){
 void initSymBuf(FILE* fin){
     for(symBufIdx=0;symBufIdx<SYMBUFSZ;symBufIdx+=1){
         getsym(fin);
-        //LOG(DEBUG_LOG,LOGSRC,L"get %S, token:%s",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
+        LOG(DEBUG_LOG,LOGSRC,L"get %S, token:%s",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     }
     symBufIdx=0;
 }
@@ -127,7 +149,7 @@ void updateSymBuf(FILE* fin){
         error(INCOMPLETE_INPUT_ERR,LOGSRC,lcnt,ccnt);
     }
     getsym(fin);
-    //LOG(DEBUG_LOG,LOGSRC,L"get %S, token:%s",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
+    LOG(DEBUG_LOG,LOGSRC,L"get %S, token:%s",getSymStr(symBuf[symBufIdx].id),symBuf[symBufIdx].token);
     symBufIdx = (symBufIdx+1)%SYMBUFSZ;
 }
 
