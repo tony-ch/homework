@@ -22,7 +22,7 @@ import java.io.*;
 @WebServlet("/faceLoginServlet")
 public class FaceLoginServlet extends HttpServlet {
     private final static int VECLEN=128;
-    private final static double TORELANCE = 0.45;
+    private final static double TOLERANCE = 0.45;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("begin: " + System.currentTimeMillis());
@@ -85,12 +85,12 @@ public class FaceLoginServlet extends HttpServlet {
                 double item_known = Double.parseDouble(br_known.readLine().split(",")[0]);
                 double item_check = Double.parseDouble(br_check.readLine().split(",")[0]);
                 dis +=(item_check-item_known)*(item_check-item_known);
-                if(dis>=TORELANCE*TORELANCE)
+                if(dis>=TOLERANCE*TOLERANCE)
                     break;
                 //System.out.println(item);
             }
             System.out.println("distance:"+ dis);
-            if(dis<TORELANCE*TORELANCE)
+            if(dis<TOLERANCE*TOLERANCE)
                 successed=true;
             br_check.close();
             br_known.close();
