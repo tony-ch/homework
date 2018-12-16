@@ -1,7 +1,7 @@
 package com.javabean.entity;
 
 public class Person {
-	private String loginname;//用户登录名，教师登录名为教师编号，学生登录名为学号
+	private String loginname;//用户登录名
 	private String name;//用户真实姓名
 	private String tel;
 	private int type;//用户类别，管理员类别为0，采购为1,维修为2,用户为3
@@ -32,6 +32,12 @@ public class Person {
 	}
 	public int getType() {
 		return type;
+	}
+	public String getTypeStr(){
+		if(this.type==0) return "admin";
+		if(this.type==1 || this.type==2 ) return "worker";
+		if(this.type==3) return "user";
+		return "";
 	}
 	public void setType(int type) {
 		this.type = type;

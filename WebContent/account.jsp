@@ -281,174 +281,209 @@ with (thisform)
 									
 							<div class="widget-content">
 								
-								
-								
-								<form id="edit-profile" 
-								action="/bicycle/updateServlet"
-								class="form-horizontal" method="post" >
-									<fieldset>
-										<div class="control-group">											
-											<label class="control-label" for="id">ID：</label>
-											<div class="controls">
-												<input type="text" class="input-medium disabled" 
-												name="id"
-												id="id" 
-												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.id }"</c:if>
-												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.id }"</c:if>
-												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.id }"</c:if>
-												 readonly />
-												<p class="help-block">ID为唯一标识，不能更改</p>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										<div class="control-group">											
-											<label class="control-label" for="loginname">登录名：</label>
-											<div class="controls">
-												<input type="text" class="input-medium disabled" 
-												name="loginname"
-												id="loginname" 
-												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.loginname }"</c:if>
-												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.loginname }"</c:if>
-												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.loginname }"</c:if>
-												 readonly />
-												<p class="help-block">登录名是为登录而用，不能修改.</p>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										
-										<div class="control-group">											
-											<label class="control-label" for="name">姓名：</label>
-											<div class="controls">
-												<input type="text" class="input-medium" 
-												maxlength=18
-												name="name"
-												id="name" 
-												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.name }"</c:if>
-												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.name }"</c:if>
-												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.name }"</c:if>
-												/>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										
-										<c:if test="${requestScope.type!='worker' }">
-										<div class="control-group">											
-											<label class="control-label" for="tel">手机号码：</label>
-											<div class="controls">
-												<input type="text" class="input-large" 
-												id="tel" 
-												name="tel"
-												pattern="[0-9]{11}"
-												maxlength=11
-												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.tel }"</c:if>
-												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.tel }"</c:if>
-												/>
-												<p class="help-block">输入11位手机号码</p>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										</c:if>
-										
-										
-										<br />
-										
-										<div class="control-group">											
-											<label class="control-label" for="password">密码：</label>
-											<div class="controls">
-												<input type="text" 
-												pattern=".{6,18}"
-												name="password"
-												maxlength=18
-												class="input-medium" id="password" 
-												<c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.password }"</c:if>
-												<c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.password }"</c:if>
-												<c:if test="${requestScope.type=='user' }">value="${requestScope.user.password }"</c:if>
-												 required/>
-												 <p class="help-block">输入6-18位密码</p>
-											</div> <!-- /controls -->				
-										</div> <!-- /control-group -->
-										
-										<c:if test="${requestScope.type=='worker'}">
-											<div class="control-group">
-												<label class="control-label" for="department">员工类型</label>
-												<div class="controls">
-													<label>
-														<input type="radio" name="department" value="B"
-														<c:if test="${requestScope.worker.department=='B' }">checked="checked"</c:if>
-														 id="department" 
-														 disabled
-														 />
-														采购员
-													</label>
-													<label>
-														<input type="radio" name="department" value="M"
-														<c:if test="${requestScope.worker.department=='M' }">checked="checked"</c:if>
-														 disabled
-														 />
-														维修工
-													</label>
-													<p class="help-block">部门不支持更改</p>
-												</div>
-											</div>
-											</c:if>	
-											
-											<c:if test="${requestScope.type=='worker'}">
-											<div class="control-group">
-												<label class="control-label" for="salaryM">月工资</label>
-												<div class="controls">
-													<input type="text" 
-														pattern="[0-9]{1,4}"
-														name="salaryM"
-														maxlength=4
-														class="input-medium" id="salary" 
-														value='${requestScope.worker.salary }'
-														 readonly/>
-													<p class="help-block">此处不支持更改</p>
-												</div>
-											</div>
-											<c:if test="${requestScope.worker.department=='M' }">
-											<div class="control-group">
-												<label class="control-label" for="cnt">处理维修次数</label>
-												<div class="controls">
-													<input type="text" 
-														pattern="[0-9]{1,4}"
-														name="cnt"
-														
-														class="input-medium" id="cnt" 
-														value='${requestScope.worker.cnt }'
-														 readonly/>
-													<p class="help-block">不支持更改</p>
-												</div>
-											</div>
-											</c:if>
-											</c:if>	
-											
-											<c:if test="${requestScope.type!='admin'}">
-											<div class="control-group">
-												<label class="control-label" for="balance">余额</label>
-												<div class="controls">
-													<input type="text" 
-														pattern="[0-9]{1,10}"
-														name="balance"
-														maxlength=10
-														class="input-medium" id="balance" 
-														<c:if test="${requestScope.type=='worker' }">value='${requestScope.worker.balance }'</c:if>
-														<c:if test="${requestScope.type=='user' }">value='${requestScope.user.balance }'</c:if>
-														 readonly/>
-													<p class="help-block">此处不支持更改</p>
-												</div>
-											</div>
-											</c:if>	
-											
-											<br />
-										
-											
-										<div class="form-actions">
-											<button type="submit" class="btn btn-primary">保存</button> 
-											<button type="reset" class="btn">重置</button>
-										</div> <!-- /form-actions -->
-									</fieldset>
-								</form>
+								<div class="tabbable">
+									<ul class="nav nav-tabs">
+										<li class="active">
+											<a href="#profiletab" data-toggle="tab">基本信息</a><!-- admtab data-toggle="tab" -->
+										</li>
+										<li>
+											<a href="#facetab" data-toggle="tab">人脸信息</a><!-- wktab data-toggle="tab" -->
+										</li>
+									</ul>
+									<div class="tab-content">
+										<div class="tab-pane active"   id="profiletab">
+											<form id="edit-profile"
+												  action="/bicycle/updateServlet"
+												  class="form-horizontal" method="post" >
+												<fieldset>
+													<div class="control-group">
+														<label class="control-label" for="id">ID：</label>
+														<div class="controls">
+															<input type="text" class="input-medium disabled"
+																   name="id"
+																   id="id"
+																   <c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.id }"</c:if>
+																   <c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.id }"</c:if>
+																   <c:if test="${requestScope.type=='user' }">value="${requestScope.user.id }"</c:if>
+																   readonly />
+															<p class="help-block">ID为唯一标识，不能更改</p>
+														</div> <!-- /controls -->
+													</div> <!-- /control-group -->
+
+													<div class="control-group">
+														<label class="control-label" for="loginname">登录名：</label>
+														<div class="controls">
+															<input type="text" class="input-medium disabled"
+																   name="loginname"
+																   id="loginname"
+																   <c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.loginname }"</c:if>
+																   <c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.loginname }"</c:if>
+																   <c:if test="${requestScope.type=='user' }">value="${requestScope.user.loginname }"</c:if>
+																   readonly />
+															<p class="help-block">登录名是为登录而用，不能修改.</p>
+														</div> <!-- /controls -->
+													</div> <!-- /control-group -->
+
+
+													<div class="control-group">
+														<label class="control-label" for="name">姓名：</label>
+														<div class="controls">
+															<input type="text" class="input-medium"
+																   maxlength=18
+																   name="name"
+																   id="name"
+																   <c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.name }"</c:if>
+																   <c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.name }"</c:if>
+																   <c:if test="${requestScope.type=='user' }">value="${requestScope.user.name }"</c:if>
+															/>
+														</div> <!-- /controls -->
+													</div> <!-- /control-group -->
+
+
+													<c:if test="${requestScope.type!='worker' }">
+														<div class="control-group">
+															<label class="control-label" for="tel">手机号码：</label>
+															<div class="controls">
+																<input type="text" class="input-large"
+																	   id="tel"
+																	   name="tel"
+																	   pattern="[0-9]{11}"
+																	   maxlength=11
+																	   <c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.tel }"</c:if>
+																	   <c:if test="${requestScope.type=='user' }">value="${requestScope.user.tel }"</c:if>
+																/>
+																<p class="help-block">输入11位手机号码</p>
+															</div> <!-- /controls -->
+														</div> <!-- /control-group -->
+
+													</c:if>
+
+
+													<br />
+
+													<div class="control-group">
+														<label class="control-label" for="password">密码：</label>
+														<div class="controls">
+															<input type="text"
+																   pattern=".{6,18}"
+																   name="password"
+																   maxlength=18
+																   class="input-medium" id="password"
+																   <c:if test="${requestScope.type=='admin' }">value="${requestScope.admin.password }"</c:if>
+																   <c:if test="${requestScope.type=='worker' }">value="${requestScope.worker.password }"</c:if>
+																   <c:if test="${requestScope.type=='user' }">value="${requestScope.user.password }"</c:if>
+																   required/>
+															<p class="help-block">输入6-18位密码</p>
+														</div> <!-- /controls -->
+													</div> <!-- /control-group -->
+
+													<c:if test="${requestScope.type=='worker'}">
+														<div class="control-group">
+															<label class="control-label" for="department">员工类型</label>
+															<div class="controls">
+																<label>
+																	<input type="radio" name="department" value="B"
+																		   <c:if test="${requestScope.worker.department=='B' }">checked="checked"</c:if>
+																		   id="department"
+																		   disabled
+																	/>
+																	采购员
+																</label>
+																<label>
+																	<input type="radio" name="department" value="M"
+																		   <c:if test="${requestScope.worker.department=='M' }">checked="checked"</c:if>
+																		   disabled
+																	/>
+																	维修工
+																</label>
+																<p class="help-block">部门不支持更改</p>
+															</div>
+														</div>
+													</c:if>
+
+													<c:if test="${requestScope.type=='worker'}">
+														<div class="control-group">
+															<label class="control-label" for="salary">月工资</label>
+															<div class="controls">
+																<input type="text"
+																	   pattern="[0-9]{1,4}"
+																	   name="salaryM"
+																	   maxlength=4
+																	   class="input-medium" id="salary"
+																	   value='${requestScope.worker.salary }'
+																	   readonly/>
+																<p class="help-block">此处不支持更改</p>
+															</div>
+														</div>
+														<c:if test="${requestScope.worker.department=='M' }">
+															<div class="control-group">
+																<label class="control-label" for="cnt">处理维修次数</label>
+																<div class="controls">
+																	<input type="text"
+																		   pattern="[0-9]{1,4}"
+																		   name="cnt"
+
+																		   class="input-medium" id="cnt"
+																		   value='${requestScope.worker.cnt }'
+																		   readonly/>
+																	<p class="help-block">不支持更改</p>
+																</div>
+															</div>
+														</c:if>
+													</c:if>
+
+													<c:if test="${requestScope.type!='admin'}">
+														<div class="control-group">
+															<label class="control-label" for="balance">余额</label>
+															<div class="controls">
+																<input type="text"
+																	   pattern="[0-9]{1,10}"
+																	   name="balance"
+																	   maxlength=10
+																	   class="input-medium" id="balance"
+																	   <c:if test="${requestScope.type=='worker' }">value='${requestScope.worker.balance }'</c:if>
+																	   <c:if test="${requestScope.type=='user' }">value='${requestScope.user.balance }'</c:if>
+																	   readonly/>
+																<p class="help-block">此处不支持更改</p>
+															</div>
+														</div>
+													</c:if>
+
+													<br />
+
+
+													<div class="form-actions">
+														<button type="submit" class="btn btn-primary">保存</button>
+														<button type="reset" class="btn">重置</button>
+													</div> <!-- /form-actions -->
+												</fieldset>
+											</form>
+										</div>
+										<div class="tab-pane"   id="facetab">
+											<form id="edit-face"
+												  class="form-horizontal" method="post" >
+												<fieldset>
+													<div class="control-group">
+														<label class="control-label" for="id">预览：</label>
+														<div class="controls">
+															<div id="my_camera"></div>
+															<!--<p class="help-block">ID为唯一标识，不能更改</p>-->
+														</div> <!-- /controls -->
+													</div> <!-- /control-group -->
+													<br />
+
+													<div class="form-actions">
+														<input type=button class="btn" value="暂停" onClick="freeze_cam()" >
+														<input type="button"  class="btn" value="恢复" onClick="unfreeze_cam()">
+														<button onclick="take_snapshot()" class="btn btn-primary">提交</button>
+														<!--<button type="reset" class="btn">重置</button>-->
+													</div> <!-- /form-actions -->
+												</fieldset>
+											</form>
+										</div>
+									</div>
+
+								</div>
 								
 							</div> <!-- /widget-content -->
 							
@@ -495,6 +530,70 @@ with (thisform)
 
 
 <script src="/bicycle/js/bootstrap.js"></script>
+
+<!-- First, include the Webcam.js JavaScript Library -->
+<script type="text/javascript" src="/bicycle/js/webcam.js"></script>
+
+<!-- Configure a few settings and attach camera -->
+<script language="JavaScript">
+	var os = function() {
+		var ua = navigator.userAgent,
+				isWindowsPhone = /(?:Windows Phone)/.test(ua),
+				isSymbian = /(?:SymbianOS)/.test(ua) || isWindowsPhone,
+				isAndroid = /(?:Android)/.test(ua),
+				isFireFox = /(?:Firefox)/.test(ua),
+				isChrome = /(?:Chrome|CriOS)/.test(ua),
+				isTablet = /(?:iPad|PlayBook)/.test(ua) || (isAndroid && !/(?:Mobile)/.test(ua)) || (isFireFox && /(?:Tablet)/.test(ua)),
+				isPhone = /(?:iPhone)/.test(ua) && !isTablet,
+				isPc = !isPhone && !isAndroid && !isSymbian && !isWindowsPhone && !isTablet;
+		return {
+			isTablet: isTablet,
+			isPhone: isPhone,
+			isAndroid : isAndroid,
+			isPc : isPc
+		};
+	}();
+	if(os.isPc){
+		//alert("PC");
+		Webcam.set({
+			width: 400,
+			height: 300,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+	}else {
+		//alert("Mobile");
+		Webcam.set({
+			width: 300,
+			height: 400,
+			image_format: 'jpeg',
+			jpeg_quality: 90
+		});
+	}
+	Webcam.attach( '#my_camera' );
+</script>
+<!-- Code to handle taking the snapshot and displaying it locally -->
+<script language="JavaScript">
+	function take_snapshot() {
+		// take snapshot and get image data
+		Webcam.snap( function(data_uri) {
+			// display results in page
+			Webcam.upload(data_uri,"/bicycle/uploadServlet");
+			//document.getElementById('results').innerHTML =
+			//		'<h2>Here is your image:</h2>' +
+			//		'<img src="'+data_uri+'"/>';
+		} );
+		Webcam.freeze();
+		alert("upload success");
+		window.location.href="/bicycle/personDetailServlet";
+	}
+	function freeze_cam() {
+		Webcam.freeze();
+	}
+	function unfreeze_cam() {
+		Webcam.unfreeze();
+	}
+</script>
 
   </body>
 </html>
