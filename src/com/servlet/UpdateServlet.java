@@ -68,7 +68,7 @@ public class UpdateServlet extends HttpServlet {
 
 			String facepath =  getServletContext().getRealPath(getServletContext().getInitParameter("face.location"));
 			String face_csv = facepath+"/"+person.getTypeStr()+"-"+person.getLoginname()+".csv";
-			if(modifyFace.equalsIgnoreCase("delete")){
+			if(null!=modifyFace && modifyFace.equalsIgnoreCase("delete")){
 				Files.deleteIfExists(Paths.get(face_csv));
 			}
 	  		//根据登陆方法返回的值判断用户是哪种类型用户，并将学生、教师或者管理员对象转化为User对象并设置对应的登录名、真实姓名、用户类型属性值

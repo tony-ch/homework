@@ -494,6 +494,7 @@ with (thisform)
 										</div>
 										<div class="tab-pane"   id="facetab">
 											<form id="edit-face"
+												  action="/bicycle/personDetailServlet"
 												  class="form-horizontal" method="post" >
 												<fieldset>
 													<div class="control-group">
@@ -618,7 +619,6 @@ with (thisform)
 		} );
 		Webcam.freeze();
 		alert("upload success");
-		window.location.href="/bicycle/personDetailServlet";
 	}
 	function freeze_cam() {
 		Webcam.freeze();
