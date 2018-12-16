@@ -22,7 +22,7 @@ import java.io.*;
 @WebServlet("/faceLoginServlet")
 public class FaceLoginServlet extends HttpServlet {
     private final static int VECLEN=128;
-    private final static double TORELANCE = 0.6;
+    private final static double TORELANCE = 0.45;
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         System.out.println("begin: " + System.currentTimeMillis());
