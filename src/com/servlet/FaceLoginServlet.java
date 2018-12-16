@@ -74,7 +74,7 @@ public class FaceLoginServlet extends HttpServlet {
             System.out.println(file.getAbsolutePath());
             System.out.println(csvfile.getAbsolutePath());
             //System.out.println(facepath+"/admin-amdin.pickle");
-            String[] args = new String[] { "python", py_addface_path, file.getAbsolutePath(), csvfile.getAbsolutePath() };
+            String[] args = new String[] { "python3", py_addface_path, file.getAbsolutePath(), csvfile.getAbsolutePath() };
             proc = Runtime.getRuntime().exec(args);// 执行py文件
             proc.waitFor();
             double dis=0;
