@@ -287,7 +287,7 @@ with (thisform)
 											<a href="#profiletab" data-toggle="tab">基本信息</a><!-- admtab data-toggle="tab" -->
 										</li>
 										<li>
-											<a href="#facetab" data-toggle="tab">人脸信息</a><!-- wktab data-toggle="tab" -->
+											<a href="#facetab" data-toggle="tab">录入人脸</a><!-- wktab data-toggle="tab" -->
 										</li>
 									</ul>
 									<div class="tab-content">
@@ -448,6 +448,39 @@ with (thisform)
 															</div>
 														</div>
 													</c:if>
+
+													<br />
+
+													<div class="control-group">
+														<label class="control-label" for="hasFace">人脸信息</label>
+														<div class="controls">
+															<input type="text"
+																   name="hasFace"
+																   maxlength=10
+																   class="input-medium" id="hasFace"
+																   value='${requestScope.hasFace}'
+																   readonly/>
+															<p class="help-block">如需录入人脸请点击录入人脸</p>
+														</div>
+														<c:if test="${requestScope.hasFace=='已录入'}">
+															<label class="control-label" for="modifyFace">删除人脸数据</label>
+															<div class="controls">
+																<label>
+																	<input type="radio" name="modifyFace" value="keep"
+																		   checked="checked"
+																		   id="modifyFace"
+																	/>
+																	保留
+																</label>
+																<label>
+																	<input type="radio" name="modifyFace" value="delete"/>
+																	删除
+																</label>
+															</div>
+														</c:if>
+													</div>
+
+
 
 													<br />
 

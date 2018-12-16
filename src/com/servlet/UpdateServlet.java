@@ -1,6 +1,9 @@
 package com.servlet;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -52,6 +55,7 @@ public class UpdateServlet extends HttpServlet {
   		String loginname=request.getParameter("loginname");
   		String name=request.getParameter("name");
   		String password=request.getParameter("password");
+  		String modifyFace = request.getParameter("modifyFace");
   		Object perObj=session.getAttribute("person");
   		Person person=(Person)perObj;
   		String tel=request.getParameter("tel");
@@ -61,7 +65,12 @@ public class UpdateServlet extends HttpServlet {
   			System.out.println(loginname);
   			System.out.println(password);
   			System.err.println("type: "+type);
-	  		
+
+			String facepath =  getServletContext().getRealPath(getServletContext().getInitParameter("face.location"));
+			String face_csv = facepath+"/"+person.getTypeStr()+"-"+person.getLoginname()+".csv";
+			if(modifyFace.equalsIgnoreCase("delete")){
+				Files.deleteIfExists(Paths.get(face_csv));
+			}
 	  		//根据登陆方法返回的值判断用户是哪种类型用户，并将学生、教师或者管理员对象转化为User对象并设置对应的登录名、真实姓名、用户类型属性值
 	  		if(type==0){
 	  			Admin admin=adminDao.findAdminByLoginName(loginname);

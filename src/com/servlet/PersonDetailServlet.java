@@ -1,5 +1,6 @@
 package com.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -46,12 +47,19 @@ public class PersonDetailServlet extends HttpServlet {
 		HttpSession session=request.getSession();
 		request.setCharacterEncoding("UTF-8");
 		response.setCharacterEncoding("UTF-8");
-		
+
 				
 		try{
 			Person person=(Person)session.getAttribute("person");
 			String loginname=person.getLoginname();		//传参，确定改哪个admin的信息
 			int type=person.getType();
+			String facepath =  getServletContext().getRealPath(getServletContext().getInitParameter("face.location"));
+			File face_csv = new File(facepath+"/"+person.getTypeStr()+"-"+person.getLoginname()+".csv");
+			if(face_csv.exists()){
+				request.setAttribute("hasFace","已录入");
+			}else{
+				request.setAttribute("hasFace","未录入");
+			}
 			if(type==0){//admin
 				AdminDao adminDao = new AdminDao();
 				Admin admin = adminDao.findAdminByLoginName(loginname);				
