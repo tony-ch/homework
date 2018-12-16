@@ -9,6 +9,7 @@ import com.javabean.entity.User;
 import com.javabean.entity.Worker;
 import org.python.antlr.ast.Str;
 import sun.misc.BASE64Decoder;
+import com.common.FaceServer;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletException;
@@ -19,9 +20,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.SecureRandom;
+import java.util.Enumeration;
 
 @WebServlet("/faceLoginServlet")
 public class FaceLoginServlet extends HttpServlet {
@@ -32,6 +36,7 @@ public class FaceLoginServlet extends HttpServlet {
     private static String py_addface_path;
     private static String facepath;
     private static SecureRandom random =  new SecureRandom();
+
 
     @Override
     public void init() throws ServletException {
@@ -53,16 +58,6 @@ public class FaceLoginServlet extends HttpServlet {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    private static String generateTempPath(String pre,String suf, String dir){
-        long rnd = random.nextLong();
-        if (rnd == -9223372036854775808L) {
-            rnd = 0L;
-        } else {
-            rnd = Math.abs(rnd);
-        }
-        return new File(dir,pre+rnd+suf).getAbsolutePath();
     }
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -144,8 +139,8 @@ public class FaceLoginServlet extends HttpServlet {
         Process proc;
         try {
             byte[] imageByte;
-            String img_file = generateTempPath("-temp-",".jpg",uploads);
-            String check_csvfile = generateTempPath("-temp-",".csv",facepath);
+            String img_file = FaceServer.generateTempPath("-temp-",".jpg",uploads);
+            String check_csvfile = FaceServer.generateTempPath("-temp-",".csv",facepath);
             String base64Image = imageString.split(",")[1];
 
             BASE64Decoder decoder = new BASE64Decoder();
@@ -154,12 +149,13 @@ public class FaceLoginServlet extends HttpServlet {
             outputStream.write(imageByte);
             System.out.println(img_file);
             System.out.println(check_csvfile);
-            String[] args = new String[]{"python3", py_addface_path, img_file, check_csvfile};
-            proc = Runtime.getRuntime().exec(args);// 执行py文件
-            proc.waitFor();
+//            String[] args = new String[]{"python3", py_addface_path, img_file, check_csvfile};
+//            proc = Runtime.getRuntime().exec(args);// 执行py文件
+//            proc.waitFor();
+            FaceServer.forwardRequest("GET",request,response,img_file,check_csvfile);
             System.out.println("face handled: " + System.currentTimeMillis());
 
-            if(!new File(known_csv).exists()){
+            if(!new File(check_csvfile).exists()){
                 System.err.println("res: 未检测到人脸");
                 session.setAttribute("message", "未检测到人脸！！！");
                 request.getRequestDispatcher("/face_login.jsp").forward(request, response);
