@@ -266,4 +266,33 @@ public class UserDao{
 		}
 		return user;
 	}
+
+	public User login_face(String loginName){
+		User user=null;
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		try{
+			conn=ConnectionFactory.getConnection();
+			String sql="select * from user where login_name=?";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, loginName);
+			rs=pstmt.executeQuery();
+			while(rs.next()){
+				user=new User();
+				user.setId(rs.getInt(1));
+				user.setLoginname(rs.getString(2));
+				user.setPassword(rs.getString(3));
+				user.setBalance(rs.getDouble(4));
+				user.setName(rs.getString(5));
+				user.setTel(rs.getString(6));
+			}
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new RTException("数据库操作异常，请稍后重试!");
+		}finally{
+			ResourceClose.close(rs, pstmt, conn);
+		}
+		return user;
+	}
 }

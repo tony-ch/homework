@@ -251,4 +251,35 @@ public class WorkerDao {
 			}
 			return worker;
 		}
+
+	public Worker login_face(String loginName){
+		Worker worker=null;
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		try{
+			conn=ConnectionFactory.getConnection();
+			String sql="select * from worker where login_name=?";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, loginName);
+			rs=pstmt.executeQuery();
+			while(rs.next()){
+				worker=new Worker();
+				worker.setId(rs.getInt(1));
+				worker.setLoginname(rs.getString(2));
+				worker.setPassword(rs.getString(3));
+				worker.setDepartment(rs.getString(4));
+				worker.setName(rs.getString(5));
+				worker.setSalary(rs.getInt(6));
+				worker.setCnt(rs.getInt(7));
+				worker.setBalance(rs.getInt(8));
+			}
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new RTException("数据库操作异常，请稍后重试!");
+		}finally{
+			ResourceClose.close(rs, pstmt, conn);
+		}
+		return worker;
+	}
 }

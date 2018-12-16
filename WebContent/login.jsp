@@ -105,6 +105,8 @@
 				</div>
 				
 				<div class="pull-right">
+					<label></label>
+					<button type="button" onclick="location.href='/bicycle/face_login.jsp'" class="btn btn-large">刷脸登录</button>
 					<button type="submit" class="btn btn-warning btn-large">
 						登录
 					</button>
@@ -117,7 +119,8 @@
 		<div id="login-extra">
 			
 			<p>还没有账号? <a href="/bicycle/register.jsp;">马上注册.</a></p>
-			
+			<!--<p>已经录入人脸信息？ <a href="/bicycle/face_login.jsp;">刷脸登录.</a></p>-->
+
 			<!--<p>忘记密码? <a href="forgot_password.html">发送邮件.</a></p>  -->
 			
 		</div> <!-- /login-extra -->

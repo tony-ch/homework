@@ -239,4 +239,32 @@ public class AdminDao{
 		}
 		return admin;
 	}
+
+	public Admin login_face(String loginName){
+		Admin admin=null;
+		Connection conn=null;
+		PreparedStatement pstmt=null;
+		ResultSet rs=null;
+		try{
+			conn=ConnectionFactory.getConnection();
+			String sql="select * from admin where login_name=?";
+			pstmt=conn.prepareStatement(sql);
+			pstmt.setString(1, loginName);
+			rs=pstmt.executeQuery();
+			while(rs.next()){
+				admin=new Admin();
+				admin.setId(rs.getInt(1));
+				admin.setLoginname(rs.getString(2));
+				admin.setPassword(rs.getString(3));
+				admin.setName(rs.getString(4));
+				admin.setTel(rs.getString(5));
+			}
+		}catch (SQLException e) {
+			e.printStackTrace();
+			throw new RTException("数据库操作异常，请稍后重试!");
+		}finally{
+			ResourceClose.close(rs, pstmt, conn);
+		}
+		return admin;
+	}
 }
