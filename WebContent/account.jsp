@@ -358,9 +358,6 @@ with (thisform)
 
 													</c:if>
 
-
-													<br />
-
 													<div class="control-group">
 														<label class="control-label" for="password">密码：</label>
 														<div class="controls">
@@ -460,27 +457,28 @@ with (thisform)
 																   class="input-medium" id="hasFace"
 																   value='${requestScope.hasFace}'
 																   readonly/>
-															<p class="help-block">如需录入人脸请点击录入人脸</p>
+															<c:if test="${requestScope.hasFace!='已录入'}"><p class="help-block">如需录入人脸请点击录入人脸</p></c:if>
 														</div>
-														<c:if test="${requestScope.hasFace=='已录入'}">
-															<label class="control-label" for="modifyFace">删除人脸数据</label>
-															<div class="controls">
-																<label>
-																	<input type="radio" name="modifyFace" value="keep"
-																		   checked="checked"
-																		   id="modifyFace"
-																	/>
-																	保留
-																</label>
-																<label>
-																	<input type="radio" name="modifyFace" value="delete"/>
-																	删除
-																</label>
-															</div>
-														</c:if>
 													</div>
 
-
+													<c:if test="${requestScope.hasFace=='已录入'}">
+													<div class="control-group">
+														<label class="control-label" for="modifyFace">删除人脸数据</label>
+														<div class="controls">
+															<label>
+																<input type="radio" name="modifyFace" value="keep"
+																	   checked="checked"
+																	   id="modifyFace"
+																/>
+																保留
+															</label>
+															<label>
+																<input type="radio" name="modifyFace" value="delete"/>
+																删除
+															</label>
+														</div>
+													</div>
+													</c:if>
 
 													<br />
 
@@ -618,7 +616,7 @@ with (thisform)
 			//		'<img src="'+data_uri+'"/>';
 		} );
 		Webcam.freeze();
-		alert("upload success");
+		alert("上传成功");
 	}
 	function freeze_cam() {
 		Webcam.freeze();
