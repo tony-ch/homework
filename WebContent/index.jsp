@@ -323,7 +323,7 @@
 	
 	<div class="container">				
 		<hr />
-		<p>&copy; 2016 Bicycle.</p>
+		<p>&copy; 2018 Bicycle.</p>
 	</div> <!-- /container -->
 	
 </div> <!-- /footer -->

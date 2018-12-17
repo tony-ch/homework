@@ -233,7 +233,7 @@
 				<div class="sidebar-extra">
 					<p>联系我们:</p>
 					<p>邮箱: changtao@buaa.edu.cn</p>
-					<p>邮箱: @buaa.edu.cn</p>
+					<p>邮箱: xyf1@buaa.edu.cn</p>
 				</div> <!-- .sidebar-extra -->
 				
 				<br />
@@ -461,7 +461,7 @@
 	
 	<div class="container">				
 		<hr />
-		<p>&copy; 2016 Bicycle.</p>
+		<p>&copy; 2018 Bicycle.</p>
 	</div> <!-- /container -->
 	
 </div> <!-- /footer -->
