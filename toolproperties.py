@@ -45,6 +45,8 @@ class ToolProperties (QtWidgets.QDockWidget):
 		l.append(QtWidgets.QWidget())
 		l.append(self.createGradientWidget())
 		l.append(QtWidgets.QWidget())
+		l.append(QtWidgets.QWidget())
+		l.append(QtWidgets.QWidget())
 
 		return l
 

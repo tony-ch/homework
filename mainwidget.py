@@ -26,9 +26,9 @@ class MainWidget(QtWidgets.QTabWidget):
 
 		self.tabBar = TabBar(self)
 		self.setTabBar(self.tabBar)
-		self.tabBar.middleClicked.connect(self.closeTab)
+		# self.tabBar.middleClicked.connect(self.closeTab)
 
-		self.setTabsClosable(True)
+		self.setTabsClosable(False)
 
 		self.widgets = []
 

@@ -76,7 +76,7 @@ class Canvas(QtWidgets.QLabel):
 
 	def changeCursor(self):
 
-		cursors = [0, 0, self.context.pencilCur, self.context.eraserCur, self.context.colorPickerCur, self.context.fillCur, 0, 0]
+		cursors = [0, 0, self.context.pencilCur, self.context.eraserCur, self.context.colorPickerCur, self.context.fillCur, 0, 0, self.context.lassoCur, self.context.handCur]
 
 		for i in range(len(cursors)):
 			if self.context.currentTool == i:
@@ -129,7 +129,7 @@ class Canvas(QtWidgets.QLabel):
 			elif event.button() == Qt.RightButton:
 				pass
 
-		# Lápiz
+		# Pencil
 		elif self.context.currentTool == Pixeler.Tools.Pencil:
 			self.lastPoint = QtCore.QPoint(x,y)
 			if self.drawing:
@@ -145,7 +145,7 @@ class Canvas(QtWidgets.QLabel):
 				self.drawing = True
 			self.signals.updateCanvas.emit()
 
-		# Goma
+		# Eraser
 		elif self.context.currentTool == Pixeler.Tools.Eraser:
 			if event.button() == Qt.LeftButton or event.button() == Qt.RightButton:
 				self.lastPoint = QtCore.QPoint(x,y)
@@ -175,8 +175,9 @@ class Canvas(QtWidgets.QLabel):
 			if event.button() == Qt.LeftButton:
 				self.context.gradient = Selection(QtCore.QPoint(x, y), self.context, self)
 
-		# Mover canvas
-		if event.button() == Qt.MiddleButton:
+		# Move canvas
+		if event.button() == Qt.MiddleButton or \
+			(self.context.currentTool == Pixeler.Tools.Hand and event.buttons() == Qt.LeftButton):
 			self.grabPoint = event.pos()
 
 		self.update()
@@ -233,7 +234,8 @@ class Canvas(QtWidgets.QLabel):
 					self.selecting = True
 					self.resizeSelection(self.context.gradient, event.pos().x(), event.pos().y())
 
-		if event.buttons() == Qt.MiddleButton:
+		if event.buttons() == Qt.MiddleButton or \
+				(self.context.currentTool == Pixeler.Tools.Hand and event.buttons() == Qt.LeftButton):
 			
 			self.move(self.mapToParent(event.pos() - self.grabPoint))
 

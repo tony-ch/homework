@@ -34,7 +34,7 @@ class Preview (QtWidgets.QDockWidget):
 		if self.context.currentImage() != None:
 			if self.context.currentQImage().width() > 128 or self.context.currentQImage().height() > 128:
 				imatge = self.context.currentQImage().scaled(128, 128, Qt.KeepAspectRatio)
-				self.label.setPixmap(QtWidgets.QPixmap.fromImage(imatge))
+				self.label.setPixmap(QtGui.QPixmap.fromImage(imatge))
 			else:
 				self.label.setPixmap(QtGui.QPixmap.fromImage(self.context.currentQImage()))
 		else:

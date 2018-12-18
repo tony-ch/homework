@@ -2,7 +2,7 @@
 name = English
 
 [pyqx]
-title = pyqx
+title = ALSPainter
 
 # ------------
 # --- MENU ---
@@ -146,25 +146,27 @@ message = There are changes without saving. Are you sure you want to exit?
 # -------------
 
 [tools]
-selection = Selection
+selection = 选择
 magicwand = Magic Wand
-pencil = Pencil
+pencil = 画笔
 brush = Brush
-eraser = Eraser
+eraser = 橡皮擦
 colorpicker = Color Picker
-zoomin = Zoom In
-zoomout = Zoom Out
+zoomin = 放大（Ctrl+滚轮上）
+zoomout = 缩小（Ctrl+滚轮下）
 fill = Fill
 gradient = Gradient
 exchange = Exchange colors
+lasso = 套索
+hand = 抓手
 
 # --------------------
 # --- DOCK WIDGETS ---
 # --------------------
 
 [dock_widgets]
-palette = Palette
-tool_properties = Tool properties
+palette = 纹理选项
+tool_properties = 工具选项
 preview = Preview
 
 # -----------------------
@@ -175,11 +177,11 @@ preview = Preview
 transparent = Transparent Selection
 
 [tool_properties_pencil]
-size = Size:
+size = 画笔大小:
 eraser = Use eraser instead\nof secondary color
 
 [tool_properties_eraser]
-size = Size:
+size = 橡皮擦大小:
 
 [tool_properties_gradient]
 horizontal = Horizontal

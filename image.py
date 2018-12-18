@@ -102,7 +102,7 @@ class Image:
 			self.recursiveFill(mask, QtCore.QPoint(x, y+1))
 	"""
 
-	def recursiveFill(self, mask, point, color, threshold=0):
+	def recursiveFill(self, mask:QtGui.QImage, point, color, threshold=0):
 
 		x, y = point.x(), point.y()
 

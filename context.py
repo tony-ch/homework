@@ -42,6 +42,9 @@ class Context:
 		self.colorPickerCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/droppericon.png"), 2, 17)
 		self.eraserCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/erasericon.png"), 2, 17)
 		self.fillCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/fillicon.png"), 1, 14)
+		self.lassoCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/lasso.png"), 3, 17)
+		self.handCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/hand.png"), 10, 10)
+		self.handgrabCur = QtGui.QCursor(QtGui.QPixmap("images/cursors/handgrab.png"), 10, 10)
 
 		self.circles, self.brushes = createBrushes()
 
@@ -292,6 +295,7 @@ class Context:
 		self.eraserSize = self.getIntDefault("eraser", "size", 1)
 
 	def saveDefaults(self):
+		return
 
 		self.setDefault("color", "primary_color", self.primaryColor.rgb())
 		self.setDefault("color", "secondary_color", self.secondaryColor.rgb())

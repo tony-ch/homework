@@ -23,7 +23,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.signals = signals
 		self.context = context
 
-		self.resize(800,480)
+		self.resize(1000,600)
 		self.setWindowTitle(self.context.getText("pyqx", "title"))
 		
 		self.statusBar = self.statusBar()
@@ -45,6 +45,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.signals.overCanvas.connect(self.setImagePosition)
 
 		self.show()
+		self.context.newImage(256, 256, QtGui.QColor(0, 0, 0, 0))
 
 	def createPopupMenu(self):
 
@@ -56,7 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		self.tools = QtWidgets.QActionGroup(self)
 
-		tools = ["selection", "magicwand", "pencil", "eraser", "colorpicker", "fill", "gradient", "exchange"]
+		tools = ["selection", "magicwand", "pencil", "eraser", "colorpicker", "fill", "gradient", "exchange", "lasso", "hand"]
 		connects = [lambda: self.context.changeCurrentTool(Pixeler.Tools.Selection),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.MagicWand),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.Pencil),
@@ -64,8 +65,11 @@ class MainWindow(QtWidgets.QMainWindow):
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.ColorPicker),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.Fill),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.Gradient),
-					lambda: self.context.changeCurrentTool(Pixeler.Tools.Exchange)]
-		shortcuts = ['Z', '', 'X', 'C', 'A', 'S', 'D', '']
+					lambda: self.context.changeCurrentTool(Pixeler.Tools.Exchange),
+					lambda: self.context.changeCurrentTool(Pixeler.Tools.Lasso),
+					lambda: self.context.changeCurrentTool(Pixeler.Tools.Hand),
+					]
+		shortcuts = ['Z', '', 'X', 'C', 'A', 'S', 'D', '', 'L', 'H']
 
 		for i in range(len(tools)):
 			a = QtWidgets.QAction(QtGui.QIcon( os.path.join("themes", self.context.theme, tools[i] + ".png") ), self.context.getText("tools", tools[i]) + " (" + shortcuts[i] + ")", self.tools)
@@ -96,7 +100,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		j = 0
 		for i in l:
 			toolBar.addAction(i)
-			if j == 7:
+			if j == 9:
 				toolBar.addSeparator()
 			j += 1
 
@@ -274,8 +278,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
 
 		# Preview
-		self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
-		self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
+		# self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
+		# self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
 
 	def restoreFocus(self):
 
@@ -523,7 +527,8 @@ class MainWindow(QtWidgets.QMainWindow):
 	def wheelEvent(self, event):
 
 		if self.ctrlPressed:
-			if event.delta() > 0:
+			print(event.angleDelta().y())
+			if event.angleDelta().y() > 0:
 				self.zoomIn()
 			else:
 				self.zoomOut()

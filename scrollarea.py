@@ -5,7 +5,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
 from canvas import Canvas
-
+import names as Pixeler
 
 class ScrollArea(QtWidgets.QScrollArea):
 	"""
@@ -88,14 +88,17 @@ class ScrollArea(QtWidgets.QScrollArea):
 
 	def mousePressEvent(self, event):
 
-		if event.button() == Qt.MiddleButton:
+		if event.button() == Qt.MiddleButton or \
+			(self.context.currentTool == Pixeler.Tools.Hand and event.buttons() == Qt.LeftButton):
 			self.grabPoint = event.pos()
 			self.grabPos = self.canvas.pos()
 
 	def mouseMoveEvent(self, event):
 
 		pos = event.pos()
-		self.canvas.move(self.grabPos + event.pos() - self.grabPoint)
+		if event.button() == Qt.MiddleButton or \
+				(self.context.currentTool == Pixeler.Tools.Hand and event.buttons() == Qt.LeftButton):
+			self.canvas.move(self.grabPos + event.pos() - self.grabPoint)
 
 		"""
 		if (self.mapToParent(pos).x() + self.width() - self.grabPoint.x()) > (self.parent.width() ):
