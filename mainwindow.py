@@ -12,7 +12,7 @@ from palette import Palette
 from toolproperties import ToolProperties
 from preview import Preview
 from dialogs import NewFileDialog, ResizeImageDialog, ResizeCanvasDialog, Preferences
-from submit import Hidefg,Submit
+from submit import ViewOpinion,Submit
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -290,15 +290,15 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.toolProperties)
 
-		# Hide FG Widget
-		self.hidefg = Hidefg("查看选项",self.context,self.signals)
-		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
-		self.addDockWidget(Qt.RightDockWidgetArea,self.hidefg)
+		# View Opinion Widget
+		self.viewOpinion = ViewOpinion("查看选项",self.context,self.signals)
+		self.viewOpinion.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+		self.addDockWidget(Qt.RightDockWidgetArea,self.viewOpinion)
 
 		# Submit
 		self.submit = Submit("", self.context, self.signals)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
-		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
 
 		# Preview
 		self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)

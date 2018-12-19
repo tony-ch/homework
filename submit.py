@@ -4,11 +4,11 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
-class Hidefg (QtWidgets.QDockWidget):
+class ViewOpinion (QtWidgets.QDockWidget):
 
 	def __init__(self, title, context, signals, Parent=None):
 
-		super(Hidefg, self).__init__(title, Parent)
+		super(ViewOpinion, self).__init__(title, Parent)
 
 		self.context = context
 		self.signals = signals
@@ -37,7 +37,7 @@ class Hidefg (QtWidgets.QDockWidget):
 
 	def showFg(self):
 
-		super(Hidefg, self).update()
+		super(ViewOpinion, self).update()
 		if self.context.currentImage() != None:
 			if(self.checkFg.isChecked()):
 				self.context.showFg=True
@@ -47,7 +47,7 @@ class Hidefg (QtWidgets.QDockWidget):
 
 	def showBg(self):
 
-		super(Hidefg, self).update()
+		super(ViewOpinion, self).update()
 		if self.context.currentImage() != None:
 			if(self.checkBg.isChecked()):
 				self.context.showBg=True
