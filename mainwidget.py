@@ -42,6 +42,11 @@ class MainWidget(QtWidgets.QTabWidget):
 
 		scrollArea = ScrollArea(self.count(), self.context, self.signals, self)
 		scrollArea.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+		#add by lyc : to hidden the scroll bar
+		# scrollArea.horizontalScrollBar().setVisible(False)
+		# scrollArea.verticalScrollBar().setVisible(False)
+		scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.widgets.append(scrollArea)
 		self.addTab(scrollArea, "Image" + str(self.count()+1))
 		self.setCurrentIndex(self.count()-1)

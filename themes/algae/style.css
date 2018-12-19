@@ -215,11 +215,11 @@ QSpinBox::down-arrow  {
 QListWidget {
 	border: none;
 	border-radius: 2px;
-	background-color: rgb(33,167,108);
+	background-color: rgb(45,46,48);
 }
 
 QListWidget::item {
-	background-color: rgb(33,167,108);
+	background-color: rgb(45,46,48);
 	border-radius: 2px;
 }
 

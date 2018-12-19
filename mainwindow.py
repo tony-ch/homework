@@ -10,10 +10,11 @@ import names as Pixeler
 from mainwidget import MainWidget
 from palette import Palette
 from toolproperties import ToolProperties
-from preview import Preview
+#from preview import Preview
 from dialogs import NewFileDialog, ResizeImageDialog, ResizeCanvasDialog, Preferences
 from submit import ViewOpinion,Submit
-
+from historyView import HistoryView
+from voiceControl import VoiceControl
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -47,6 +48,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		self.show()
 		self.context.newImage(256, 256, QtGui.QColor(0, 0, 0, 0))
+		self.context.changeCurrentTool(Pixeler.Tools.Pencil)
+		self.context.currentImage().loadDemoFromFile(['demoimg/104.jpg'])
+		self.signals.updateCanvas.emit()
+
 
 	def createPopupMenu(self):
 
@@ -87,6 +92,8 @@ class MainWindow(QtWidgets.QMainWindow):
 		for i in range(len(tools)):
 			a = QtWidgets.QAction(QtGui.QIcon( os.path.join("themes", self.context.theme, tools[i] + ".png") ), self.context.getText("tools", tools[i]) + " (" + shortcuts[i] + ")", self.tools)
 			a.setCheckable(True)
+			if tools[i] == 'pencil':
+				a.setChecked(True)
 			a.setShortcut(shortcuts[i])
 			if connects[i] != 0: a.toggled.connect(connects[i])
 			l.append(a)
@@ -300,9 +307,21 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
 		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
 
+		#comment by lyc
 		# Preview
-		self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
-		self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
+		#self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
+		#self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
+
+		#add by lyc
+		#HisotryView
+		self.historyView=HistoryView("history view", self.context, self.signals, self)
+		#self.historyView.setStyleSheet("border: 2px solid black;")
+		self.addDockWidget(Qt.RightDockWidgetArea,self.historyView)
+
+		# add by lyc
+		# HisotryView
+		self.voiceControl = VoiceControl("请点击按钮进行语音控制", self.context, self.signals, self)
+		self.addDockWidget(Qt.RightDockWidgetArea, self.voiceControl)
 
 	def restoreFocus(self):
 
@@ -380,16 +399,20 @@ class MainWindow(QtWidgets.QMainWindow):
 		pass
 
 	def undo(self):
-
+		# modified by lyc
+		# return
 		if self.context.currentImage().posHistory > 0:
+			print(self.context.currentImage().posHistory)
 			self.context.currentImage().posHistory -= 1
 			self.context.currentImage().image = QtGui.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
 
 	def redo(self):
-
+		# modified by lyc
+		# return
 		if self.context.currentImage().posHistory < len(self.context.currentImage().history)-1:
+			print(self.context.currentImage().posHistory)
 			self.context.currentImage().posHistory += 1
 			self.context.currentImage().image = QtGui.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
 			self.signals.updateCanvas.emit()

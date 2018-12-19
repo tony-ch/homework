@@ -81,7 +81,7 @@ class ToolProperties (QtWidgets.QDockWidget):
 		slider.setValue(self.context.pencilSize)
 		self.pencilSize = SizeLabel(str(self.context.pencilSize))
 
-		slider.setMaximum(9)
+		slider.setMaximum(30)
 		slider.setMinimum(1)
 		slider.setPageStep(1)
 		slider.setValue(self.context.pencilSize)
@@ -144,7 +144,7 @@ class ToolProperties (QtWidgets.QDockWidget):
 		slider.setValue(self.context.eraserSize)
 		self.eraserSize = SizeLabel(str(self.context.eraserSize))
 
-		slider.setMaximum(9)
+		slider.setMaximum(31)
 		slider.setMinimum(1)
 		slider.setPageStep(1)
 		slider.setValue(self.context.eraserSize)

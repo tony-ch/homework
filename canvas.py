@@ -243,13 +243,13 @@ class Canvas(QtWidgets.QLabel):
 
 			w = self.parent.frameGeometry().width()
 			h = self.parent.frameGeometry().height()
-
-			sb = self.parent.horizontalScrollBar()
+			#comment by lyc : bugs here -> cause movement shake
+			#sb = self.parent.horizontalScrollBar()
 			"""
 			sb.maximum() - sb.minimum() -> self.mapToParent(self.pos().x()) - self.frameGeometry().width()
 			sb.value() -> x
 			"""
-			sb.setValue( self.mapToParent(self.pos()).x() * sb.maximum() / float(-self.width() + self.parent.width())  )
+			#sb.setValue( self.mapToParent(self.pos()).x() * sb.maximum() / float(-self.width() + self.parent.width())  )
 
 		self.update()
 

@@ -9,7 +9,7 @@ def createBrushes():
 	circles = []
 	brushes = []
 
-	for i in range(9):
+	for i in range(31):
 		m, im = createCircle(i)
 		circles.append(m)
 		pm = QtGui.QBitmap().fromImage(im)

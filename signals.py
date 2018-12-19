@@ -46,3 +46,8 @@ class Signals(QtCore.QObject):
 
 	updatePencilSize = QtCore.pyqtSignal([int])
 	updateEraserSize = QtCore.pyqtSignal([int])
+
+	#history view
+	# historyAdd=QtCore.pyqtSignal()
+	historyReset=QtCore.pyqtSignal()
+	# historyRestore=QtCore.pyqtSignal()

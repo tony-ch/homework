@@ -81,7 +81,6 @@ class Context:
 		return self.imagePos
 
 	def currentImage(self):
-
 		if len(self.images) > 0:
 			return self.images[self.getCurrentImagePos()]
 		return None
@@ -113,13 +112,13 @@ class Context:
 
 	def setPencilSize(self, size):
 
-		if size < 10 and size > 0:
+		if size < 31 and size > 0:
 			self.pencilSize = size
 			self.signals.updatePencilSize.emit(self.pencilSize)
 
 	def setEraserSize(self, size):
 
-		if size < 10 and size > 0:
+		if size < 31 and size > 0:
 			self.eraserSize = size
 			self.signals.updateEraserSize.emit(self.eraserSize)
 
@@ -277,12 +276,12 @@ class Context:
 
 	def loadDefaultsPencil(self):
 
-		self.pencilSize = self.getIntDefault("pencil", "size", 3)
+		self.pencilSize = self.getIntDefault("pencil", "size", 10)
 		self.secondaryColorEraser = self.getBoolDefault("pencil", "secondary_color_eraser", False)
 
 	def loadDefaultsEraser(self):
 
-		self.eraserSize = self.getIntDefault("eraser", "size", 1)
+		self.eraserSize = self.getIntDefault("eraser", "size", 10)
 
 	def saveDefaults(self):
 		return

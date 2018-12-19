@@ -3,7 +3,7 @@
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-from client import GANPaint
+#from client import GANPaint
 
 class Image:
 
@@ -31,6 +31,7 @@ class Image:
 		self.modified=False
 		self.selection=None
 		self.bg_image=self.ori_bg_img
+		self.context.signals.historyReset.emit()
 
 	def submit(self):
 		print("submit")
@@ -75,6 +76,16 @@ class Image:
 		
 		self.posHistory += 1
 		self.modified = True
+		#add by lyc
+		self.context.signals.historyReset.emit()
+
+	#add by lyc
+	def changeCurrentHistoryStep(self,target:int):
+		self.posHistory = target
+		self.image=QtGui.QImage(self.history[self.posHistory])
+		self.context.signals.updateCanvas.emit()
+		self.context.signals.resizeCanvas.emit()
+
 
 	def paintPoint(self, x, y, color, size):
 
