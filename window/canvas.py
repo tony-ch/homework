@@ -133,7 +133,8 @@ class Canvas(QtWidgets.QLabel):
 		elif self.context.currentTool == Pixeler.Tools.Pencil:
 			#lyc add
 			# self.parent.parent.parent.viewOpinion.checkFg.setChecked(True)
-			self.signals.updateViewOpition.emit(True)
+			self.signals.showBG.emit(True)
+			self.signals.showFG.emit(True)
 			self.lastPoint = QtCore.QPoint(x,y)
 			if self.drawing:
 				self.drawing = False
@@ -387,6 +388,8 @@ class Canvas(QtWidgets.QLabel):
 		# Transparency
 		if self.image().bgColor == QtGui.QColor(0,0,0,0):
 			painter.fillRect(self.rect(), QtGui.QBrush(QtGui.QImage("images/transparent.png")))
+			if self.context.showOri:
+				painter.drawImage(self.rect(), self.context.currentImage().ori_bg_img)
 			if(self.context.showBg):
 				painter.drawImage(self.rect(), self.context.currentImage().bg_image)
 		

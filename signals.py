@@ -44,7 +44,8 @@ class Signals(QtCore.QObject):
 	leaveCanvas = QtCore.pyqtSignal()
 	overCanvas = QtCore.pyqtSignal([int, int])
 
-	updateViewOpition = QtCore.pyqtSignal([bool])
+	showFG = QtCore.pyqtSignal([bool])
+	showBG = QtCore.pyqtSignal([bool])
 
 	updatePencilSize = QtCore.pyqtSignal([int])
 	updateEraserSize = QtCore.pyqtSignal([int])

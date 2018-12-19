@@ -21,27 +21,43 @@ class ViewOpinion (QtWidgets.QDockWidget):
 		w.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 		vbox = QtWidgets.QVBoxLayout()
 
-		self.checkFg = QtWidgets.QCheckBox("显示前景", self)
+		self.checkFg = QtWidgets.QCheckBox("显示笔画", self)
 		self.checkFg.setChecked(self.context.showFg)
 		self.checkFg.toggled.connect(self.updateFg)
 
-		self.checkBg = QtWidgets.QCheckBox("显示背景", self)
+		self.checkBg = QtWidgets.QRadioButton("显示结果", self)
 		self.checkBg.setChecked(self.context.showBg)
 		self.checkBg.toggled.connect(self.updateBg)
 
+		self.checkOri = QtWidgets.QRadioButton("显示原图", self)
+		self.checkOri.setChecked(self.context.showBg)
+		self.checkOri.toggled.connect(self.updateOri)
+
+		self.btnGroup = QtWidgets.QButtonGroup()
+		self.btnGroup.addButton(self.checkOri,0)
+		self.btnGroup.addButton(self.checkBg,1)
+		self.btnGroup.setExclusive(True)
+
 		# self.context.signals.enterCanvas.connect(self.showFg)
 		# self.context.signals.submitCavas.connect(self.hideFg)
-		self.context.signals.updateViewOpition.connect(self.updateOpition)
+		self.context.signals.showFG.connect(self.showFG)
+		self.context.signals.showBG.connect(self.showBG)
 
 		vbox.setAlignment(QtCore.Qt.AlignTop)
+		vbox.addWidget(self.checkOri)
 		vbox.addWidget(self.checkBg)
+		vbox.addSpacing(5)
 		vbox.addWidget(self.checkFg)
 		w.setLayout(vbox)
 		self.setWidget(w)
 
-	def updateOpition(self, option):
+	def showFG(self, option):
 		self.checkFg.setChecked(option)
 		self.updateFg()
+
+	def showBG(self,option):
+		self.checkBg.setChecked(option)
+		self.updateBg()
 
 	def updateFg(self):
 
@@ -61,6 +77,16 @@ class ViewOpinion (QtWidgets.QDockWidget):
 				self.context.showBg=True
 			else:
 				self.context.showBg=False
+			self.signals.updateCanvas.emit()
+
+	def updateOri(self):
+
+		super(ViewOpinion, self).update()
+		if self.context.currentImage() != None:
+			if(self.checkOri.isChecked()):
+				self.context.showOri=True
+			else:
+				self.context.showOri=False
 			self.signals.updateCanvas.emit()
 
 
@@ -100,5 +126,6 @@ class Submit (QtWidgets.QDockWidget):
 
 	def submit_image(self):
 		# self.parent.viewOpinion.checkFg.setChecked(False)
-		self.signals.updateViewOpition.emit(False)
+		self.signals.showBG.emit(True)
+		self.signals.showFG.emit(False)
 		self.signals.submitCavas.emit()

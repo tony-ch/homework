@@ -220,6 +220,7 @@ class Context:
 		self.loadDefaultsEraser()
 		self.showFg = True
 		self.showBg = True
+		self.showOri = False
 
 	def loadDefaultsPalette(self):
 
