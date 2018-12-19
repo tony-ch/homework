@@ -52,11 +52,6 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.context.currentImage().loadDemoFromFile(['demoimg/700.jpg'])
 		self.signals.updateCanvas.emit()
 
-
-	def createPopupMenu(self):
-
-		pass # Reimplementando esta función conseguimos que no se creen los menús popup cuando hacemos click derecho en toolbars/dockwidgets.
-
 	def createToolBarActions(self):
 
 		l = []
@@ -133,154 +128,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		return toolBar
 
-	def createFileActions(self):
-
-		ids = ["new", "open", "save", "saveas", "exit"]
-		icons = ["document-new.png", "document-open.png", "document-save.png", "document-save-as.png", "application-exit.png"]
-		shortcuts = ['Ctrl+N', '', '', 'Ctrl+Shift+S', 'Ctrl+Q']
-		connects = [self.newFile, self.openDemoImg, self.saveFile, self.saveFileAs, self.close]
-
-		l = []
-
-		for i in range(len(ids)):
-			a = QtWidgets.QAction(QtGui.QIcon("images/" + icons[i]), self.context.getText("menu_file_labels", ids[i]), self)
-			a.setShortcut(shortcuts[i])
-			a.triggered.connect(self.restoreFocus)
-			a.setStatusTip(self.context.getText("menu_file_status_tips", ids[i]))
-			if connects[i] != 0: a.triggered.connect(connects[i])
-			l.append(a)
-
-		l.insert(4,0) # Los ceros simbolizan separadores
-
-		return l
-
-	def createEditActions(self):
-
-		ids = ["undo", "redo", "selectall", "deselect", "cut", "copy", "paste", "clear", "preferences"]
-		icons = ["edit-undo.png", "edit-redo.png", "", "", "edit-cut.png", "edit-copy.png", "edit-paste.png", "edit-clear.png", "document-properties.png"]
-		shortcuts = ['Ctrl+Z', 'Ctrl+Y', "Ctrl+A", "Ctrl+Shift+A", 'Ctrl+X', 'Ctrl+C', 'Ctrl+V', 'Del', '']
-		connects = [self.undo, self.redo, self.selectAll, self.deselect, self.cut, self.copy, self.paste, self.clear, self.showPreferences]
-
-		l = []
-
-		for i in range(len(ids)):
-			a = QtWidgets.QAction(QtGui.QIcon("images/" + icons[i]), self.context.getText("menu_edit_labels", ids[i]), self)
-			a.setShortcut(shortcuts[i])
-			a.triggered.connect(self.restoreFocus)
-			a.setStatusTip(self.context.getText("menu_edit_status_tips", ids[i]))
-			if connects[i] != 0: a.triggered.connect(connects[i])
-			l.append(a)
-
-		# Los ceros simbolizan separadores
-		l.insert(2,0)
-		l.insert(5,0)
-		l.insert(10,0)
-
-		return l
-
-	def createViewActions(self):
-
-		ids = ["pixel_grid", "matrix_grid"]
-		icons = ["", ""]
-		shortcuts = ['Ctrl+G', 'Ctrl+M']
-		connects = [self.setPixelGrid, self.setMatrixGrid]
-
-		l = []
-
-		for i in range(len(ids)):
-			a = QtWidgets.QAction(QtGui.QIcon("images/" + icons[i]), self.context.getText("menu_view_labels", ids[i]), self)
-			a.setShortcut(shortcuts[i])
-			a.triggered.connect(self.restoreFocus)
-			a.setStatusTip(self.context.getText("menu_view_status_tips", ids[i]))
-			if connects[i] != 0: a.triggered.connect(connects[i])
-			a.setCheckable(True)
-			l.append(a)
-
-		l.insert(2,0) # Los ceros simbolizan separadores
-
-		# Algunas opcionas son chekables, lo consideramos:
-		l[0].setCheckable(True)
-		if self.context.grid: l[0].setChecked(True)
-		l[1].setCheckable(True)
-		if self.context.matrixGrid: l[1].setChecked(True)
-
-		return l
-
-	def createTransformActions(self):
-
-		ids = ["flip_hor", "flip_ver", "rotate_cw", "rotate_ccw", "rotate_180", "resize", "resize_canvas"]
-		icons = ["", "", "", "", "", "", ""]
-		shortcuts = ['', '', '', '', '', '', '']
-		connects = [self.flipHorizontally,self.flipVertically,self.rotate90CW,self.rotate90CCW,self.rotate180,self.showResizeImageDialog,self.showResizeCanvasDialog]
-
-		l = []
-
-		for i in range(len(ids)):
-			a = QtWidgets.QAction(QtGui.QIcon("images/" + icons[i]), self.context.getText("menu_transform_labels", ids[i]), self)
-			a.setShortcut(shortcuts[i])
-			a.triggered.connect(self.restoreFocus)
-			a.setStatusTip(self.context.getText("menu_transform_status_tips", ids[i]))
-			if connects[i] != 0: a.triggered.connect(connects[i])
-			l.append(a)
-
-		# Los ceros simbolizan separadores
-		l.insert(2,0)
-		l.insert(6,0)
-
-		return l
-
-	def createHelpActions(self):
-
-		ids = ["contents", "about"]
-		icons = ["help-contents.png", "help-about.png"]
-		shortcuts = ['F1', 'Ctrl+B']
-		connects = [self.showHelp, self.showAboutDialog]
-
-		l = []
-
-		for i in range(len(ids)):
-			a = QtWidgets.QAction(QtGui.QIcon("images/" + icons[i]), self.context.getText("menu_help_labels", ids[i]), self)
-			a.setShortcut(shortcuts[i])
-			a.triggered.connect(self.restoreFocus)
-			a.setStatusTip(self.context.getText("menu_help_status_tips", ids[i]))
-			if connects[i] != 0: a.triggered.connect(connects[i])
-			l.append(a)
-
-		l.insert(1,0) # Los ceros simbolizan separadores
-
-		return l
-
-	# def createMenuBar(self):
-	#
-	# 	menubar = self.menuBar()
-	# 	fileMenu = menubar.addMenu(self.context.getText("menu", "file"))
-	# 	editMenu = menubar.addMenu(self.context.getText("menu", "edit"))
-	# 	viewMenu = menubar.addMenu(self.context.getText("menu", "view"))
-	# 	transformMenu = menubar.addMenu(self.context.getText("menu", "transform"))
-	# 	helpMenu = menubar.addMenu(self.context.getText("menu", "help"))
-	# 	fileActions = self.createFileActions()
-	# 	editActions = self.createEditActions()
-	# 	viewActions = self.createViewActions()
-	# 	transformActions = self.createTransformActions()
-	# 	helpActions = self.createHelpActions()
-	# 	for i in fileActions:
-	# 		if i == 0: fileMenu.addSeparator()
-	# 		else: fileMenu.addAction(i)
-	# 	for i in editActions:
-	# 		if i == 0: editMenu.addSeparator()
-	# 		else: editMenu.addAction(i)
-	# 	for i in viewActions:
-	# 		if i == 0: viewMenu.addSeparator()
-	# 		else: viewMenu.addAction(i)
-	# 	for i in helpActions:
-	# 		if i == 0: helpMenu.addSeparator()
-	# 		else: helpMenu.addAction(i)
-	# 	for i in transformActions:
-	# 		if i == 0: transformMenu.addSeparator()
-	# 		else: transformMenu.addAction(i)
-	#
-	# 	return menubar
-
 	def createDockWidgets(self):
 
 		# Palette widget
@@ -350,19 +197,6 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.context.currentImage().zoom -= 1
 			self.signals.zoom.emit()
 
-	def newFile(self):
-		pass
-		# d = NewFileDialog(self.context, self)
-	#
-	# def openFile(self):
-	# 	pass
-	# 	fileName = QtWidgets.QFileDialog.getOpenFileName(self,
-	# 				self.context.getText("dialog_open", "title"),
-	# 				"/home",
-	# 				self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
-	# 	if fileName:
-	# 		self.context.loadImage(fileName)
-
 	def saveFile(self):
 		self.saveFileAs()
 
@@ -420,37 +254,6 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
 
-	def selectAll(self):
-
-		self.mainWidget.currentWidget().canvas.selectAll()
-
-	def deselect(self):
-
-		self.mainWidget.currentWidget().canvas.applySelection()
-
-	def cut(self):
-
-		self.signals.cutImage.emit()
-
-	def copy(self):
-
-		self.signals.copyImage.emit()
-
-	def paste(self):
-
-		clipboard = QtWidgets.QApplication.clipboard()
-		if not clipboard.image().isNull():
-			self.signals.pasteImage.emit()
-			self.signals.updateCanvas.emit()
-
-	def clear(self):
-
-		self.signals.clearImage.emit()
-
-	def showPreferences(self):
-
-		d = Preferences(self.context, self.signals, self)
-
 	def setPixelGrid(self):
 
 		self.context.grid = not self.context.grid
@@ -462,42 +265,6 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.context.matrixGrid = not self.context.matrixGrid
 		self.signals.updateCanvas.emit()
 		self.context.setDefault("grid", "matrix_grid", self.context.matrixGrid)
-
-	def flipHorizontally(self):
-
-		pass
-
-	def flipVertically(self):
-
-		pass
-
-	def rotate90CW(self):
-
-		pass
-
-	def rotate90CCW(self):
-
-		pass
-
-	def rotate180(self):
-
-		pass
-
-	def showResizeImageDialog(self):
-
-		pass
-
-	def showResizeCanvasDialog(self):
-
-		pass
-
-	def showHelp(self):
-
-		pass
-
-	def showAboutDialog(self):
-
-		pass
 
 	def showImagePosition(self):
 
@@ -551,36 +318,6 @@ class MainWindow(QtWidgets.QMainWindow):
 			QtCore.QCoreApplication.instance().restoreOverrideCursor()
 			self.releaseMouse()
 			self.releaseKeyboard()
-
-	def mousePressEvent(self, event):
-
-		super(MainWindow, self).mousePressEvent(event)
-
-		# if self.ctrlPressed:
-		# 	print("Picking Desktop Color")
-		# 	widget = QtCore.QCoreApplication.instance().desktop().screen()
-		# 	im = QtWidgets.QPixmap.grabWindow(widget.winId()).toImage() # Captura de pantalla
-		# 	c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
-		# 	if event.button() == Qt.LeftButton:
-		# 		self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
-		# 	elif event.button() == Qt.RightButton:
-		# 		self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
-			# im.save("desktop.png") # Guardar la captura de pantalla en un archivo
-			# print "Getting color " + c.red(), c.green(), c.blue() + " from screen" # Comprueba qué color coge
-
-	# def mouseMoveEvent(self, event):
-	#
-	# 	super(MainWindow, self).mouseMoveEvent(event)
-	#
-	# 	# Lo mismo de antes pero para cuando el ratón se mueve
-	# 	if self.ctrlPressed:
-	# 		widget = QtCore.QCoreApplication.instance().desktop().screen()
-	# 		im = QtGuiApplication.primaryScreen().grabWindow(widget.winId()).toImage() # Captura de pantalla
-	# 		c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
-	# 		if event.buttons() == Qt.LeftButton:
-	# 			self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
-	# 		elif event.buttons() == Qt.RightButton:
-	# 			self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
 
 	def wheelEvent(self, event):
 
