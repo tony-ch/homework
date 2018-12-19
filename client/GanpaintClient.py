@@ -34,6 +34,8 @@ class GANPaint(object):
         assert operations is not None or qImageOp is not None
         if(operations is None):
             operations=self._interpreteOp(qImageOp)
+        if len(operations)==0:
+             return None
         interventions = self._intervent(operations)
         final_json = self._final_json(id, interventions,project)
         # print(final_json)
@@ -100,8 +102,8 @@ class GANPaint(object):
             op[idx]=color
             if(op[:,:,:-1].max()>0):
                 op = self.NPtoPIL(op)
-                # op = op.resize((self.mask_shape[0],self.mask_shape[1]),Image.ANTIALIAS)
-                op = op.resize((self.mask_shape[0],self.mask_shape[1]))
+                op = op.resize((self.mask_shape[0],self.mask_shape[1]),Image.ANTIALIAS)
+                # op = op.resize((self.mask_shape[0],self.mask_shape[1]))
                 print(action)
                 # plt.figure()
                 # plt.imshow(op)

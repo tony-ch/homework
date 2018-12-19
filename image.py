@@ -39,7 +39,8 @@ class Image:
 		if self.id is not None:
 			print("submit")
 			res = self.ganPaintClient.upload(self.id,operations=None,qImageOp=self.image)
-			self.bg_image=res
+			if res is not None:
+				self.bg_image=res
 
 	@classmethod
 	def fromFile(cls, fileName, context):
