@@ -49,7 +49,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.show()
 		self.context.newImage(256, 256, QtGui.QColor(0, 0, 0, 0))
 		self.context.changeCurrentTool(Pixeler.Tools.Pencil)
-		self.context.currentImage().loadDemoFromFile(['demoimg/104.jpg'])
+		self.context.currentImage().loadDemoFromFile(['demoimg/700.jpg'])
 		self.signals.updateCanvas.emit()
 
 
@@ -138,7 +138,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		ids = ["new", "open", "save", "saveas", "exit"]
 		icons = ["document-new.png", "document-open.png", "document-save.png", "document-save-as.png", "application-exit.png"]
 		shortcuts = ['Ctrl+N', '', '', 'Ctrl+Shift+S', 'Ctrl+Q']
-		connects = [self.newFile, self.openFile, self.saveFile, self.saveFileAs, self.close]
+		connects = [self.newFile, self.openDemoImg, self.saveFile, self.saveFileAs, self.close]
 
 		l = []
 
@@ -351,17 +351,17 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.signals.zoom.emit()
 
 	def newFile(self):
-
-		d = NewFileDialog(self.context, self)
-
-	def openFile(self):
-
-		fileName = QtWidgets.QFileDialog.getOpenFileName(self,
-					self.context.getText("dialog_open", "title"),
-					"/home",
-					self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
-		if fileName:
-			self.context.loadImage(fileName)
+		pass
+		# d = NewFileDialog(self.context, self)
+	#
+	# def openFile(self):
+	# 	pass
+	# 	fileName = QtWidgets.QFileDialog.getOpenFileName(self,
+	# 				self.context.getText("dialog_open", "title"),
+	# 				"/home",
+	# 				self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
+	# 	if fileName:
+	# 		self.context.loadImage(fileName)
 
 	def saveFile(self):
 		self.saveFileAs()
@@ -522,7 +522,7 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.ctrlPressed = True
 			QtCore.QCoreApplication.instance().setOverrideCursor(self.context.colorPickerCur)
 			self.signals.ctrlPressed.emit()
-			self.grabMouse()
+			# self.grabMouse()
 			self.grabKeyboard()
 
 		elif event.key() == Qt.Key_Plus:
@@ -568,19 +568,19 @@ class MainWindow(QtWidgets.QMainWindow):
 			# im.save("desktop.png") # Guardar la captura de pantalla en un archivo
 			# print "Getting color " + c.red(), c.green(), c.blue() + " from screen" # Comprueba qué color coge
 
-	def mouseMoveEvent(self, event):
-
-		super(MainWindow, self).mouseMoveEvent(event)
-
-		# Lo mismo de antes pero para cuando el ratón se mueve
-		if self.ctrlPressed:
-			widget = QtCore.QCoreApplication.instance().desktop().screen()
-			im = QtWidgets.QPixmap.grabWindow(widget.winId()).toImage() # Captura de pantalla
-			c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
-			if event.buttons() == Qt.LeftButton:
-				self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
-			elif event.buttons() == Qt.RightButton:
-				self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
+	# def mouseMoveEvent(self, event):
+	#
+	# 	super(MainWindow, self).mouseMoveEvent(event)
+	#
+	# 	# Lo mismo de antes pero para cuando el ratón se mueve
+	# 	if self.ctrlPressed:
+	# 		widget = QtCore.QCoreApplication.instance().desktop().screen()
+	# 		im = QtGuiApplication.primaryScreen().grabWindow(widget.winId()).toImage() # Captura de pantalla
+	# 		c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
+	# 		if event.buttons() == Qt.LeftButton:
+	# 			self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
+	# 		elif event.buttons() == Qt.RightButton:
+	# 			self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
 
 	def wheelEvent(self, event):
 
