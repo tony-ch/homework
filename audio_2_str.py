@@ -33,16 +33,17 @@ class recoder:
 
     def recoder(self):
         pa = PyAudio()
-        # print(pa.get_default_input_device_info())
-        print(pa.get_device_count())
         stream = pa.open(format=paInt16, channels=1, rate=self.SAMPLING_RATE, input=True,
                          frames_per_buffer=self.NUM_SAMPLES)
         save_count = 0
         save_buffer = []
-        time_count = self.TIME_COUNT
+        # time_count = self.TIME_COUNT
+
+        start = datetime.now()
+        time = 0
 
         while True:
-            time_count -= 1
+            # time_count -= 1
             # print time_count
             # 读入NUM_SAMPLES个取样
             string_audio_data = stream.read(self.NUM_SAMPLES)
@@ -73,7 +74,18 @@ class recoder:
                     save_buffer = []
                     print("Recode a piece of  voice successfully!")
                     return True
-            if time_count == 0:
+            # if time_count == 0:
+            #     if len(save_buffer) > 0:
+            #         self.Voice_String = save_buffer
+            #         save_buffer = []
+            #         print("Recode a piece of  voice successfully!")
+            #         return True
+            #     else:
+            #         return False
+
+            end = datetime.now()
+            time = (end - start).seconds
+            if time == 5:
                 if len(save_buffer) > 0:
                     self.Voice_String = save_buffer
                     save_buffer = []
@@ -111,11 +123,11 @@ def audio_2_str():
         order.append(None)
 
     if ('树' in result):
-        order.append('树木')
+        order.append('树')
     elif ('门' in result):
         order.append('门')
     elif ('草' in result):
-        order.append('草地')
+        order.append('草')
     elif ('天' in result):
         order.append('天空')
     elif ('云' in result):
@@ -123,8 +135,9 @@ def audio_2_str():
     elif ('砖' in result):
         order.append('砖块')
     elif ('顶' in result):
-        order.append('圆顶')
+        order.append('塔尖')
     else:
         order.append(None)
-    return order
-    # return result, order
+
+    #print(result, order)
+    return  order

@@ -89,5 +89,5 @@ class Submit (QtWidgets.QDockWidget):
 		self.signals.resetCavas.emit()
 
 	def submit_image(self):
+		self.parent.viewOpinion.checkFg.setChecked(False)
 		self.signals.submitCavas.emit()
-

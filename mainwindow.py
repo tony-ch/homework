@@ -303,7 +303,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.addDockWidget(Qt.RightDockWidgetArea,self.viewOpinion)
 
 		# Submit
-		self.submit = Submit("", self.context, self.signals)
+		self.submit = Submit("", self.context, self.signals,self)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
 		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
 

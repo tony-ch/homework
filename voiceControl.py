@@ -30,6 +30,11 @@ class VoiceControl (QtWidgets.QDockWidget):
 			self.parent.undo()
 		elif list[0]=="重做":
 			self.parent.redo()
+
+		for i in range(0,len(self.context.paletteText)):
+			if self.context.paletteText[i] in list:
+				self.context.changePrimaryColor(QtGui.QColor(*self.context.defaultPalette[i]))
+				break
 		return
 
 	def update(self):
