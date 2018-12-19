@@ -332,7 +332,6 @@ class MainWindow(QtWidgets.QMainWindow):
 		QtCore.QCoreApplication.instance().restoreOverrideCursor()
 
 	def setCurrentTool(self, index):
-
 		self.tools.actions()[0].setChecked(True)
 		self.signals.updateTool.emit(0)
 

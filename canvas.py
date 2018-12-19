@@ -777,4 +777,5 @@ class Canvas(QtWidgets.QLabel):
 
 	def submit(self):
 		self.context.currentImage().submit()
+		#self.context.showFg=False
 		self.signals.updateCanvas.emit()

@@ -13,6 +13,7 @@ class Image:
 		self.image = image
 		self.bg_image = QtGui.QImage(image.width(), image.height(), QtGui.QImage.Format_ARGB32_Premultiplied)
 		self.ori_bg_img = self.bg_image
+		self.id=None
 		self.bgColor = bg
 		self.context = context
 
@@ -21,6 +22,7 @@ class Image:
 		self.history = [QtGui.QImage(self.image)]
 		self.posHistory = 0
 		self.modified = False
+		self.ganPaintClient=GANPaint(defaultPalette=self.context.defaultPalette)
 
 	def reset(self):
 		print("reset")
@@ -34,8 +36,10 @@ class Image:
 		self.context.signals.historyReset.emit()
 
 	def submit(self):
-		print("submit")
-		pass
+		if self.id is not None:
+			print("submit")
+			res = self.ganPaintClient.upload(self.id,operations=None,qImageOp=self.image)
+			self.bg_image=res
 
 	@classmethod
 	def fromFile(cls, fileName, context):
@@ -59,10 +63,14 @@ class Image:
 	def loadDemoFromFile(self, fileName):
 		# self.image.fill(QtGui.QColor(0, 0, 0, 0))
 		# self.bg_image =
-		self.ori_bg_img = QtGui.QImage(fileName[0]).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
-		self.bg_image = self.ori_bg_img
-		#self.reset()
-		# self.context.signals.bgImageChanged.emit()
+		print("filename",fileName)
+		if(fileName is None or (fileName[0])!=0):
+			self.id = int(fileName[0].split("/")[-1].split(".")[0])
+			print("open: image ", self.id)
+			self.ori_bg_img = QtGui.QImage(fileName[0]).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
+			# self.bg_image = self.ori_bg_img
+			self.reset()
+			# self.context.signals.bgImageChanged.emit()
 
 	def save(self):
 		self.bg_image.save(self.fileName)
