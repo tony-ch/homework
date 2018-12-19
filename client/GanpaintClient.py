@@ -36,7 +36,7 @@ class GANPaint(object):
             operations=self._interpreteOp(qImageOp)
         interventions = self._intervent(operations)
         final_json = self._final_json(id, interventions,project)
-        print(final_json)
+        # print(final_json)
         pil_img = self._send_request(self.url, final_json, format)
         if format == 'NP':
             return self.PILtoNP(pil_img)
@@ -47,7 +47,7 @@ class GANPaint(object):
 
     def _send_request(self, url, json_data,format):
         response = requests.post(url,json=json_data)
-        print(response)
+        # print(response)
         res_base64 = response.json()['res'][0]['d']
         img_base64 = res_base64.split(',')[1]
         # fp =open('1.jpg','wb')
@@ -87,29 +87,19 @@ class GANPaint(object):
         } for op in operations ]
 
     def _interpreteOp(self, qimagOp):
-        operations = [{'op': 'add_dome', 'mask': Image.open("client/mask.png")}]
+        # operations = [{'op': 'add_dome', 'mask': Image.open("client/mask.png")}]
         pil_img = self.QImagetoPIL(qimagOp)
         np_img = self.PILtoNP(pil_img)
         assert self.defaultPalette is not None
         operations_from_qimage = []
         for color,action in zip(self.defaultPalette,self.defaultOp):
             color = [color[0],color[1],color[2],255]
-            print(color)
+            # print(color)
             op = np.zeros(np_img.shape,dtype=np.uint8)
             idx = (np_img==color).all(axis=-1)
             op[idx]=color
-            # op = np.zeros(np_img.shape,dtype=np.uint8)
-            #
-            # for i in range(np_img.shape[0]):
-            #     for j in range(np_img.shape[1]):
-            #         if((np_img[i][j][:-1]==color).all()):
-            #             op[i][j] = np_img[i][j]
-            # op = op + np_img * (np_img == (color.append(255)))
             if(op[:,:,:-1].max()>0):
                 op = self.NPtoPIL(op)
-                # plt.figure()
-                # plt.imshow(op)
-                # plt.show()
                 # op = op.resize((self.mask_shape[0],self.mask_shape[1]),Image.ANTIALIAS)
                 op = op.resize((self.mask_shape[0],self.mask_shape[1]))
                 print(action)

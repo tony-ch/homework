@@ -3,7 +3,7 @@
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-#from client import GANPaint
+from client import GANPaint
 
 class Image:
 
