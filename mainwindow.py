@@ -155,7 +155,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		# Submit
 		self.submit = Submit("", self.context, self.signals,self)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
-		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 
 		#comment by lyc
 		# Preview
@@ -167,11 +167,13 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.historyView=HistoryView("操作历史", self.context, self.signals, self)
 		#self.historyView.setStyleSheet("border: 2px solid black;")
 		self.addDockWidget(Qt.RightDockWidgetArea,self.historyView)
+		self.historyView.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
 
 		# add by lyc
 		# HisotryView
 		self.voiceControl = VoiceControl("请点击按钮进行语音控制", self.context, self.signals, self)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.voiceControl)
+		self.voiceControl.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 
 	def restoreFocus(self):
 

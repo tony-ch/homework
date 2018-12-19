@@ -83,7 +83,9 @@ class Submit (QtWidgets.QDockWidget):
 
 		self.reset = QtWidgets.QPushButton("重置", self)
 		self.reset.clicked.connect(self.reset_image)
+		self.reset.setToolTip("重置前景背景和操作历史")
 		self.submit = QtWidgets.QPushButton("提交", self)
+		self.submit.setToolTip("提交纹理更改，查看结果")
 		self.submit.clicked.connect(self.submit_image)
 
 		hbox.setAlignment(QtCore.Qt.AlignTop)
