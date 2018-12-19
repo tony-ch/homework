@@ -25,7 +25,7 @@ class Hidefg (QtWidgets.QDockWidget):
 		self.checkFg.setChecked(self.context.showFg)
 		self.checkFg.toggled.connect(self.showFg)
 
-		self.checkBg = QtWidgets.QCheckBox("显示前景", self)
+		self.checkBg = QtWidgets.QCheckBox("显示背景", self)
 		self.checkBg.setChecked(self.context.showBg)
 		self.checkBg.toggled.connect(self.showBg)
 
