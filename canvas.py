@@ -135,6 +135,7 @@ class Canvas(QtWidgets.QLabel):
 		elif self.context.currentTool == Pixeler.Tools.Pencil:
 			#lyc add
 			# self.parent.parent.parent.viewOpinion.checkFg.setChecked(True)
+			self.signals.updateViewOpition.emit(True)
 			self.lastPoint = QtCore.QPoint(x,y)
 			if self.drawing:
 				self.drawing = False
@@ -153,6 +154,7 @@ class Canvas(QtWidgets.QLabel):
 		elif self.context.currentTool == Pixeler.Tools.Eraser:
 			# lyc add
 			# self.parent.parent.parent.viewOpinion.checkFg.setChecked(True)
+			self.signals.updateViewOpition.emit(True)
 			if event.button() == Qt.LeftButton or event.button() == Qt.RightButton:
 				self.lastPoint = QtCore.QPoint(x,y)
 				self.image().paintPoint(x, y, self.image().bgColor, self.context.eraserSize)
