@@ -23,11 +23,14 @@ class ViewOpinion (QtWidgets.QDockWidget):
 
 		self.checkFg = QtWidgets.QCheckBox("显示前景", self)
 		self.checkFg.setChecked(self.context.showFg)
-		self.checkFg.toggled.connect(self.showFg)
+		self.checkFg.toggled.connect(self.updateFg)
 
 		self.checkBg = QtWidgets.QCheckBox("显示背景", self)
 		self.checkBg.setChecked(self.context.showBg)
-		self.checkBg.toggled.connect(self.showBg)
+		self.checkBg.toggled.connect(self.updateBg)
+
+		self.context.signals.enterCanvas.connect(self.showFg)
+		self.context.signals.submitCavas.connect(self.hideFg)
 
 		vbox.setAlignment(QtCore.Qt.AlignTop)
 		vbox.addWidget(self.checkBg)
@@ -36,6 +39,15 @@ class ViewOpinion (QtWidgets.QDockWidget):
 		self.setWidget(w)
 
 	def showFg(self):
+		self.checkFg.setChecked(True)
+		self.updateFg()
+
+	def hideFg(self):
+		self.checkFg.setChecked(False)
+		self.updateFg()
+
+
+	def updateFg(self):
 
 		super(ViewOpinion, self).update()
 		if self.context.currentImage() != None:
@@ -45,7 +57,7 @@ class ViewOpinion (QtWidgets.QDockWidget):
 				self.context.showFg=False
 			self.signals.updateCanvas.emit()
 
-	def showBg(self):
+	def updateBg(self):
 
 		super(ViewOpinion, self).update()
 		if self.context.currentImage() != None:
@@ -89,5 +101,5 @@ class Submit (QtWidgets.QDockWidget):
 		self.signals.resetCavas.emit()
 
 	def submit_image(self):
-		self.parent.viewOpinion.checkFg.setChecked(False)
+		# self.parent.viewOpinion.checkFg.setChecked(False)
 		self.signals.submitCavas.emit()
