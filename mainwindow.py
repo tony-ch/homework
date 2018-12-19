@@ -12,6 +12,7 @@ from palette import Palette
 from toolproperties import ToolProperties
 from preview import Preview
 from dialogs import NewFileDialog, ResizeImageDialog, ResizeCanvasDialog, Preferences
+from submit import Hidefg,Submit
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -57,6 +58,18 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		self.tools = QtWidgets.QActionGroup(self)
 
+		a = QtWidgets.QAction(QtGui.QIcon(os.path.join("themes", self.context.theme, "open.png")),
+							  '打开', self.tools)
+		a.setShortcut("Ctrl+O")
+		a.triggered.connect(self.openDemoImg)
+		l.append(a)
+
+		a = QtWidgets.QAction(QtGui.QIcon(os.path.join("themes", self.context.theme, "save.png")),
+							  '保存', self.tools)
+		a.setShortcut("Ctrl+S")
+		a.triggered.connect(self.saveResultImg)
+		l.append(a)
+
 		tools = ["selection", "magicwand", "pencil", "eraser", "colorpicker", "fill", "gradient", "exchange", "lasso", "hand"]
 		connects = [lambda: self.context.changeCurrentTool(Pixeler.Tools.Selection),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.MagicWand),
@@ -100,7 +113,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		j = 0
 		for i in l:
 			toolBar.addAction(i)
-			if j == 9:
+			if j==1 or j == 11:
 				toolBar.addSeparator()
 			j += 1
 
@@ -114,7 +127,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		ids = ["new", "open", "save", "saveas", "exit"]
 		icons = ["document-new.png", "document-open.png", "document-save.png", "document-save-as.png", "application-exit.png"]
-		shortcuts = ['Ctrl+N', 'Ctrl+O', 'Ctrl+S', 'Ctrl+Shift+S', 'Ctrl+Q']
+		shortcuts = ['Ctrl+N', '', '', 'Ctrl+Shift+S', 'Ctrl+Q']
 		connects = [self.newFile, self.openFile, self.saveFile, self.saveFileAs, self.close]
 
 		l = []
@@ -274,12 +287,22 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		# Tool Properties widget
 		self.toolProperties = ToolProperties(self.context.getText("dock_widgets", "tool_properties"), self.context, self.signals)
+		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.toolProperties)
-		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
+
+		# Hide FG Widget
+		self.hidefg = Hidefg("查看选项",self.context,self.signals)
+		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+		self.addDockWidget(Qt.RightDockWidgetArea,self.hidefg)
+
+		# Submit
+		self.submit = Submit("", self.context, self.signals)
+		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
+		self.toolProperties.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 
 		# Preview
-		# self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
-		# self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
+		self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
+		self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
 
 	def restoreFocus(self):
 
@@ -320,11 +343,7 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.context.loadImage(fileName)
 
 	def saveFile(self):
-
-		if self.context.currentImage().fileName == "":
-			self.saveFileAs()
-		else:	
-			self.context.currentImage().save()
+		self.saveFileAs()
 
 	def saveFileAs(self):
 
@@ -342,6 +361,20 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.signals.fileNameChanged.emit(self.context.getCurrentImagePos(), os.path.basename(str(fileName + filterName[1:])))
 		self.context.currentImage().save()
 
+
+	def openDemoImg(self):
+		filename = QtWidgets.QFileDialog.getOpenFileName(self,
+					'选择一张图片',
+					"./demoimg",
+					self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
+		if(filename):
+			self.context.currentImage().loadDemoFromFile(filename)
+		self.signals.updateCanvas.emit()
+
+	def saveResultImg(self):
+		self.saveFile()
+
+
 	def close(self):
 
 		pass
@@ -350,7 +383,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		if self.context.currentImage().posHistory > 0:
 			self.context.currentImage().posHistory -= 1
-			self.context.currentImage().image = QtWidgets.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
+			self.context.currentImage().image = QtGui.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
 
@@ -358,7 +391,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		if self.context.currentImage().posHistory < len(self.context.currentImage().history)-1:
 			self.context.currentImage().posHistory += 1
-			self.context.currentImage().image = QtWidgets.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
+			self.context.currentImage().image = QtGui.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
 
@@ -498,15 +531,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		super(MainWindow, self).mousePressEvent(event)
 
-		if self.ctrlPressed:
-			print("Picking Desktop Color")
-			widget = QtCore.QCoreApplication.instance().desktop().screen()
-			im = QtWidgets.QPixmap.grabWindow(widget.winId()).toImage() # Captura de pantalla
-			c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
-			if event.button() == Qt.LeftButton:
-				self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
-			elif event.button() == Qt.RightButton:
-				self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
+		# if self.ctrlPressed:
+		# 	print("Picking Desktop Color")
+		# 	widget = QtCore.QCoreApplication.instance().desktop().screen()
+		# 	im = QtWidgets.QPixmap.grabWindow(widget.winId()).toImage() # Captura de pantalla
+		# 	c = QtWidgets.QColor(im.pixel(QtWidgets.QCursor.pos())) # Cogemos el color de la posición del cursor
+		# 	if event.button() == Qt.LeftButton:
+		# 		self.context.changePrimaryColor(c) # Cambiamos el color primario actual por el que hemos cogido
+		# 	elif event.button() == Qt.RightButton:
+		# 		self.context.changeSecondaryColor(c) # Cambiamos el color secundario actual por el que hemos cogido
 			# im.save("desktop.png") # Guardar la captura de pantalla en un archivo
 			# print "Getting color " + c.red(), c.green(), c.blue() + " from screen" # Comprueba qué color coge
 
@@ -527,7 +560,6 @@ class MainWindow(QtWidgets.QMainWindow):
 	def wheelEvent(self, event):
 
 		if self.ctrlPressed:
-			print(event.angleDelta().y())
 			if event.angleDelta().y() > 0:
 				self.zoomIn()
 			else:

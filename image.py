@@ -7,10 +7,11 @@ from PyQt5.QtCore import Qt
 
 class Image:
 
-	def __init__(self, fileName, image, bg, context):
+	def __init__(self, fileName, image: QtGui.QImage, bg, context):
 
 		self.fileName = fileName
 		self.image = image
+		self.bg_image = QtGui.QImage(image.width(), image.height(), QtGui.QImage.Format_ARGB32_Premultiplied)
 		self.bgColor = bg
 		self.context = context
 
@@ -20,15 +21,28 @@ class Image:
 		self.posHistory = 0
 		self.modified = False
 
+	def reset(self):
+		print("reset")
+		self.image.fill(self.bgColor)
+		self.history.clear()
+		self.history.append(QtGui.QImage(self.image))
+		self.posHistory = 0
+		self.modified=False
+		self.selection=None
+		self.bg_image=self.ori_bg_img
+
+	def submit(self):
+		print("submit")
+		pass
+
 	@classmethod
 	def fromFile(cls, fileName, context):
-
-		image = QtGui.QImage(fileName).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
+		image = QtGui.QImage(fileName[0]).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
 
 		if image.hasAlphaChannel():
-			bgColor = QtWidgets.QColor(0,0,0,0)
+			bgColor = QtGui.QColor(0,0,0,0)
 		else:
-			bgColor = QtWidgets.QColor(255,255,255)
+			bgColor = QtGui.QColor(255,255,255)
 
 		return cls(fileName, image, bgColor, context)
 
@@ -40,9 +54,16 @@ class Image:
 
 		return cls("", image, bg, context)
 
-	def save(self):
+	def loadDemoFromFile(self, fileName):
+		# self.image.fill(QtGui.QColor(0, 0, 0, 0))
+		# self.bg_image =
+		self.ori_bg_img = QtGui.QImage(fileName[0]).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
+		self.bg_image = self.ori_bg_img
+		#self.reset()
+		# self.context.signals.bgImageChanged.emit()
 
-		self.image.save(self.fileName)
+	def save(self):
+		self.bg_image.save(self.fileName)
 		self.modified = False
 
 	def addHistoryStep(self):

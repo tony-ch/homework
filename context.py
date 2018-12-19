@@ -19,16 +19,21 @@ class Context:
 		self.signals = signals
 
 		self.palette = []
-		self.defaultPalette = [[14, 53, 75], [0, 76, 115], [18, 121, 174], [49, 162, 238], [136, 199, 234], [27, 52, 43],
-							  [30, 85, 55], [69, 145, 26], [121, 191, 29], [190, 222, 44], [69, 18, 18], [113, 31, 31],
-							  [184, 37, 53], [220, 81, 115], [255, 159, 182], [39, 20, 67], [105, 28, 99], [173, 81, 185],
-							  [184, 152, 208], [53, 48, 36], [89, 66, 40], [140, 92, 77], [208, 128, 112], [229, 145, 49],
-							  [247, 176, 114], [252, 215, 142], [0, 0, 0], [33, 33, 33], [79, 79, 79], [179, 179, 179],
-							  [255, 255, 255], [37, 42, 46], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
-							  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
-							  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
-							  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
-							  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
+		self.defaultPalette = [
+			[9, 125, 3], [5, 244, 193], [89, 14, 15], [32, 160, 190], [154, 165, 190], [255, 0, 0], [150, 66, 146]
+		]
+
+		self.paletteText = ['树','草','门','天空','云','砖块','塔尖']
+		# self.defaultPalette = [[14, 53, 75], [0, 76, 115], [18, 121, 174], [49, 162, 238], [136, 199, 234], [27, 52, 43],
+		# 					  [30, 85, 55], [69, 145, 26], [121, 191, 29], [190, 222, 44], [69, 18, 18], [113, 31, 31],
+		# 					  [184, 37, 53], [220, 81, 115], [255, 159, 182], [39, 20, 67], [105, 28, 99], [173, 81, 185],
+		# 					  [184, 152, 208], [53, 48, 36], [89, 66, 40], [140, 92, 77], [208, 128, 112], [229, 145, 49],
+		# 					  [247, 176, 114], [252, 215, 142], [0, 0, 0], [33, 33, 33], [79, 79, 79], [179, 179, 179],
+		# 					  [255, 255, 255], [37, 42, 46], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+		# 					  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+		# 					  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+		# 					  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0],
+		# 					  [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
 		self.imagePos = -1
 		self.images = []
@@ -134,25 +139,6 @@ class Context:
 		self.currentTool = index
 		self.signals.updateTool.emit(index)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	def getText(self, sect, ident): # Get some text in the current language
 
 		return self.tdatabase.getText(self.lang, sect, ident).replace("\\n", "\n")
@@ -237,6 +223,8 @@ class Context:
 		self.loadDefaultsSelection()
 		self.loadDefaultsPencil()
 		self.loadDefaultsEraser()
+		self.showFg = True
+		self.showBg = True
 
 	def loadDefaultsPalette(self):
 
@@ -274,8 +262,10 @@ class Context:
 
 	def loadDefaultsColor(self):
 
-		self.primaryColor = QtGui.QColor(self.getIntDefault("color", "primary_color", QtCore.Qt.color1))
-		self.secondaryColor = QtGui.QColor(self.getIntDefault("color", "secondary_color", QtCore.Qt.color0))
+		color1 = self.defaultPalette[0]
+		color0 = self.defaultPalette[-1]
+		self.primaryColor = QtGui.QColor(self.getIntDefault("color", "primary_color", QtGui.QColor(color1[0], color1[1], color1[2])))
+		self.secondaryColor = QtGui.QColor(self.getIntDefault("color", "secondary_color",QtGui.QColor(color0[0], color0[1], color0[2])))
 
 	def loadDefaultsTheme(self):
 
@@ -297,15 +287,15 @@ class Context:
 	def saveDefaults(self):
 		return
 
-		self.setDefault("color", "primary_color", self.primaryColor.rgb())
-		self.setDefault("color", "secondary_color", self.secondaryColor.rgb())
-
-		self.setDefault("selection", "transparent", self.transparentSelection)
-		self.setDefault("pencil", "size", self.pencilSize)
-		self.setDefault("pencil", "secondary_color_eraser", self.secondaryColorEraser)
-		self.setDefault("eraser", "size", self.eraserSize)
-
-		self.savePalette()
+		# self.setDefault("color", "primary_color", self.primaryColor.rgb())
+		# self.setDefault("color", "secondary_color", self.secondaryColor.rgb())
+		#
+		# self.setDefault("selection", "transparent", self.transparentSelection)
+		# self.setDefault("pencil", "size", self.pencilSize)
+		# self.setDefault("pencil", "secondary_color_eraser", self.secondaryColorEraser)
+		# self.setDefault("eraser", "size", self.eraserSize)
+		#
+		# self.savePalette()
 
 	def savePalette(self):
 

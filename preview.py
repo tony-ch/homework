@@ -18,7 +18,7 @@ class Preview (QtWidgets.QDockWidget):
 
 		self.label = QtWidgets.QLabel()
 		if self.context.getCurrentImagePos() != -1:
-			self.label.setPixmap(QtWidgets.QPixmap.fromImage(self.context.currentQImage()))
+			self.label.setPixmap(QtGui.QPixmap.fromImage(self.context.currentQImage()))
 		self.label.setObjectName("Preview")
 		self.label.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
 		self.label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)
@@ -26,7 +26,7 @@ class Preview (QtWidgets.QDockWidget):
 		self.update()
 
 		self.signals.updateCanvas.connect(self.update)
-		self.signals.imageChanged.connect(self.update)
+		self.signals.updateCanvas.connect(self.update)
 
 	def update(self):
 

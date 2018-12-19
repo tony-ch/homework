@@ -105,10 +105,10 @@ class ToolProperties (QtWidgets.QDockWidget):
 		hbox2.addWidget(alpha)
 		"""
 		hbox2 = QtWidgets.QHBoxLayout()
-		eraser = QtWidgets.QCheckBox(self.context.getText("tool_properties_pencil", "eraser"), self)
-		eraser.setChecked(self.context.secondaryColorEraser)
-		eraser.toggled.connect(self.toggleSecondaryColorEraser)
-		hbox2.addWidget(eraser)
+		# eraser = QtWidgets.QCheckBox(self.context.getText("tool_properties_pencil", "eraser"), self)
+		# eraser.setChecked(self.context.secondaryColorEraser)
+		# eraser.toggled.connect(self.toggleSecondaryColorEraser)
+		# hbox2.addWidget(eraser)
 
 		vbox.setAlignment(QtCore.Qt.AlignTop)
 

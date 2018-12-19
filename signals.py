@@ -11,11 +11,14 @@ class Signals(QtCore.QObject):
 
 	newImage = QtCore.pyqtSignal()
 	imageChanged = QtCore.pyqtSignal([int])
+	bgImageChanged = QtCore.pyqtSignal()
 	imageRemoved = QtCore.pyqtSignal([int])
 	fileNameChanged = QtCore.pyqtSignal([int, str])
 
 	updateCanvas = QtCore.pyqtSignal()
 	resizeCanvas = QtCore.pyqtSignal()
+	resetCavas = QtCore.pyqtSignal()
+	submitCavas = QtCore.pyqtSignal()
 
 	copyImage = QtCore.pyqtSignal()
 	cutImage = QtCore.pyqtSignal()

@@ -33,7 +33,7 @@ class CurrentColor(QtWidgets.QLabel):
 		mimecontext = QtCore.QMimeData()
 		mimecontext.setColorData(self.color)
 
-		drag = QtWidgets.QDrag(self)
+		drag = QtGui.QDrag(self)
 		drag.setMimeData(mimecontext)
 		drag.setHotSpot(e.pos() - self.rect().topLeft())
 
@@ -64,7 +64,7 @@ class Color(QtWidgets.QFrame):
 	Una QFrame cuadrada que representa un color de la paleta.
 	"""
 
-	def __init__(self, position, color, context, signals, Parent=None):
+	def __init__(self, position, text, color, context, signals, Parent=None):
 
 		super(Color, self).__init__(Parent)
 
@@ -76,10 +76,18 @@ class Color(QtWidgets.QFrame):
 		self.color = QtGui.QColor(color[0], color[1], color[2])
 
 		self.setObjectName("Color")
-		self.setFixedSize(12, 12)
+		self.setFixedSize(128, 32)
 		self.setStyleSheet("background-color: " + self.color.name() + ";")
 
 		self.setAcceptDrops(True)
+
+		layout = QtWidgets.QGridLayout()
+		text_label = QtWidgets.QLabel(text)
+		text_label.setAlignment(Qt.AlignCenter)
+		if color[0]+color[1]+color[2]>255:
+			text_label.setStyleSheet("color: black")
+		layout.addWidget(text_label)
+		self.setLayout(layout)
 
 	def mousePressEvent(self, e):
 
@@ -114,7 +122,7 @@ class Color(QtWidgets.QFrame):
 
 	def dropEvent(self, e):
 
-		self.changeColor(QtWidgets.QColor(e.mimeData().colorData()))
+		self.changeColor(QtGui.QColor(e.mimeData().colorData()))
 
 		e.setDropAction(QtCore.Qt.CopyAction)
 		e.accept()
@@ -142,27 +150,29 @@ class Palette (QtWidgets.QWidget):
 		self.setObjectName("Palette")
 
 		palette = QtWidgets.QGridLayout()
-		for i in range(5):
-			for j in range(12):
-				palette.addWidget(Color(i*12+j, self.context.palette[i*12+j], self.context, self.signals), i, j)
-				"""
-				if i > 1:
-					palette.addWidget(Color(True, self.context, self.signals), i, j)
-				else:
-					palette.addWidget(Color(False, self.context, self.signals), i, j)
-				"""
+		for i in range(7):
+			palette.addWidget(Color(i, self.context.paletteText[i] ,self.context.palette[i], self.context, self.signals), i//2, i%2)
+			"""
+			if i > 1:
+				palette.addWidget(Color(True, self.context, self.signals), i, j)
+			else:
+				palette.addWidget(Color(False, self.context, self.signals), i, j)
+			"""
 		palette.setSpacing(1)
 
 		hbox = QtWidgets.QHBoxLayout()
+		currentColorLabel = QtWidgets.QLabel("当前纹理")
+		currentColorLabel.setAlignment(Qt.AlignCenter)
+		hbox.addWidget(currentColorLabel)
 		hbox.addWidget(CurrentColor(True, self.context, self.signals))
-		hbox.addWidget(CurrentColor(False, self.context, self.signals))
+		# hbox.addWidget(CurrentColor(False, self.context, self.signals))
 		hbox.setSpacing(2)
 		#hbox.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
 
 		vbox = QtWidgets.QVBoxLayout()
 		vbox.addLayout(hbox)
 		vbox.addLayout(palette)
-		vbox.setSpacing(2)
+		vbox.setSpacing(6)
 		#vbox.setSizeConstraint(QtWidgets.QLayout.SetMaximumSize)
 
 		self.setLayout(vbox)

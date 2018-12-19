@@ -31,6 +31,8 @@ class Canvas(QtWidgets.QLabel):
 		self.signals.zoom.connect(self.zoom)
 		self.signals.updateCanvas.connect(self.update)
 		self.signals.resizeCanvas.connect(self.resize)
+		self.signals.resetCavas.connect(self.reset)
+		self.signals.submitCavas.connect(self.submit)
 		self.signals.updateTool.connect(self.applySelection)
 		self.signals.updateTool.connect(self.changeCursor)
 		self.signals.transparentSelection.connect(self.makeSelectionTransparent)
@@ -98,7 +100,7 @@ class Canvas(QtWidgets.QLabel):
 
 		mimeData = event.mimeData()
 		if mimeData.hasImage() and not mimeData.imageData().isNull():
-			self.image().image =  QtWidgets.QImage(mimeData.imageData())
+			self.image().image =  QtGui.QImage(mimeData.imageData())
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
 		event.acceptProposedAction()
@@ -211,13 +213,13 @@ class Canvas(QtWidgets.QLabel):
 				self.drawLineTo(QtCore.QPoint(x,y), self.context.primaryColor, self.context.pencilSize)
 				self.signals.updateCanvas.emit()
 				self.lastPoint = QtCore.QPoint(endPoint)
-			elif event.buttons() == Qt.RightButton and self.drawing:
-				color = self.context.secondaryColor
-				if self.context.secondaryColorEraser:
-					color = self.image().bgColor
-				self.drawLineTo(QtCore.QPoint(x,y), color, self.context.pencilSize)
-				self.signals.updateCanvas.emit()
-				self.lastPoint = QtCore.QPoint(endPoint)
+			# elif event.buttons() == Qt.RightButton and self.drawing:
+			# 	color = self.context.primaryColor
+			# 	# if self.context.secondaryColorEraser:
+			# 	# 	color = self.image().bgColor
+			# 	self.drawLineTo(QtCore.QPoint(x,y), color, self.context.pencilSize)
+			# 	self.signals.updateCanvas.emit()
+			# 	self.lastPoint = QtCore.QPoint(endPoint)
 
 		# Goma
 		elif self.context.currentTool == Pixeler.Tools.Eraser:
@@ -381,9 +383,12 @@ class Canvas(QtWidgets.QLabel):
 		# Transparency
 		if self.image().bgColor == QtGui.QColor(0,0,0,0):
 			painter.fillRect(self.rect(), QtGui.QBrush(QtGui.QImage("images/transparent.png")))
+			if(self.context.showBg):
+				painter.drawImage(self.rect(), self.context.currentImage().bg_image)
 		
 		# Image
-		painter.drawImage(self.rect(), self.context.currentQImage())
+		if(self.context.showFg):
+			painter.drawImage(self.rect(), self.context.currentQImage())
 
 		# Selection
 		if not self.selecting and self.image().selection != None and self.image().selection.finished and self.image().selection.image != None:
@@ -471,20 +476,20 @@ class Canvas(QtWidgets.QLabel):
 		y = self.lastPoint.y()
 
 		if dy > dx:
-		    steep = 1
-		    x,y = y,x
-		    dx,dy = dy,dx
-		    sx,sy = sy,sx
+			steep = 1
+			x,y = y,x
+			dx,dy = dy,dx
+			sx,sy = sy,sx
 		d = (2 * dy) - dx
 
 		for i in range(0,dx):
-		    if steep: self.image().paintPoint(y, x, color, size)
-		    else: self.image().paintPoint(x, y, color, size)
-		    while d >= 0:
-		        y = y + sy
-		        d = d - (2 * dx)
-		    x = x + sx
-		    d = d + (2 * dy)
+			if steep: self.image().paintPoint(y, x, color, size)
+			else: self.image().paintPoint(x, y, color, size)
+			while d >= 0:
+				y = y + sy
+				d = d - (2 * dx)
+			x = x + sx
+			d = d + (2 * dy)
 
 		self.image().paintPoint(endPoint.x(), endPoint.y(), color, size)
 
@@ -535,7 +540,7 @@ class Canvas(QtWidgets.QLabel):
 
 	def clearImage(self):
 
-		print("Borrando")
+		print("Erasing")
 		if self.context.imagePos == self.index: # Eliminar sólo si este Canvas es el actual
 
 			if self.image().selection != None:
@@ -730,7 +735,7 @@ class Canvas(QtWidgets.QLabel):
 		elif x >= selection.origin.x() and y < selection.origin.y():
 			selection.setGeometry( selection.origin.x(), y, x - selection.origin.x() + 1, selection.origin.y() - y + 1 )
 		else:
-			selection.setGeometry( xorig, yorig, 1, 1 )
+			selection.setGeometry( selection.origin.x(), selection.origin.y(), 1, 1 )
 
 		selection.show()
 
@@ -765,3 +770,11 @@ class Canvas(QtWidgets.QLabel):
 		painter.setCompositionMode(QtGui.QPainter.CompositionMode_Source)
 		painter.fillRect(self.image().selection.rect, self.image().bgColor)
 		painter.end()
+
+	def reset(self):
+		self.context.currentImage().reset()
+		self.signals.updateCanvas.emit()
+
+	def submit(self):
+		self.context.currentImage().submit()
+		self.signals.updateCanvas.emit()
