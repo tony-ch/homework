@@ -27,7 +27,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		self.resize(1000,600)
 		self.setWindowTitle(self.context.getText("pyqx", "title"))
-		
+
 		self.statusBar = self.statusBar()
 		self.menuBar = self.createMenuBar()
 		self.toolBar = self.createToolBar()
@@ -119,6 +119,9 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		j = 0
 		for i in l:
+			if j in [2, 3, 6, 7, 8, 9, 10]:
+				j += 1
+				continue
 			toolBar.addAction(i)
 			if j==1 or j == 11:
 				toolBar.addSeparator()
@@ -248,7 +251,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		return l
 
 	def createMenuBar(self):
-		
+
 		menubar = self.menuBar()
 		fileMenu = menubar.addMenu(self.context.getText("menu", "file"))
 		editMenu = menubar.addMenu(self.context.getText("menu", "edit"))
@@ -279,7 +282,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		return menubar
 
 	def createDockWidgets(self):
-		
+
 		# Palette widget
 		self.palette = QtWidgets.QDockWidget(self.context.getText("dock_widgets", "palette"), self)
 		self.palette.setAllowedAreas(Qt.RightDockWidgetArea)
@@ -352,7 +355,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		d = NewFileDialog(self.context, self)
 
 	def openFile(self):
-		
+
 		fileName = QtWidgets.QFileDialog.getOpenFileName(self,
 					self.context.getText("dialog_open", "title"),
 					"/home",
@@ -367,8 +370,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		d = QtWidgets.QFileDialog()
 		fileName, filterName = d.getSaveFileName(self,
-					self.context.getText("dialog_save", "title"), 
-					"", 
+					self.context.getText("dialog_save", "title"),
+					"",
 					"*.bmp;;*.gif;;*.png;;*.xpm;;*.jpg")
 
 		if fileName.split(".")[-1] in ["bmp", "gif", "png", "xpm", "jpg"]:
@@ -604,7 +607,7 @@ class MainWindow(QtWidgets.QMainWindow):
 			if reply == QtWidgets.QMessageBox.Discard:
 				event.accept()
 			elif reply == QtWidgets.QMessageBox.Cancel:
-				event.ignore()  
+				event.ignore()
 				return
 			elif reply == QtWidgets.QMessageBox.SaveAll:
 				for i in l:
@@ -614,7 +617,7 @@ class MainWindow(QtWidgets.QMainWindow):
 				event.accept()
 				return
 
-			
+
 
 		self.context.saveDefaults()
 
