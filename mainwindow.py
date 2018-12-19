@@ -29,7 +29,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.setWindowTitle(self.context.getText("pyqx", "title"))
 
 		self.statusBar = self.statusBar()
-		self.menuBar = self.createMenuBar()
+		# self.menuBar = self.createMenuBar()
 		self.toolBar = self.createToolBar()
 		self.createDockWidgets()
 
@@ -250,36 +250,36 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		return l
 
-	def createMenuBar(self):
-
-		menubar = self.menuBar()
-		fileMenu = menubar.addMenu(self.context.getText("menu", "file"))
-		editMenu = menubar.addMenu(self.context.getText("menu", "edit"))
-		viewMenu = menubar.addMenu(self.context.getText("menu", "view"))
-		transformMenu = menubar.addMenu(self.context.getText("menu", "transform"))
-		helpMenu = menubar.addMenu(self.context.getText("menu", "help"))
-		fileActions = self.createFileActions()
-		editActions = self.createEditActions()
-		viewActions = self.createViewActions()
-		transformActions = self.createTransformActions()
-		helpActions = self.createHelpActions()
-		for i in fileActions:
-			if i == 0: fileMenu.addSeparator()
-			else: fileMenu.addAction(i)
-		for i in editActions:
-			if i == 0: editMenu.addSeparator()
-			else: editMenu.addAction(i)
-		for i in viewActions:
-			if i == 0: viewMenu.addSeparator()
-			else: viewMenu.addAction(i)
-		for i in helpActions:
-			if i == 0: helpMenu.addSeparator()
-			else: helpMenu.addAction(i)
-		for i in transformActions:
-			if i == 0: transformMenu.addSeparator()
-			else: transformMenu.addAction(i)
-
-		return menubar
+	# def createMenuBar(self):
+	#
+	# 	menubar = self.menuBar()
+	# 	fileMenu = menubar.addMenu(self.context.getText("menu", "file"))
+	# 	editMenu = menubar.addMenu(self.context.getText("menu", "edit"))
+	# 	viewMenu = menubar.addMenu(self.context.getText("menu", "view"))
+	# 	transformMenu = menubar.addMenu(self.context.getText("menu", "transform"))
+	# 	helpMenu = menubar.addMenu(self.context.getText("menu", "help"))
+	# 	fileActions = self.createFileActions()
+	# 	editActions = self.createEditActions()
+	# 	viewActions = self.createViewActions()
+	# 	transformActions = self.createTransformActions()
+	# 	helpActions = self.createHelpActions()
+	# 	for i in fileActions:
+	# 		if i == 0: fileMenu.addSeparator()
+	# 		else: fileMenu.addAction(i)
+	# 	for i in editActions:
+	# 		if i == 0: editMenu.addSeparator()
+	# 		else: editMenu.addAction(i)
+	# 	for i in viewActions:
+	# 		if i == 0: viewMenu.addSeparator()
+	# 		else: viewMenu.addAction(i)
+	# 	for i in helpActions:
+	# 		if i == 0: helpMenu.addSeparator()
+	# 		else: helpMenu.addAction(i)
+	# 	for i in transformActions:
+	# 		if i == 0: transformMenu.addSeparator()
+	# 		else: transformMenu.addAction(i)
+	#
+	# 	return menubar
 
 	def createDockWidgets(self):
 
