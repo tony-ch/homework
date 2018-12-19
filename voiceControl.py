@@ -30,6 +30,17 @@ class VoiceControl (QtWidgets.QDockWidget):
 			self.parent.undo()
 		elif list[0]=="重做":
 			self.parent.redo()
+		elif list[0] == "清除":
+			self.signals.resetCavas.emit()
+		elif list[0] == "打开":
+			self.parent.openDemoImg()
+		elif list[0] == "关闭":
+			# self.parent.close()
+			exit(0)
+		elif list[0] == "保存":
+			self.parent.saveFile()
+		else:
+			return
 
 		for i in range(0,len(self.context.paletteText)):
 			if self.context.paletteText[i] in list:

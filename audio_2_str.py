@@ -105,9 +105,13 @@ def audio_2_str():
     r.recoder()
     r.savewav("test.wav")
     client = AipSpeech(APP_ID, API_KEY, SECRET_KEY)
-    result = str(client.asr(get_file_content('test.wav'), 'wav', 8000, {
-        'dev_pid': 1536,
-    })['result'])
+    try:
+        result = str(client.asr(get_file_content('test.wav'), 'wav', 8000, {
+            'dev_pid': 1536,
+        })['result'])
+        print(result)
+    except:
+        return
 
     order = []
 
@@ -119,6 +123,14 @@ def audio_2_str():
         order.append('撤销')
     elif ('重做' in result):
         order.append('重做')
+    elif ('清除' in result):
+        order.append('清除')
+    elif ('保存' in result):
+        order.append('保存')
+    elif ('打开' in result):
+        order.append('打开')
+    elif ('关闭' in result):
+        order.append('关闭')
     else:
         order.append(None)
 
