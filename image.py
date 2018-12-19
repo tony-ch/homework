@@ -12,6 +12,7 @@ class Image:
 		self.fileName = fileName
 		self.image = image
 		self.bg_image = QtGui.QImage(image.width(), image.height(), QtGui.QImage.Format_ARGB32_Premultiplied)
+		self.ori_bg_img = self.bg_image
 		self.bgColor = bg
 		self.context = context
 
