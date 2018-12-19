@@ -4,7 +4,7 @@ import json
 import requests
 import base64
 import numpy as np
-from cv2 import cv2 as cv
+import cv2 as cv
 from matplotlib import pyplot as plt
 from PIL import Image
 import io
