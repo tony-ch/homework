@@ -26,7 +26,7 @@ class TDatabase:
 		cp = ConfigParser()
 		l = os.listdir("lang")
 		for i in l:
-			cp.read("lang/" + i)
+			cp.read("lang/" + i, encoding="utf-8")
 			langname = cp.get("_lang", "name")
 			d2 = {}
 			for j in cp.sections()[1:]: # Sin la sección _lang
