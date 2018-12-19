@@ -23,7 +23,7 @@ class HistoryView (QtWidgets.QDockWidget):
 		self.setAllowedAreas(Qt.RightDockWidgetArea)
 		self.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
 		self.listWidget=QListWidget()
-		self.listWidget.setObjectName("history view")
+		self.listWidget.setObjectName("操作历史")
 		self.listWidget.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Maximum)
 		self.listWidget.setIconSize(QtCore.QSize(128,128))
 		self.listWidget.setViewMode(QtWidgets.QListView.ListMode)

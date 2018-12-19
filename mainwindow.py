@@ -317,7 +317,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 		#add by lyc
 		#HisotryView
-		self.historyView=HistoryView("history view", self.context, self.signals, self)
+		self.historyView=HistoryView("操作历史", self.context, self.signals, self)
 		#self.historyView.setStyleSheet("border: 2px solid black;")
 		self.addDockWidget(Qt.RightDockWidgetArea,self.historyView)
 
