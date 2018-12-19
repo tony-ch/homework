@@ -63,8 +63,8 @@ class Image:
 	def loadDemoFromFile(self, fileName):
 		# self.image.fill(QtGui.QColor(0, 0, 0, 0))
 		# self.bg_image =
-		print("filename",fileName)
-		if(fileName is None or (fileName[0])!=0):
+		# print("filename",fileName)
+		if(fileName is None or len(fileName[0])!=0):
 			self.id = int(fileName[0].split("/")[-1].split(".")[0])
 			print("open: image ", self.id)
 			self.ori_bg_img = QtGui.QImage(fileName[0]).convertToFormat(QtGui.QImage.Format_ARGB32_Premultiplied)
