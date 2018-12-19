@@ -126,5 +126,5 @@ def audio_2_str():
         order.append('圆顶')
     else:
         order.append(None)
-
-    return result, order
+    return order
+    # return result, order
