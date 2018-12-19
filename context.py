@@ -1,15 +1,11 @@
 #!/usr/bin/env python
 #coding: utf-8
 
-import os
 from configparser import ConfigParser, NoSectionError, NoOptionError
 
-from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtCore import Qt
-
-from image import Image
-from translation import Language, TDatabase
-from brushes import *
+from window.image import Image
+from tool.translation import TDatabase
+from tool.brushes import *
 
 
 class Context:

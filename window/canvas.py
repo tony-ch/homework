@@ -1,13 +1,11 @@
 #!/usr/bin/env python
 #coding: utf-8
 
-import sys
-
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
-import names as Pixeler
-from selection import Selection
+from tool import names as Pixeler
+from tool.selection import Selection
 
 
 class Canvas(QtWidgets.QLabel):

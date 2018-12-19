@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 #coding: utf-8
 
-import gc, sys
-
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
-from scrollarea import ScrollArea
+from window.scrollarea import ScrollArea
 
 
 class MainWidget(QtWidgets.QTabWidget):

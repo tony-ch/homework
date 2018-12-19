@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 #coding: utf-8
 
-from PyQt5 import QtWidgets, QtCore, QtGui
+from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt
 
-from canvas import Canvas
-import names as Pixeler
+from window.canvas import Canvas
+from tool import names as Pixeler
+
 
 class ScrollArea(QtWidgets.QScrollArea):
 	"""

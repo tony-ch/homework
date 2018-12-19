@@ -3,7 +3,7 @@
 
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
-from audio_2_str import *
+from voice.audio_2_str import *
 
 class VoiceControl (QtWidgets.QDockWidget):
 

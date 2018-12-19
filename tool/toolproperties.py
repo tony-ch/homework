@@ -4,8 +4,6 @@
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import Qt
 
-import names as Pixeler
-
 
 class SizeLabel (QtWidgets.QLabel):
 

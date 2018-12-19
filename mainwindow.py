@@ -6,15 +6,14 @@ import os
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtCore import Qt
 
-import names as Pixeler
-from mainwidget import MainWidget
-from palette import Palette
-from toolproperties import ToolProperties
+from tool import names as Pixeler
+from window.mainwidget import MainWidget
+from dock.palette import Palette
+from tool.toolproperties import ToolProperties
 #from preview import Preview
-from dialogs import NewFileDialog, ResizeImageDialog, ResizeCanvasDialog, Preferences
-from submit import ViewOpinion,Submit
-from historyView import HistoryView
-from voiceControl import VoiceControl
+from dock.submit import ViewOpinion,Submit
+from dock.historyView import HistoryView
+from voice.voiceControl import VoiceControl
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -49,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.show()
 		self.context.newImage(256, 256, QtGui.QColor(0, 0, 0, 0))
 		self.context.changeCurrentTool(Pixeler.Tools.Pencil)
-		self.context.currentImage().loadDemoFromFile(['demoimg/700.jpg'])
+		self.context.currentImage().loadDemoFromFile(['images/demoimg/700.jpg'])
 		self.signals.updateCanvas.emit()
 
 	def createToolBarActions(self):
@@ -222,7 +221,7 @@ class MainWindow(QtWidgets.QMainWindow):
 	def openDemoImg(self):
 		filename = QtWidgets.QFileDialog.getOpenFileName(self,
 					'选择一张图片',
-					"./demoimg",
+					"./images/demoimg",
 					self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
 		if(filename):
 			self.context.currentImage().loadDemoFromFile(filename)
