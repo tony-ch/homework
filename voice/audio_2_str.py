@@ -111,7 +111,7 @@ def audio_2_str():
         })['result'])
         print(result)
     except:
-        return
+        return [None]
 
     order = []
 
