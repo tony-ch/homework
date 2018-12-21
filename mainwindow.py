@@ -69,6 +69,9 @@ class MainWindow(QtWidgets.QMainWindow):
 		a.triggered.connect(self.saveResultImg)
 		l.append(a)
 
+		QtWidgets.QShortcut(QtGui.QKeySequence.Undo,self,self.undo)
+		QtWidgets.QShortcut(QtGui.QKeySequence.Redo,self,self.redo)
+
 		tools = ["selection", "magicwand", "pencil", "eraser", "colorpicker", "fill", "gradient", "exchange", "lasso", "hand"]
 		connects = [lambda: self.context.changeCurrentTool(Pixeler.Tools.Selection),
 					lambda: self.context.changeCurrentTool(Pixeler.Tools.MagicWand),
@@ -102,6 +105,12 @@ class MainWindow(QtWidgets.QMainWindow):
 		a.triggered.connect(self.zoomOut)
 		l.append(a)
 
+		a = QtWidgets.QAction(QtGui.QIcon(os.path.join("themes", self.context.theme, "help.png")),
+							  self.context.getText("tools", "help"), self.tools)
+		a.setShortcut(QtGui.QKeySequence.HelpContents)
+		a.triggered.connect(self.showHelp)
+		l.append(a)
+
 		l[self.context.currentTool].setChecked(True)
 
 		return l
@@ -117,7 +126,7 @@ class MainWindow(QtWidgets.QMainWindow):
 				j += 1
 				continue
 			toolBar.addAction(i)
-			if j==1 or j == 11:
+			if j==1 or j == 11 or j == 13:
 				toolBar.addSeparator()
 			j += 1
 
@@ -254,6 +263,11 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.context.currentImage().image = QtGui.QImage(self.context.currentImage().history[self.context.currentImage().posHistory])
 			self.signals.updateCanvas.emit()
 			self.signals.resizeCanvas.emit()
+
+	def showHelp(self):
+		url = QtCore.QUrl('doc/index.html')
+		if not QtGui.QDesktopServices.openUrl(url):
+			QtWidgets.QMessageBox.warning(self,"帮助","打开帮助文档失败")
 
 	def setPixelGrid(self):
 

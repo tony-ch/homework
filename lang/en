@@ -159,6 +159,7 @@ gradient = Gradient
 exchange = Exchange colors
 lasso = 套索
 hand = 抓手
+help = 帮助
 
 # --------------------
 # --- DOCK WIDGETS ---
