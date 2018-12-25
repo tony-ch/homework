@@ -1,0 +1,6 @@
+﻿cmake-build*
+.idea/
+.vscode/
+
+bin/
+obj/
