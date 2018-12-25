@@ -1,0 +1,5 @@
+### CLion
+.idea/
+### obj
+bin/
+obj/
