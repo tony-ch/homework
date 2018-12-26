@@ -6,6 +6,7 @@ from configparser import ConfigParser, NoSectionError, NoOptionError
 from window.image import Image
 from tool.translation import TDatabase
 from tool.brushes import *
+from tool import names as Pixeler
 
 
 class Context:
@@ -133,6 +134,9 @@ class Context:
 		print("Emitting updateTool")
 		self.currentTool = index
 		self.signals.updateTool.emit(index)
+		if index==Pixeler.Tools.Eraser:
+			self.signals.showBG.emit(True)
+			self.signals.showFG.emit(True)
 
 	def getText(self, sect, ident): # Get some text in the current language
 

@@ -18,6 +18,7 @@ class VoiceControl (QtWidgets.QDockWidget):
 		self.setFeatures(QtWidgets.QDockWidget.NoDockWidgetFeatures)
 
 		self.button=QtWidgets.QPushButton("录音")
+		self.button.setShortcut(' ')
 		self.setToolTip("点击按钮开始录音，进行语音控制")
 		self.setWidget(self.button)
 		self.update()
