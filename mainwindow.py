@@ -265,7 +265,7 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.signals.resizeCanvas.emit()
 
 	def showHelp(self):
-		url = QtCore.QUrl('doc/index.html')
+		url = QtCore.QUrl(os.path.abspath('doc/index.html').replace('\\', '/'))
 		if not QtGui.QDesktopServices.openUrl(url):
 			QtWidgets.QMessageBox.warning(self,"帮助","打开帮助文档失败")
 
