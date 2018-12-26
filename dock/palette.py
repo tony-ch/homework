@@ -81,7 +81,8 @@ class Color(QtWidgets.QFrame):
 
 		self.setAcceptDrops(True)
 
-		layout = QtWidgets.QGridLayout()
+		layout = QtWidgets.QBoxLayout(QtWidgets.QBoxLayout.TopToBottom)
+		layout.setContentsMargins(2, 2, 2, 2)
 		text_label = QtWidgets.QLabel(text)
 		text_label.setAlignment(Qt.AlignCenter)
 		if color[0]+color[1]+color[2]>255:

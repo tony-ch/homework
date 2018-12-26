@@ -42,12 +42,10 @@ class VoiceControl (QtWidgets.QDockWidget):
 		elif list[0] == "保存":
 			self.parent.saveFile()
 		else:
-			return
-
-		for i in range(0,len(self.context.paletteText)):
-			if self.context.paletteText[i] in list:
-				self.context.changePrimaryColor(QtGui.QColor(*self.context.defaultPalette[i]))
-				break
+			for i in range(0,len(self.context.paletteText)):
+				if self.context.paletteText[i] in list:
+					self.context.changePrimaryColor(QtGui.QColor(*self.context.defaultPalette[i]))
+					break
 		return
 
 	def update(self):
