@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+#coding: utf-8
+
+from PyQt5 import QtCore
+
+class Signals(QtCore.QObject):
+	"""
+	La clase Communication hace de puente entre diferentes
+	instancias de todo el programa.
+	"""
+
+	newImage = QtCore.pyqtSignal()
+	imageChanged = QtCore.pyqtSignal([int])
+	bgImageChanged = QtCore.pyqtSignal()
+	imageRemoved = QtCore.pyqtSignal([int])
+	fileNameChanged = QtCore.pyqtSignal([int, str])
+
+	updateCanvas = QtCore.pyqtSignal()
+	resizeCanvas = QtCore.pyqtSignal()
+	resetCavas = QtCore.pyqtSignal()
+	submitCavas = QtCore.pyqtSignal()
+
+	copyImage = QtCore.pyqtSignal()
+	cutImage = QtCore.pyqtSignal()
+	pasteImage = QtCore.pyqtSignal()
+	clearImage  = QtCore.pyqtSignal()
+
+	updateColor = QtCore.pyqtSignal()
+	updateColorDeg = QtCore.pyqtSignal()
+
+	ctrlPressed = QtCore.pyqtSignal()
+
+	updateTool = QtCore.pyqtSignal([int])
+	autoUpdateTool = QtCore.pyqtSignal([int])
+
+	transparentSelection = QtCore.pyqtSignal([bool])
+
+	zoom = QtCore.pyqtSignal()
+
+	colorPickerOn = QtCore.pyqtSignal()
+	colorPickerOff = QtCore.pyqtSignal()
+
+	enterCanvas = QtCore.pyqtSignal()
+	leaveCanvas = QtCore.pyqtSignal()
+	overCanvas = QtCore.pyqtSignal([int, int])
+
+	showFG = QtCore.pyqtSignal([bool])
+	showBG = QtCore.pyqtSignal([bool])
+
+	updatePencilSize = QtCore.pyqtSignal([int])
+	updateEraserSize = QtCore.pyqtSignal([int])
+
+	#history view
+	# historyAdd=QtCore.pyqtSignal()
+	historyReset=QtCore.pyqtSignal()
+	# historyRestore=QtCore.pyqtSignal()
