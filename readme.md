@@ -15,4 +15,4 @@
 > git pull </path/to/big-repo>  <name-of-new-branch>
 
 克隆指定分支并使用浅克隆
-> git clone --depth 1 -b <branch> git@github.com:tony-ch/homework.git
+> git clone --depth 1 -b <target_branch> git@github.com:tony-ch/homework.git
