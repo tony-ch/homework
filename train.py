@@ -11,24 +11,39 @@ from keras.objectives import *
 from keras.metrics import binary_accuracy,categorical_accuracy
 from keras.models import load_model
 import keras.backend as K
+from keras.preprocessing.image import *
 
 from models import *
 from utils.loss_function import *
 import time
+from data import transform_imgs, load2d, find_weight,flatten_except_1dim
 
-batch_size = 16
-batchnorm_momentum = 0.95
-epochs = 20
-lr_base = 0.01 * (float(batch_size) / 16)
-lr_power = 0.9
+
 resume_training = False
-weight_decay = 1e-4    
 target_size = (96, 96)
 save_path = 'models/'
 classes = 15
-loss_fn = binary_crossentropy_with_logits
-# loss_fn = mse
+prop_train = 0.9
 
+batch_size = 32
+epochs = 100
+
+batchnorm_momentum = 0.95
+# lr_base = 0.01 * (float(batch_size) / 16)
+weight_decay = 1e-4
+
+loss_fn = binary_crossentropy_with_logits
+# loss_fn = "mse"
+aug_data = True
+
+const = 10 if loss_fn=="mse" else 1
+
+#########################################################
+print("create session..")
+config = tf.ConfigProto()
+config.gpu_options.per_process_gpu_memory_fraction = 0.95
+config.gpu_options.visible_device_list = "0"
+K.set_session(tf.Session(config=config))
 ###########################################################
 if target_size:
     input_shape = target_size + (1,)
@@ -39,78 +54,93 @@ batch_shape = (batch_size,) + input_shape
 if not os.path.exists(save_path):
     os.mkdir(save_path)
 
-# ###############learning rate scheduler####################
-def lr_scheduler(epoch, mode='power_decay'):
-    '''if lr_dict.has_key(epoch):
-        lr = lr_dict[epoch]
-        print 'lr: %f' % lr'''
-
-    if mode is 'power_decay':
-        # original lr scheduler
-        lr = lr_base * ((1 - float(epoch)/epochs) ** lr_power)
-    if mode is 'exp_decay':
-        # exponential decay
-        lr = (float(lr_base) ** float(lr_power)) ** float(epoch+1)
-    # adam default lr
-    if mode is 'adam':
-        lr = 0.001
-
-    if mode is 'progressive_drops':
-        # drops as progression proceeds, good for sgd
-        if epoch > 0.9 * epochs:
-            lr = 0.0001
-        elif epoch > 0.75 * epochs:
-            lr = 0.001
-        elif epoch > 0.5 * epochs:
-            lr = 0.01
-        else:
-            lr = 0.1
-
-    print('lr: %f' % lr)
-    return lr
-scheduler = LearningRateScheduler(lr_scheduler)
-
 # ###################### make model ########################
-checkpoint_path = os.path.join(save_path, 'checkpoint_weights.hdf5')
-
-model = AtrousFCN_Vgg16_16s(weight_decay=weight_decay,
-                                input_shape=input_shape,
-                                batch_momentum=batchnorm_momentum,
-                                classes=classes)
+print("create model ...")
+model = FCN_Vgg16_16s(input_shape=input_shape, classes=classes)
 
 # ###################### optimizer ########################
-optimizer = SGD(lr=lr_base, momentum=0.9)
+# optimizer = SGD(lr=lr_base, momentum=0.9)
 # optimizer = Nadam(lr=lr_base, beta_1 = 0.825, beta_2 = 0.99685)
 
 model.compile(loss=loss_fn,
-                optimizer=optimizer)
-if resume_training:
-    model.load_weights(checkpoint_path, by_name=True)
+                optimizer='rmsprop', sample_weight_mode='temporal')
 model_path = os.path.join(save_path, "model.json")
 # save model structure
 f = open(model_path, 'w')
 model_json = model.to_json()
 f.write(model_json)
 f.close
-img_path = os.path.join(save_path, "model.png")
-# #vis_util.plot(model, to_file=img_path, show_shapes=True)
 model.summary()
 
-# lr_reducer      = ReduceLROnPlateau(monitor=softmax_sparse_crossentropy_ignoring_last_label, factor=np.sqrt(0.1),
-#                                     cooldown=0, patience=15, min_lr=0.5e-6)
-# early_stopper   = EarlyStopping(monitor=sparse_accuracy_ignoring_last_label, min_delta=0.0001, patience=70)
-# callbacks = [early_stopper, lr_reducer]
-callbacks = [scheduler]
+# prepare data and label for training
+print("prepare data ...")
+X_train, y_train, y_train0, nm_landmarks = load2d(test=False)
+print(X_train.shape,y_train.shape, y_train0.shape)
+# print(y_train0)
+landmark_order = {"orig" : [0,1,2,3,4,5,6,7,8,9,11,12],
+                  "new"  : [1,0,4,5,2,3,8,9,6,7,12,11]}
 
-# ################### checkpoint saver#######################
-checkpoint = ModelCheckpoint(filepath=os.path.join(save_path, 'checkpoint_weights.hdf5'), save_weights_only=True)#.{epoch:d}
-callbacks.append(checkpoint)
-# set data generator and train
-with open('npz/label_rsp.npz','rb') as f:
-    y_train = np.load(f)
-with open('npz/train.npz','rb') as f:
-    X_train = np.load(f)
+print("split data ...")
+Ntrain = int(X_train.shape[0]*prop_train)
+X_tra, y_tra, X_val,y_val = X_train[:Ntrain],y_train[:Ntrain],X_train[Ntrain:],y_train[Ntrain:]
+del X_train, y_train
 
-history = model.fit(X_train,y_train, epochs=epochs, batch_size = batch_size, validation_split=0.1, callbacks=callbacks)
+w_tra = find_weight(y_tra)
 
+weight_val = find_weight(y_val)
+
+class generator(Iterator):
+    '''
+    data generator for saving memory
+    '''
+    def __init__(self, X_tra,y_tra,w_tra,landmark_order,batch_size, shuffle=None, seed=None):
+        self.x_tra = X_tra
+        self.y_tra = y_tra
+        self.w_tra = w_tra
+        self.landmark_order = landmark_order
+        self.batch_size = batch_size
+        self.num_sample = X_tra.shape[0]
+        super().__init__(self.num_sample,batch_size,shuffle,seed)
+    def _get_batches_of_transformed_samples(self, index_array):
+        """Gets a batch of transformed samples.
+        # Arguments
+            index_array: array of sample indices to include in batch.
+        # Returns
+            A batch of transformed samples.
+        """
+        # print("\nindex_array", index_array)
+        # rdx_idx = choices(range(self.num_sample),k=self.batch_size)
+        # print('rdx idx', rdx_idx)
+        if aug_data:
+            x_batch, y_batch, w_batch = transform_imgs([self.x_tra[index_array],self.y_tra[index_array], self.w_tra[index_array]],self.landmark_order)
+        else:
+            x_batch, y_batch, w_batch = self.x_tra[index_array],self.y_tra[index_array], self.w_tra[index_array]
+        w_batch_fla = flatten_except_1dim(w_batch,ndim=2)
+        y_batch_fla = flatten_except_1dim(y_batch,ndim=3)
+        return x_batch, y_batch_fla*const, w_batch_fla
+
+
+##################### starting training ######################
+print("start train ...")
+weight_val_fla = flatten_except_1dim(weight_val,ndim=2)
+y_val_fla = flatten_except_1dim(y_val,ndim=3)
+steps_per_epoch = int(np.ceil(X_tra.shape[0] / float(batch_size)))
+
+# for i in range(y_tra.shape[0]):
+#         for j in range(15):
+#             plt.imshow(y_tra[i,:,:,j])
+#             plt.show()
+hist = model.fit_generator(generator(X_tra,y_tra,w_tra,landmark_order,batch_size, shuffle=True),
+                validation_data=(X_val, y_val_fla*const, weight_val_fla),
+                steps_per_epoch = steps_per_epoch,
+                epochs=epochs)
+
+##################### saving model ######################
 model.save_weights(save_path+'/model.hdf5')
+
+for label in ["val_loss","loss"]:
+    plt.plot(hist.history[label],label=label)
+plt.legend()
+plt.savefig("result/loss.png")
+plt.pause(1)
+plt.close()

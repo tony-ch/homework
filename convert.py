@@ -13,17 +13,18 @@ fields = train_csv_data.shape[1]
 IM_SZ = 96
 P_NUM = 15
 
-imag = []
-for i in range(count):
-    img = train_csv_data['Image'][i].split(' ')
-    img = ['0' if x == '' else x for x in img]
-    imag.append(img)
-image_list = np.array(imag, dtype=np.uint8)
-X_train = image_list.reshape(-1,IM_SZ,IM_SZ,1)
-with open('npz/train.npz','wb') as f:
-    np.save(f,X_train)
+# imag = []
+# for i in range(count):
+#     img = train_csv_data['Image'][i].split(' ')
+#     img = ['0' if x == '' else x for x in img]
+#     imag.append(img)
+# image_list = np.array(imag, dtype=np.uint8)
+# X_train = image_list.reshape(-1,IM_SZ,IM_SZ,1)
+# with open('npz/train.npz','wb') as f:
+#     np.save(f,X_train)
 
 training = train_csv_data.drop('Image',axis = 1)
+training.to_csv("points.csv")
 y_train = []
 # print(training.isnull().any().value_counts())
 training = training.fillna(value=training.mean(axis=0))
@@ -44,7 +45,7 @@ for i in range(count):
     # new_arr = np.zeros((IM_SZ,IM_SZ),dtype=np.uint8)
     # all_channel = np.zeros((P_NUM, IM_SZ, IM_SZ), dtype = np.uint8)
     for p in range(0,P_NUM*2, 2):
-        # ax.add_artist(plt.Circle((y_train[i,p],y_train[i,p+1]),1,color='r'))
+        ax.add_artist(plt.Circle((y_train[i,p],y_train[i,p+1]),1,color='r'))
         x = np.round(y_train[i,p]).astype(np.uint8)
         y = np.round(y_train[i,p+1]).astype(np.uint8)
         l,r,t,b = max(y-2,0),min(IM_SZ-1,y+3),max(0,x-2),min(IM_SZ-1,x+3)
