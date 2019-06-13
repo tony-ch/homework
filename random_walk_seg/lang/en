@@ -1,0 +1,195 @@
+[_lang]
+name = English
+
+[pyqx]
+title = ALSPainter
+
+# ------------
+# --- MENU ---
+# ------------
+
+[menu]
+file = 文件
+edit = 编辑
+transform = 变换
+help = 帮助
+view = 视图
+
+[menu_file_labels]
+new = 新建
+open = 打开
+save = 保存
+saveas = 另存为
+exit= 退出
+
+[menu_file_status_tips]
+new = 创建新的图片
+open = 打开一张已经存在的图片
+save = 保存当前图片
+saveas = 存为新图片
+exit = 退出应用
+
+[menu_edit_labels]
+undo = 撤销
+redo = 重做
+selectall = 全选
+deselect = 取消选定
+invert = 翻转
+cut = 剪切
+copy = 复制
+paste = 粘贴
+clear = 清空
+preferences = 首选项
+
+[menu_edit_status_tips]
+undo = 还原上次操作
+redo = 重做最后一个动作
+selectall = 选择整个图片
+deselect = 取消选中的内容
+invert = 翻转选中的内容
+cut = 剪切图片或者其中的一部分
+copy = 复制图片或其中的一部分
+paste = 粘贴图片
+clear = 清空图片或者其中的一部分
+preferences = 打开首选项对话框
+
+[menu_view_labels]
+pixel_grid = 像素网格
+matrix_grid = 矩阵网格
+
+[menu_view_status_tips]
+pixel_grid = 切换像素网格
+matrix_grid = 切换矩阵网格
+
+[menu_transform_labels]
+flip_hor = 水平翻转
+flip_ver = 垂直翻转
+rotate_cw = 顺时针旋转90º
+rotate_ccw = 逆时针旋转90º
+rotate_180 = 旋转180º
+resize = 调整大小
+resize_canvas = 调整画布大小
+
+[menu_transform_status_tips]
+flip_hor = 水平翻转图片或者图片的一部分
+flip_ver = 垂直翻转图片或者图片的一部分
+rotate_cw = 对图片或者图片的一部分顺时针旋转90º
+rotate_ccw = 对图片或者图片的一部分逆时针旋转90º
+rotate_180 = 对图片或者图片的一部分旋转180º
+resize = 对图片或者图片的一部分调整大小
+resize_canvas = 调整画布大小
+
+[menu_help_labels]
+contents = 内容
+about = 关于
+
+[menu_help_status_tips]
+contents = 展示帮助窗口
+about = 关于Pixs2Pics
+
+# ---------------
+# --- DIALOGS ---
+# ---------------
+
+[dialog_new_image]
+title = 创建一张新的图片
+dimension = 尺寸
+background = 背景
+transparent = 透明度
+color = 颜色
+
+[dialog_open]
+title = 打开一个已经存在的图片
+images = 图片
+all_files = 所有文件
+
+[dialog_save]
+title = 保存当前文件
+
+[dialog_resize]
+title = 调整大小
+dimension = 新的维度
+
+[dialog_resize_canvas]
+title = 重设大小
+dimension = 新的维度
+
+[dialog_preferences]
+title = 首选项
+item_language = 语言
+item_language_language = 语言
+item_language_changed_title = 改变过的语言设置
+item_language_changed_message = 您必须关闭Pix2Pics以使语言设置生效
+item_theme = 主题
+item_theme_theme = 主题
+item_theme_changed_title = 改变的主题设置
+item_theme_changed_message = 您必须关闭Pix2Pics以使主题设置生效
+item_matrix_grid = 矩阵网格
+item_matrix_grid_dimension = 维度
+
+[dialog_preferences_language]
+
+[dialog_about]
+title = 关于 Pixs2Pics
+description = Pixs2Pics是一个像素艺术软件，既能。。。 is a Pixel Art software that serves all purposes, from creating sprites and tiles to editing simple images.
+
+[dialog_close_tab]
+title = 关闭
+message = 变化未保存。你确定要关闭图片吗？
+
+[dialog_exit]
+title = 退出
+message = 变化未保存。你确定要退出吗？
+
+# -------------
+# --- TOOLS ---
+# -------------
+
+[tools]
+selection = 选择
+magicwand = Magic Wand
+pencil = 画笔
+brush = Brush
+eraser = 橡皮擦
+colorpicker = 颜色拾取
+zoomin = 放大（Ctrl+滚轮上）
+zoomout = 缩小（Ctrl+滚轮下）
+fill = 填充
+gradient = Gradient
+exchange = Exchange colors
+lasso = 套索
+hand = 抓手
+help = 帮助
+
+# --------------------
+# --- DOCK WIDGETS ---
+# --------------------
+
+[dock_widgets]
+palette = 画笔选项
+tool_properties = 工具选项
+para_properties = 参数选项
+preview = 预览
+
+# -----------------------
+# --- TOOL PROPERTIES ---
+# -----------------------
+
+[tool_properties_selection]
+transparent = Transparent Selection
+
+[tool_properties_pencil]
+size = 画笔大小:
+eraser = Use eraser instead\nof secondary color
+
+[tool_properties_eraser]
+size = 橡皮擦大小:
+
+[tool_properties_gradient]
+horizontal = 水平
+vertical = 垂直
+
+[status]
+ready = 准备
+
+[newimage]
