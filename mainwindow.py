@@ -11,9 +11,8 @@ from window.mainwidget import MainWidget
 from dock.palette import Palette
 from tool.toolproperties import ToolProperties
 #from preview import Preview
-from dock.submit import ViewOpinion,Submit
-from dock.historyView import HistoryView
-from voice.voiceControl import VoiceControl
+from dock.submit import ViewOpinion,Submit,ParaOpinion
+# from voice.voiceControl import VoiceControl
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -48,7 +47,7 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.show()
 		self.context.newImage(256, 256, QtGui.QColor(0, 0, 0, 0))
 		self.context.changeCurrentTool(Pixeler.Tools.Pencil)
-		self.context.currentImage().loadDemoFromFile(['images/demoimg/700.jpg'])
+		# self.context.currentImage().loadDemoFromFile(['images/demoimg/700.jpg'])
 		self.signals.updateCanvas.emit()
 
 	def createToolBarActions(self):
@@ -160,28 +159,15 @@ class MainWindow(QtWidgets.QMainWindow):
 		self.viewOpinion.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 		self.addDockWidget(Qt.RightDockWidgetArea,self.viewOpinion)
 
+		# Para Opinion Widget
+		self.paraOpinion = ParaOpinion("参数设置",self.context,self.signals)
+		self.paraOpinion.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
+		self.addDockWidget(Qt.RightDockWidgetArea,self.paraOpinion)
+
 		# Submit
 		self.submit = Submit("", self.context, self.signals,self)
 		self.addDockWidget(Qt.RightDockWidgetArea, self.submit)
 		self.submit.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
-
-		#comment by lyc
-		# Preview
-		#self.preview = Preview(self.context.getText("dock_widgets", "preview"), self.context, self.signals, self)
-		#self.addDockWidget(Qt.RightDockWidgetArea, self.preview)
-
-		#add by lyc
-		#HisotryView
-		self.historyView=HistoryView("操作历史", self.context, self.signals, self)
-		#self.historyView.setStyleSheet("border: 2px solid black;")
-		self.addDockWidget(Qt.RightDockWidgetArea,self.historyView)
-		self.historyView.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Expanding)
-
-		# add by lyc
-		# HisotryView
-		self.voiceControl = VoiceControl("请点击按钮进行语音控制", self.context, self.signals, self)
-		self.addDockWidget(Qt.RightDockWidgetArea, self.voiceControl)
-		self.voiceControl.setSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum)
 
 	def restoreFocus(self):
 
@@ -232,9 +218,10 @@ class MainWindow(QtWidgets.QMainWindow):
 					'选择一张图片',
 					"./images/demoimg",
 					self.context.getText("dialog_open", "images") + u" (*.bmp *.gif *.png *.xpm *.jpg);;" + self.context.getText("dialog_open", "all_files") + u" (*)")
-		if(filename):
-			self.context.currentImage().loadDemoFromFile(filename)
-		self.signals.updateCanvas.emit()
+		if filename is not None and len(filename[0])>0:
+			print(filename)
+			self.context.loadImage(filename)
+			self.signals.updateCanvas.emit()
 
 	def saveResultImg(self):
 		self.saveFile()
@@ -265,9 +252,7 @@ class MainWindow(QtWidgets.QMainWindow):
 			self.signals.resizeCanvas.emit()
 
 	def showHelp(self):
-		url = QtCore.QUrl(os.path.abspath('doc/index.html').replace('\\', '/'))
-		if not QtGui.QDesktopServices.openUrl(url):
-			QtWidgets.QMessageBox.warning(self,"帮助","打开帮助文档失败")
+		pass
 
 	def setPixelGrid(self):
 

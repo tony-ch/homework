@@ -780,10 +780,12 @@ class Canvas(QtWidgets.QLabel):
 		painter.end()
 
 	def reset(self):
-		self.context.currentImage().reset()
-		self.signals.updateCanvas.emit()
+		if self.context.imagePos == self.index:
+			self.image().reset()
+			self.signals.updateCanvas.emit()
 
 	def submit(self):
-		self.context.currentImage().submit()
-		#self.context.showFg=False
-		self.signals.updateCanvas.emit()
+		if self.context.imagePos == self.index:
+			self.image().submit()
+			#self.context.showFg=False
+			self.signals.updateCanvas.emit()

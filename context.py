@@ -16,11 +16,14 @@ class Context:
 		self.signals = signals
 
 		self.palette = []
-		self.defaultPalette = [
-			[9, 125, 3], [5, 244, 193], [89, 14, 15], [32, 160, 191], [154, 165, 190], [255, 0, 0], [150, 66, 146]
-		]
+		# self.defaultPalette = [
+		# 	[9, 125, 3], [5, 244, 193], [89, 14, 15], [32, 160, 191]
+		# ]
+		self.defaultPalette = [ [247, 176, 114], [14, 53, 75], [30, 85, 55], [184, 37, 53] ]
+		self.defaultPalette = [ [180,120,120],      [6,230,230],      [4,200,3] ,[80,50,50], [254,85,0], [0,0,85]]
+		
 
-		self.paletteText = ['树','草','门','天空','云','砖块','塔尖']
+		self.paletteText = ['1','2','3','4','5','6']
 		# self.defaultPalette = [[14, 53, 75], [0, 76, 115], [18, 121, 174], [49, 162, 238], [136, 199, 234], [27, 52, 43],
 		# 					  [30, 85, 55], [69, 145, 26], [121, 191, 29], [190, 222, 44], [69, 18, 18], [113, 31, 31],
 		# 					  [184, 37, 53], [220, 81, 115], [255, 159, 182], [39, 20, 67], [105, 28, 99], [173, 81, 185],
@@ -53,9 +56,8 @@ class Context:
 		self.loadDefaults()
 
 	def newImage(self, width, height, bg):
-
 		self.images.append(Image.newImage(width, height, bg, self))
-		self.image = len(self.images) - 1
+		self.imagePos = len(self.images) - 1
 
 		print("newImage")
 
@@ -64,7 +66,7 @@ class Context:
 	def loadImage(self, fileName):
 
 		self.images.append(Image.fromFile(fileName, self))
-		self.image = len(self.images) - 1
+		self.imagePos = len(self.images) - 1
 
 		self.signals.newImage.emit()
 
@@ -79,13 +81,13 @@ class Context:
 
 	def currentImage(self):
 		if len(self.images) > 0:
-			return self.images[self.getCurrentImagePos()]
+			return self.images[self.imagePos]
 		return None
 
 	def currentQImage(self):
 
 		if self.imagePos != -1:
-			return self.images[self.getCurrentImagePos()].image
+			return self.images[self.imagePos].image
 		return None
 
 	def getImagePos(self, index):
@@ -225,6 +227,10 @@ class Context:
 		self.showFg = True
 		self.showBg = True
 		self.showOri = False
+		self.para_mode = 'cg_mg'
+		self.para_beta = 130
+		self.para_alpha = 0.8
+		self.para_usegray = False
 
 	def loadDefaultsPalette(self):
 
@@ -277,12 +283,12 @@ class Context:
 
 	def loadDefaultsPencil(self):
 
-		self.pencilSize = self.getIntDefault("pencil", "size", 10)
+		self.pencilSize = self.getIntDefault("pencil", "size", 5)
 		self.secondaryColorEraser = self.getBoolDefault("pencil", "secondary_color_eraser", False)
 
 	def loadDefaultsEraser(self):
 
-		self.eraserSize = self.getIntDefault("eraser", "size", 10)
+		self.eraserSize = self.getIntDefault("eraser", "size", 5)
 
 	def saveDefaults(self):
 		return

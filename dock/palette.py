@@ -151,7 +151,7 @@ class Palette (QtWidgets.QWidget):
 		self.setObjectName("Palette")
 
 		palette = QtWidgets.QGridLayout()
-		for i in range(7):
+		for i in range(len(self.context.defaultPalette)):
 			palette.addWidget(Color(i, self.context.paletteText[i] ,self.context.palette[i], self.context, self.signals), i//2, i%2)
 			"""
 			if i > 1:
@@ -162,7 +162,7 @@ class Palette (QtWidgets.QWidget):
 		palette.setSpacing(1)
 
 		hbox = QtWidgets.QHBoxLayout()
-		currentColorLabel = QtWidgets.QLabel("当前纹理")
+		currentColorLabel = QtWidgets.QLabel("当前选择")
 		currentColorLabel.setAlignment(Qt.AlignCenter)
 		hbox.addWidget(currentColorLabel)
 		hbox.addWidget(CurrentColor(True, self.context, self.signals))

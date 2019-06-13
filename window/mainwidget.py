@@ -26,7 +26,7 @@ class MainWidget(QtWidgets.QTabWidget):
 		self.setTabBar(self.tabBar)
 		# self.tabBar.middleClicked.connect(self.closeTab)
 
-		self.setTabsClosable(False)
+		self.setTabsClosable(True)
 
 		self.widgets = []
 
@@ -43,8 +43,8 @@ class MainWidget(QtWidgets.QTabWidget):
 		#add by lyc : to hidden the scroll bar
 		# scrollArea.horizontalScrollBar().setVisible(False)
 		# scrollArea.verticalScrollBar().setVisible(False)
-		scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-		scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		# scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+		# scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 		self.widgets.append(scrollArea)
 		self.addTab(scrollArea, "Image" + str(self.count()+1))
 		self.setCurrentIndex(self.count()-1)

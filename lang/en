@@ -166,8 +166,9 @@ help = 帮助
 # --------------------
 
 [dock_widgets]
-palette = 纹理选项
+palette = 画笔选项
 tool_properties = 工具选项
+para_properties = 参数选项
 preview = 预览
 
 # -----------------------
